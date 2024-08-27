@@ -5,6 +5,7 @@ import {User} from './models/model.js';
 import rateLimit from 'express-rate-limit';
 import { body, validationResult } from 'express-validator';
 import jwt from 'jsonwebtoken';
+import authMiddleware from './middleAuthentication/authMiddleware.js';
 const app = express();
 
 app.use(express.json());
@@ -141,6 +142,9 @@ app.get('/weblog/userLogin',loginLimiter, [
         })
     }
 })
+
+
+
 app.listen((port), () => console.log("App is running On ", port));
 
 
