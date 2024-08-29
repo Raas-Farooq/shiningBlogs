@@ -1,12 +1,13 @@
-import jwt from 'jsonwebtoken';
+import jwt, {decode} from 'jsonwebtoken';
 
-const authMiddleware = async(req,res) => {
-    const token = req.header("Authorization")?.replace('Bearer ', ' ');
+const authMiddleware = async(req,res, next) => {
+    const token = req.header("Authorization")?.replace('Bearer ', '');
 
     if(!token) return res.status(404).json({success:false, message:"Unable to get Token Bearer"});
 
     try{
-        jwt.verify(token, process.env.JWT_SECRET);
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        req.user = decoded.user;
         next()
     }
     catch(err){

@@ -27,5 +27,28 @@ const usersSchema = new mongoose.Schema({
 
 const User = mongoose.model('User', usersSchema)
 
+const blogSchema = new mongoose.Schema({
+    userId:{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:'User'
+    },
+    title:{
+        type:String,
+        required:true
+    },
+    content:[{
+        type:{type:String, enum:['text', 'image', 'video']},
+        value:String,
+        url:String
+    }],
+    createdAt:{
+        type:Date,
+        default:Date.now
+    }
+}, {
+    timestamps:true,
+    collection:'Blogs'
+})
 
-export {User}
+const Blog = mongoose.model('blog', blogSchema)
+export {User, Blog}
