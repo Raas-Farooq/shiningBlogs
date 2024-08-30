@@ -36,6 +36,11 @@ const blogSchema = new mongoose.Schema({
         type:String,
         required:true
     },
+    titleImage:{
+        type:String,
+        required:true
+    },
+    
     content:[{
         type:{type:String, enum:['text', 'image', 'video']},
         value:String,

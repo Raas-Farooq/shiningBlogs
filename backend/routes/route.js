@@ -2,7 +2,7 @@ import { ExpressValidator } from "express-validator";
 import express from 'express';
 import rateLimit from "express-rate-limit";
 import { body} from "express-validator";
-import {registerUser, logging, addBlog, updateBlogPost} from "../controllers/blogController.js";
+import {registerUser, logging, addBlog, updateBlogPost, deleteBlog} from "../controllers/blogController.js";
 import authMiddleware from "../middleAuthentication/authMiddleware.js";
 
 
@@ -30,7 +30,7 @@ router.get('/userLogin',loginLimiter, [
     body('password').notEmpty()
 ], logging)
 
-// eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NmNkODBhNzU0MjFkMTcwNDMwNTBkMDYiLCJlbWFpbCI6ImFjdGlvbkBnbWFpbC5jb20iLCJpYXQiOjE3MjQ4MzIwMTUsImV4cCI6MTcyNDgzNTYxNX0.cuq2EwJ1O-VSMYKohfYl4ayCSVNehBTZZtB-ZuWCm0A
+
 const newBlogLimiter = rateLimit({
     windowMs:15 * 60 * 1000,
     max:10,
@@ -47,7 +47,6 @@ router.post('/addBlog', newBlogLimiter, authMiddleware, [
 
 const updateLimit = rateLimit({
     windowMs:15 * 60 * 1000,
-    max:2,
     message:"Too many attempts try again later"
 })
 router.put('/updatedBlog/:id',updateLimit, authMiddleware,
@@ -60,4 +59,12 @@ router.put('/updatedBlog/:id',updateLimit, authMiddleware,
     ],
     updateBlogPost
 )
+
+const deleteLimit = rateLimit({
+    windowMs:15 * 60 * 1000,
+    max:5
+})
+router.delete('/deleteBlog/:id', deleteLimit, authMiddleware, deleteBlog);
+
+
 export default router;

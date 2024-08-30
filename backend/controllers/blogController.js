@@ -141,11 +141,6 @@ const logging =  async(req,res) => {
 
              }
             )
-        // res.status(201).json({
-        //     success:true,
-        //     message:"Successfully Logged In",
-        //     user
-        // })
     }
     // Handle server errors
     catch(err){
@@ -161,13 +156,14 @@ const logging =  async(req,res) => {
 const addBlog = async (req,res) => {
 
     console.log("AddBlog Running :",)
-    const {title, content} = req.body;
+    const {titleImage, title, content} = req.body;
     const user_id = req.user.userId;
     console.log("user _id  :", user_id)
     try{
         const newBlog = new Blog({
             userId:user_id,
             title:title,
+            titleImage,
             content:content
         })
 
@@ -210,6 +206,7 @@ const addBlog = async (req,res) => {
  */
 const updateBlogPost = async(req,res) => {
 
+    console.log("Shocked to See the Update Blog")
     // checking the validation Result
     const errs = validationResult(req);
 
@@ -223,9 +220,10 @@ const updateBlogPost = async(req,res) => {
 
     // 
     const user_id = req.user.userId;
-    const { new_title, new_content} = req.body;
+    console.log("req. body: ", req.body);
+    const { title,titleImage, content} = req.body;
     const id = req.params.id; 
-
+    console.log(`new_ title: ${title} & content: ${content}`)
     try{
         //updating a blog
 
@@ -245,10 +243,11 @@ const updateBlogPost = async(req,res) => {
             })
         }
 
-        if(new_title) blogPost.title = new_title;
-        if(new_content) blogPost.content = new_content;
+        if(title) blogPost.title = title;
+        if(content) blogPost.content = content;
+        if(titleImage) blogPost.titleImage = titleImage;
 
-        await blogPost.save();
+        const updatedBlog = await blogPost.save();
         // successfully updated the blogPost
         return res.status(200).json({
             success: true,
@@ -263,4 +262,43 @@ const updateBlogPost = async(req,res) => {
         })
     }
 }
-export {registerUser, logging, addBlog, updateBlogPost}
+
+const deleteBlog = async(req, res) => {
+    const delId = req.params.id;
+    const userId = req.user.userId;
+    console.log("delId: ", delId , " userId Authorization: ", userId);
+
+    try{
+        
+        const delBlog = await Blog.findById(delId);
+
+        if(!delBlog) {
+            return res.status(404).json({
+                success:false,
+                message:"coudn't find the Blog",
+
+            })
+        }
+
+        if(delBlog.userId.toString() !== userId){
+            return res.status(403).json({
+                success:false,
+                message:"Not an Authorized User to delete a Blog"
+            })
+        }
+
+        await Blog.findByIdAndDelete(delBlog);
+        return res.status(200).json({
+            success:true,
+            message:"Successfully Deleted the Blog",
+            
+        })                                                                                                                                                                                                                                                                                                                                                                                                   
+    }
+    catch(err){
+        return res.status(500).json({
+            success:false,
+            message:"Server error occured during deleting Process"
+        })
+    }
+}
+export {registerUser, logging, addBlog, updateBlogPost, deleteBlog}
