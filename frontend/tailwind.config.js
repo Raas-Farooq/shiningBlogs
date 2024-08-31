@@ -13,6 +13,9 @@ export default {
       padding: {
         '50': '12.5rem',
       },
+      screens:{
+        'cus': '950px'
+      }
     },
   },
   plugins: [],
