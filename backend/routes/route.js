@@ -2,7 +2,7 @@ import { ExpressValidator } from "express-validator";
 import express from 'express';
 import rateLimit from "express-rate-limit";
 import { body} from "express-validator";
-import {registerUser, logging, addBlog, updateBlogPost, deleteBlog} from "../controllers/blogController.js";
+import {registerUser, logging, addBlog, updateBlogPost, deleteBlog, updateUserProfile} from "../controllers/blogController.js";
 import authMiddleware from "../middleAuthentication/authMiddleware.js";
 
 
@@ -66,5 +66,17 @@ const deleteLimit = rateLimit({
 })
 router.delete('/deleteBlog/:id', deleteLimit, authMiddleware, deleteBlog);
 
+const updateUserLimit = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 2
+})
 
+router.put('/updateUserProfile/:id', updateUserLimit, authMiddleware,
+    [
+        body('username').isLength({min:3}).trim().escape().withMessage("Username length should be atleast 3 characters"),
+        body('email').isEmail().normalizeEmail().withMessage('Enter Valid Email Address'),
+        body('password').isLength({min:8}).withMessage("Password Length Should be More than 8 characters")
+    ],
+updateUserProfile
+)
 export default router;

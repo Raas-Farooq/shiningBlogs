@@ -23,7 +23,7 @@ const registerUser = async (req,res) => {
     try{
             
         console.log("webLog is Growing faster than Plant ");
-        const {username, email, password} = req.body;
+        const {profileImage, username, email, password} = req.body;
         console.log("webLog is Growing faster than Plant ", username, " ", email);
         const isUserExist = await User.findOne({email});
 
@@ -37,6 +37,7 @@ const registerUser = async (req,res) => {
         const protectedPassword = await bcrypt.hash(password, saltRange);
         console.log("protected Password", protectedPassword);
         const newUser = new User({
+            profileImage:profileImage,
             username: username,
             email:email,
             password:protectedPassword
@@ -66,6 +67,72 @@ const registerUser = async (req,res) => {
             })
     }
     
+}
+
+// Update User name
+
+/**
+ * 
+ * @param {Object} req - requests from user
+ * @param {Object} res - response to user  
+ * 
+ * @param {body} profileImage - title image of the user
+ * @param {body} username - name of the user 
+ */
+const updateUserProfile = async (req, res) => {
+
+    const errors = validationResult(req);
+    const userId = req.user.userId;
+    const id = req.params.id;
+
+
+    if(!errors.isEmpty()){
+        return res.status(400).json({
+            success:false,
+            message:"Not a valid data"
+        })
+    }
+    
+    const {profileImage, username, email, password} = req.body;
+    const user = await User.findById(id);
+    if(user.userId.toString() !== userId){
+        return res.status(403).json({
+            success:false,
+            message:"You are not authorized to Edit this Profile"
+        })
+    }
+
+    
+    try{
+        let updatingUser = {};
+        if(profileImage) updatingUser.profileImage = profileImage;
+        if(username) updatingUser.username = username;
+        if(email) updatingUser.email = email;
+        if(password){
+            const hashedPassword = await bcrypt.hash(password, 10);
+            updatingUser.password = hashedPassword;
+        }
+
+        const updated = await User.findByIdAndUpdate(id,
+            {
+                $set:updatingUser,
+            },
+            {new:true, runValidators:true}
+        )
+        return res.status(200).json({
+            success:true,
+            message:" User Profile Updated",
+            new_Profile:updated
+        })
+ 
+    }
+    catch(err){
+        return res.status(500).json({
+            success:false,
+            message:"Unable to Update the User",
+        })
+    }
+
 }
 
 // user Login Function
@@ -301,4 +368,4 @@ const deleteBlog = async(req, res) => {
         })
     }
 }
-export {registerUser, logging, addBlog, updateBlogPost, deleteBlog}
+export {registerUser, logging, addBlog, updateBlogPost, deleteBlog, updateUserProfile}

@@ -11,7 +11,7 @@ const databaseConnection = async() => {
         console.log("Database Connected");
         
 })
-    .catch(err => console.log("this is teh err: ", err));
+    .catch(err => console.log("Error while connection MongoDb (database): ", err));
 
     return connect
 }
