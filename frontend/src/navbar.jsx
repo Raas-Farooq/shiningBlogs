@@ -1,9 +1,6 @@
 import { useEffect, useState } from 'react';
-<<<<<<< HEAD
 import {FaBars, FaTimes, FaFacebook, FaPinterest, FaSearch, FaTwitter, FaWhatsapp, FaUser, FaRegUser} from 'react-icons/fa';
-=======
-import {FaBars, FaTimes, FaFacebook, FaPinterest, FaSearch, FaTwitter, FaWhatsapp, FaUser, FaRegUser, FaLeaf} from 'react-icons/fa';
->>>>>>> feature/frontend
+
 import { FaTwitch } from 'react-icons/fa';
 import {CiSearch} from 'react-icons/ci';
 import WindowSize from './windowSize';
@@ -50,14 +47,6 @@ export default function Navbar(){
                 <li className="px-2 ml-3 py-2" ><a href=""><FaWhatsapp /> </a></li>
             </ul>
 
-            <ul className={`md:flex mb-4 w-1/4 md:text-sm ${showMenu ? 'flex': 'hidden'}`}>
-                <li className="px-2 py-2"><a href="" className='hover:text-gray-300'> Login </a></li>
-                <li className="px-2 py-2"><a href="" className='hover:text-gray-300'> Register </a></li>
-
-                <div className={`mt-2 ${showMenu ? 'hidden': 'block'}`}>
-                <button className='text-black'> <CiSearch /> </button>
-                </div>
-            </ul>
             <ul className={`md:flex mb-4 w-1/4 md:text-sm ${showMenu ? 'flex': 'hidden'} `}>
                 <li className={`px-2 py-2 ${searchClicked ? 'hidden': 'none'} `}><a href="" className='hover:text-gray-300'> Login </a></li>
                 <li className={`px-2 py-2 ${searchClicked ? 'hidden': 'none'} `} ><a href="" className='hover:text-gray-300'> Register </a></li>
@@ -79,9 +68,7 @@ export default function Navbar(){
 
             <div className={`mt-1 ${showMenu ? 'ml-12': 'none'}`}>
                 <button className='p-2 border border-brown-400 rounded text-black'> <FaRegUser /> </button>
-                <button 
-                
-                className='p-2 border border-brown-400 rounded text-black'> <FaRegUser /> </button>
+            
             </div>
         </nav>
     )

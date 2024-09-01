@@ -3,6 +3,24 @@
   margin: 0 auto;
   /* padding: 2rem; */
 }
+/* .bgImage{
+  background-image: url('https://wallpapercave.com/wp/wp2060641.jpg');
+  background-position: center;
+  background-size: cover;
+  width:90%;
+  height:80vh;
+  margin-left: 40px;
+} */
+/* .imageContainer{
+  display: flex;
+  justify-content: center;
+} */
+.bgImage{
+  /* object-fit: cover; */
+  /* width:90%;
+  height:80vh; */
+  /* margin-left: 40px; */
+}
 /* 
 body{
   display:block !important;
