@@ -3,7 +3,7 @@ import {FaBars, FaTimes, FaFacebook, FaPinterest, FaSearch, FaTwitter, FaWhatsap
 
 import { FaTwitch } from 'react-icons/fa';
 import {CiSearch} from 'react-icons/ci';
-import WindowSize from './windowSize';
+import WindowSize from '../../windowSize';
 
 
 export default function Navbar(){
