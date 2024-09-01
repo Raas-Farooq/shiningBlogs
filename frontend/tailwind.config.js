@@ -14,7 +14,8 @@ export default {
         '50': '12.5rem',
       },
       screens:{
-        'cus': '950px'
+        'cus': '950px',
+        'xs' : '450px'
       }
     },
   },
