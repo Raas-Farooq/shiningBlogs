@@ -5,9 +5,14 @@ const AppContext = React.createContext();
 export const GlobalState = ({children}) => {
 
     const [openUserAccount, setOpenUserAccount] = useState(false);
- 
+    const [showMenu, setShowMenu] = useState(false);
+
+
     return <AppContext.Provider value={{
-        openUserAccount,setOpenUserAccount
+        openUserAccount,
+        setOpenUserAccount,
+        setShowMenu,
+        showMenu
     }}>
         {children}
     </AppContext.Provider>

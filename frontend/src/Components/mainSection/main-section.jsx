@@ -1,10 +1,12 @@
+import { useGlobalContext } from "../../globalContext/globalContext"
 
 
 const MainSection = () => {
 
+    const {openUserAccount, showMenu} = useGlobalContext();
     return (
         <>
-            <div className='flex justify-center h-full mt-20'>
+            <div className={`flex justify-center h-full ${(openUserAccount || showMenu) && 'mt-12 xs:mt-[10rem]'} `}>
                 <img 
                 src="https://wallpapercave.com/wp/wp2060641.jpg" 
                 className='w-11/12 h-[80vh] object-cover' 

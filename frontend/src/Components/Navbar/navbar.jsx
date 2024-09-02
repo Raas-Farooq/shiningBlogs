@@ -4,12 +4,13 @@ import { useGlobalContext } from '../../globalContext/globalContext';
 import { FaTwitch } from 'react-icons/fa';
 import {CiSearch} from 'react-icons/ci';
 import WindowSize from '../../windowSize';
-
+import { Link } from 'react-router-dom';
+import '../../App.css';
 
 export default function Navbar(){
 
-    const {setOpenUserAccount, openUserAccount} = useGlobalContext();
-    const [showMenu, setShowMenu] = useState(false);
+    const {setOpenUserAccount, openUserAccount, setShowMenu, showMenu} = useGlobalContext();
+    
     console.log("openUserAccount: ", openUserAccount);
     console.log("showMenu: ", showMenu);
     const [searchClicked, setSearchClicked] = useState(false);
@@ -25,7 +26,7 @@ export default function Navbar(){
         // console.log("show Menu useEffect: ", showMenu)
     }, [size.width])
     return(
-        <nav className={`flex bg-gray-300 shadow-lg text-white bg-[#FFFFFF] top-0 z-10 items-center fixed w-full justify-between ${showMenu ? 'flex-col' : 'flex'} ${showMenu &&  openUserAccount ?'flex-col fixed': 'relative'}` }> 
+        <nav className={`flex bg-gray-300 shadow-lg text-white bg-[#FFFFFF] top-0 z-10 items-center fixed w-full justify-between ${showMenu ? 'flex-col pb-[8rem] ' : 'flex'} ${showMenu &&  openUserAccount ?'flex-col fixed': 'relative'}` }> 
             
             <div className={`pl-12 pb-4 md:hidden text-black text-xl `}>
                 <button onClick={() => setShowMenu(!showMenu)} className="border border-red-200 p-2 mt-2"> {showMenu ?  <FaTimes /> : <FaBars />}</button>
@@ -38,10 +39,18 @@ export default function Navbar(){
             </div>
            
             <ul className={`md:flex mb-2 ml-10 mt-2 w-1/3 ${showMenu ? 'flex flex-col items-start mt-2 ': 'hidden'}`}>
-            <li className="px-2 ml-3 py-2 md:text-sm bg-green-300 hover:bg-green-200 md:w-auto w-24 mb-2"><a href="" className="text-gray-800 hover:text-green-600"> Home  </a></li>
-                <li className="px-2 ml-3 py-2 bg-green-300 hover:bg-green-200 md:w-auto w-24 mb-2"><a href="" className="text-gray-800 hover:text-green-600"> About  </a></li>
-                <li className="px-2 ml-3 py-2 bg-green-300 hover:bg-green-200 md:w-auto w-24 mb-2"><a href="" className="text-gray-800 hover:text-green-600"> Write  </a></li>
-                <li className="px-2 ml-3 py-2 bg-green-300 hover:bg-green-200 md:w-auto w-24 mb-2"><a href="" className="text-gray-800 hover:text-green-600"> Content  </a></li>
+                <li className=" flex">
+                   <Link to={'/'} className='px-2 ml-3 pointer py-2 bg-green-300 hover:bg-green-200 md:w-auto w-24 mb-2'>Home</Link>   
+                </li>
+                <li className=" flex">
+                   <Link to={'/about'} className='px-2 ml-3 pointer py-2 bg-green-300 hover:bg-green-200 md:w-auto w-24 mb-2'>About</Link>   
+                </li>
+                <li className=" flex">
+                   <Link to={'/write'} className='px-2 ml-3 pointer py-2 bg-green-300 hover:bg-green-200 md:w-auto w-24 mb-2'>Write</Link>   
+                </li>
+                <li className=" flex">
+                   <Link to={'/content'} className='px-2 ml-3 pointer py-2 bg-green-300 hover:bg-green-200 md:w-auto w-24 mb-2'>Content</Link>   
+                </li>
             </ul>
             
             <ul className={`md:flex mb-2 ml-5 w-1/3 md:w-1/4 ${showMenu ? 'flex-col ': 'hidden'}`}>

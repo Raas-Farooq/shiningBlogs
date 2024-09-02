@@ -9,10 +9,20 @@ body{
   width:auto !important;
   height:auto !important;
 } */
+
+.customAbout{
+  padding: 10px;
+  height: 100%;
+  width: 100%;
+  display: block;
+  z-index: 10;
+}
 #root {
   max-width: 1280px;
   margin: 0 auto;
 }
+
+
 
 .card {
   padding: 2em;
