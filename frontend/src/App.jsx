@@ -5,6 +5,8 @@ import './App.css'
 import Navbar from './Components/Navbar/navbar';
 import MainSection from './Components/mainSection/main-section';
 import BlogContent from './Components/contentSection/blog-content';
+import UserAccount from './Components/userAccount/userAccout'
+
 
 function App() {
   const [count, setCount] = useState(0)
@@ -12,6 +14,7 @@ function App() {
   return (
     <>
       <Navbar />
+      <UserAccount />
       <MainSection />
       <BlogContent />
     </>

@@ -10,7 +10,7 @@ export default function BlogContent(){
     ];
 
     return (
-        <div className="flex xs:flex-col sm:flex">
+        <div className="flex xs:flex-col sm:flex-row">
             <div className="blogsContainer xs:w-[95vw] w-[70vw] ">
                 <div className="flex flex-wrap gap-5 text-center justify-center">
                 {listArr.map((item,index) => {
@@ -50,7 +50,7 @@ export default function BlogContent(){
             </div>
 
             <div className="flex justify-center">
-                <button className="xs:block md:hidden border bg-green-400 text-center p-3 hover:bg-green-200">About Me</button>
+                <button className="xs:block sm:hidden border bg-green-400 text-center p-3 hover:bg-green-200">About Me</button>
             </div>
         </div>
     )
