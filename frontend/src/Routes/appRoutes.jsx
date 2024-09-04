@@ -16,17 +16,18 @@ const PageTransition = () => {
 
         <TransitionGroup className="page-container">
             <CSSTransition 
-            
-            timeout={500}
             key={location.key}
             classNames="slide"
+            timeout={500}
             >
-            <Routes location={location}>
-                <Route path="/" element={<App />} />
-                <Route path="/about" element={<About />} />
-                <Route path="/write" element={<Write />} />
-                <Route path="/content" element={<Content />} />
-            </Routes>
+            <div className="page-wrapper">
+                <Routes location={location}>
+                    <Route path="/" element={<App />} />
+                    <Route path="/about" element={<About />} />
+                    <Route path="/write" element={<Write />} />
+                    <Route path="/content" element={<Content />} />
+                </Routes>
+            </div>
             </CSSTransition>
         </TransitionGroup>
             

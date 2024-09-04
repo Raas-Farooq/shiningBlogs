@@ -30,6 +30,7 @@ export default function Navbar(){
             
             <div className={`pl-12 pb-4 md:hidden text-black text-xl `}>
                 <button onClick={() => setShowMenu(!showMenu)} className="border border-red-200 p-2 mt-2"> {showMenu ?  <FaTimes /> : <FaBars />}</button>
+                    
             </div> 
             <div className={` ${showMenu ? 'flex-grow ': 'hidden'}`}>
                 <input type="search" 
