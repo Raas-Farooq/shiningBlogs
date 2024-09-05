@@ -16,10 +16,9 @@ const PageTransition = () => {
 
         <TransitionGroup className="page-container">
             <CSSTransition 
-            
-            timeout={500}
             key={location.key}
             classNames="slide"
+            timeout={500}
             >
             <div className="page-wrapper">
                 <Routes location={location}>

@@ -30,6 +30,7 @@ export default function Navbar(){
             
             <div className={`pl-12 pb-4 md:hidden text-black text-xl `}>
                 <button onClick={() => setShowMenu(!showMenu)} className="border border-red-200 p-2 mt-2"> {showMenu ?  <FaTimes /> : <FaBars />}</button>
+                    
             </div> 
             <div className={` ${showMenu ? 'flex-grow ': 'hidden'}`}>
                 <input type="search" 
@@ -80,7 +81,11 @@ export default function Navbar(){
             </ul>
 
             <div className={`absolute right-4 top-3 ${showMenu && 'hidden'}  ${openUserAccount && 'hidden'}`}>
-                <button onClick={() => setOpenUserAccount(true)} className='p-2 border border-brown-400 rounded text-black'> <FaRegUser /> </button>
+                <button onClick={() => {
+                    console.log("userAccount clicked")
+                    setOpenUserAccount(true)
+                }
+                } className='p-2 border border-brown-400 rounded text-black'> <FaRegUser /> </button>
             
             </div>
         </nav>

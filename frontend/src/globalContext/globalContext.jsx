@@ -5,6 +5,7 @@ const AppContext = React.createContext();
 export const GlobalState = ({children}) => {
 
     const [openUserAccount, setOpenUserAccount] = useState(false);
+    const [editProfile, setEditProfile] = useState(false);
     const [showMenu, setShowMenu] = useState(false);
 
 
@@ -12,7 +13,9 @@ export const GlobalState = ({children}) => {
         openUserAccount,
         setOpenUserAccount,
         setShowMenu,
-        showMenu
+        showMenu,
+        editProfile,
+        setEditProfile
     }}>
         {children}
     </AppContext.Provider>
