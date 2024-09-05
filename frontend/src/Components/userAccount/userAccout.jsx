@@ -1,86 +1,82 @@
-import { useState } from "react";
-import { useGlobalContext } from "../../globalContext/globalContext"
+import { useEffect, useState } from "react";
+import { useGlobalContext } from "../../globalContext/globalContext";
 import { FaImage } from "react-icons/fa";
+import updateProfile from "../../pages/updateProfile";
+import UpdateProfile from "../../pages/updateProfile";
 
 const UserAccount = () => {
+  const { openUserAccount, setOpenUserAccount, setEditProfile,editProfile } = useGlobalContext();
+  console.log("inside user Account: openUser ",openUserAccount);
+  const [userImage, setUserImage] = useState("");
+  const [imagePreview, setImagePreview] = useState("");
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
 
-    const {openUserAccount, setOpenUserAccount} = useGlobalContext();
-    const [userImage, setUserImage] = useState('');
-    const [imagePreview, setImagePreview] = useState('');
-    const [username, setUsername] = useState('');
-    const [password, setPassword] = useState('');
+    useEffect(() => {
+        console.log("update Profile: ", editProfile)
+    }, [editProfile])
 
 
-    const handleImageSubmit = (e) => {
-        e.preventDefault();
-        console.log("handleImageSubmit: ", e.target.files[0]);
-        setUserImage(e.target.files[0]);
-
-        const preview = URL.createObjectURL(userImage);
-        setImagePreview(preview);
-        console.log("image Preview: ", imagePreview.length)
-    }
-
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        console.log("Preview after submit:", imagePreview);
-
-        console.log("Image of The User: ", userImage);
-        console.log("userName: ", username);
-        console.log("Password after submission: ", password);
-        
-    }
-    // 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
-
-    return (
-        <div className="mt-16">
-            {openUserAccount && (
-                <>
-                    <h1> UPDATE Your Profile</h1>
-                    <form className="flex flex-col p-5" method="post" >
-                        
-                        <input type="file" accept="image/*" onChange={handleImageSubmit}
-                        />
-                        
-                        
-                        
-                        {imagePreview && (
-                            
-                            <img src={imagePreview} alt="profile Image" className="w-[80px] h-[70px] p-2 m-5" />
-        
-                        )
-                        // : 
-                        // (   <div  className="p-2 m-5">
-                        //         <label> Upload Profile Picture</label>
-                        //         <div><FaImage /></div>
-                        //     </div>
-                          
-                        //     )
-                        }
-
-                        <input type="input" 
-                        name="input" 
-                        className="border border-gray-300 w-[25vw] p-2 m-5" 
-                        placeholder="Enter New Username" 
-                        onChange={(e) => setUsername(e.target.value)} />
-
-                        <input type="password" 
-                        name="password" 
-                        className="border border-gray-300 w-[25vw] p-2 m-5" 
-                        placeholder="Enter New Password" 
-                        onChange={(e) => setPassword(e.target.value)}
-                        />
-
-                        <button type="submit" onClick={handleSubmit} className="border border-gray-300 w-[15vw] p-2 m-5 bg-red-400 hover:bg-red-300 ">Update Account</button>
-
-                    </form>
-
-                    <button onClick={()=> setOpenUserAccount(false)} className="bg-green-400 border p-3 ml-8">Go Back</button>
-                </>
-            )}
-            
+  return (
+    <>
+      {openUserAccount && (
+        <div className="flex justify-center m-5 p-5 w-full">
+          <div className="">
+            <h2 className="font-extrabold "> About Raas </h2>
+            <img
+              src="https://wallpapers.com/images/hd/greenery-background-abj04ct0og086pp4.jpg"
+              alt="greenry"
+              className="w-auto md:h-h-[210px]"
+              style={{ width: "240px", height: "250px" }}
+            />
+            <div className="w-[200px] ">
+              <h2 className="font-bold mt-4"> Goal</h2>
+              <h3>
+                {" "}
+                Lorem ipsum dolor sit amet consectetur adipisicing elit. Maxime,
+                nobis tempore! Ea odit officiis laborum mollitia in accusantium,
+                magni veritatis, quae tenetur vero reprehenderit voluptas at non
+                nemo dolor ducimus?
+              </h3>
+            </div>
+            <div className="w-[300px] ">
+              <h3 className="text-bold text-lg font-bold mt-4 text-center border-t border-blue-400">
+                {" "}
+                Interest{" "}
+              </h3>
+              <span className="border-t border-blue-400"></span>
+              <div>
+                <h5>Religions</h5>
+                <h5>Islam</h5>
+                <h5>International Politics</h5>
+                <h5>Technology</h5>
+                <h5>Innovation</h5>
+              </div>
+            </div>
+          </div>
+          <div className="mt-5">
+            <button onClick={() => setOpenUserAccount(false)}
+            className="p-2 border bg-green-400 mr-2 hover:bg-green-300 text-white text-bolder xs:mb-4">
+              {" "}
+              Back To Home{" "}
+            </button>
+            <button 
+            onClick={() => {
+                console.log("edit Profile clicked"),
+                setOpenUserAccount(false);
+                setEditProfile(true)
+                }
+            }
+            className=" border bg-green-400 hover:bg-green-300 text-white text-bolder p-2">
+              {" "}
+              Edit Profile{" "}
+            </button>
+          </div>
         </div>
-    )
-}
+      )}
+      
+    </>
+  );
+};
 
-export default UserAccount
+export default UserAccount;

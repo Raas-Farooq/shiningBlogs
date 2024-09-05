@@ -6,15 +6,19 @@ import Navbar from './Components/Navbar/navbar';
 import MainSection from './Components/mainSection/main-section';
 import BlogContent from './Components/contentSection/blog-content';
 import UserAccount from './Components/userAccount/userAccout'
-
+import UpdateProfile from './pages/updateProfile';
 
 function App() {
-  const [count, setCount] = useState(0)
+
 
   return (
     <>
+      {/* {currentState === 'Navbar' && <Navbar />}
+      {currentState === 'UserAccount' && <UserAccount />} */}
       <Navbar />
       <UserAccount />
+      <UserAccount />
+      <UpdateProfile />
       <MainSection />
       <BlogContent />
     </>
