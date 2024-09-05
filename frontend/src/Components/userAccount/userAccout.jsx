@@ -13,8 +13,9 @@ const UserAccount = () => {
 
     const handleImageSubmit = (e) => {
         e.preventDefault();
-        console.log("handleImageSubmit: ", e.target.files[0]);
-        setUserImage(e.target.files[0]);
+        const new_file = e.target.files[0];
+        console.log("new file: ", new_file);
+        setUserImage(new_file);
 
         const preview = URL.createObjectURL(userImage);
         setImagePreview(preview);

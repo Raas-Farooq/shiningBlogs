@@ -21,12 +21,14 @@ const PageTransition = () => {
             key={location.key}
             classNames="slide"
             >
-            <Routes location={location}>
-                <Route path="/" element={<App />} />
-                <Route path="/about" element={<About />} />
-                <Route path="/write" element={<Write />} />
-                <Route path="/content" element={<Content />} />
-            </Routes>
+            <div className="page-wrapper">
+                <Routes location={location}>
+                    <Route path="/" element={<App />} />
+                    <Route path="/about" element={<About />} />
+                    <Route path="/write" element={<Write />} />
+                    <Route path="/content" element={<Content />} />
+                </Routes>
+            </div>
             </CSSTransition>
         </TransitionGroup>
             
