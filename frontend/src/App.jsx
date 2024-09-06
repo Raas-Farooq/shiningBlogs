@@ -16,9 +16,6 @@ function App() {
       {/* {currentState === 'Navbar' && <Navbar />}
       {currentState === 'UserAccount' && <UserAccount />} */}
       <Navbar />
-      <UserAccount />
-      <UserAccount />
-      <UpdateProfile />
       <MainSection />
       <BlogContent />
     </>

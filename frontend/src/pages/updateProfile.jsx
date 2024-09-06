@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useGlobalContext } from "../globalContext/globalContext";
-
+import { Link } from "react-router-dom";
 import { FaImage } from "react-icons/fa";
 
 const UpdateProfile = () => {
@@ -34,7 +34,7 @@ const UpdateProfile = () => {
     
     return (
         <div className="mt-16">
-            {editProfile && (
+            {/* {editProfile && ( */}
                 <>
                     <h1> UPDATE Your Profile</h1>
                     <form className="flex flex-col p-5" method="post" >
@@ -72,9 +72,11 @@ const UpdateProfile = () => {
 
                     </form>
 
-                    <button onClick={()=> setEditProfile(false)} className="bg-green-400 border p-3 ml-8">Go Back</button>
+                    <button onClick={()=> setEditProfile(false)} ><Link 
+                    className="bg-green-400 border p-3 ml-8"
+                    to="/userAccount">Go Back </Link></button>
                 </>
-            )}
+            {/* )} */}
             
         </div>
     )

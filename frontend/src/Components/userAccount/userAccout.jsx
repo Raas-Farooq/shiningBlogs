@@ -5,6 +5,7 @@ import { FaImage } from "react-icons/fa";
 =======
 import { useEffect, useState } from "react";
 import { useGlobalContext } from "../../globalContext/globalContext";
+import { Link } from "react-router-dom";
 import { FaImage } from "react-icons/fa";
 import updateProfile from "../../pages/updateProfile";
 import UpdateProfile from "../../pages/updateProfile";
@@ -13,10 +14,6 @@ import UpdateProfile from "../../pages/updateProfile";
 const UserAccount = () => {
   const { openUserAccount, setOpenUserAccount, setEditProfile,editProfile } = useGlobalContext();
   console.log("inside user Account: openUser ",openUserAccount);
-  const [userImage, setUserImage] = useState("");
-  const [imagePreview, setImagePreview] = useState("");
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
 
 <<<<<<< HEAD
     const {openUserAccount, setOpenUserAccount} = useGlobalContext();
@@ -105,7 +102,6 @@ const UserAccount = () => {
 
   return (
     <>
-      {openUserAccount && (
         <div className="flex justify-center m-5 p-5 w-full">
           <div className="">
             <h2 className="font-extrabold "> About Raas </h2>
@@ -141,10 +137,11 @@ const UserAccount = () => {
             </div>
           </div>
           <div className="mt-5">
-            <button onClick={() => setOpenUserAccount(false)}
-            className="p-2 border bg-green-400 mr-2 hover:bg-green-300 text-white text-bolder xs:mb-4">
-              {" "}
-              Back To Home{" "}
+            <button onClick={() => setOpenUserAccount(false)}>
+             <Link className="p-2 border bg-green-400 mr-2 hover:bg-green-300 text-white text-bolder xs:mb-4"
+             to="/"
+             >Back To Home </Link>
+              
             </button>
             <button 
             onClick={() => {
@@ -153,15 +150,20 @@ const UserAccount = () => {
                 setEditProfile(true)
                 }
             }
-            className=" border bg-green-400 hover:bg-green-300 text-white text-bolder p-2">
-              {" "}
-              Edit Profile{" "}
+            >
+              <Link className=" border bg-green-400 hover:bg-green-300 text-white text-bolder p-2 xs:"
+              to={"/updateProfile"}>
+                Edit Profile</Link>  
             </button>
           </div>
+<<<<<<< HEAD
 >>>>>>> feature/blogContent
         </div>
       )}
       
+=======
+        </div>    
+>>>>>>> feature/blogContent
     </>
   );
 };
