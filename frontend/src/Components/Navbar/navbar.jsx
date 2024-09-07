@@ -17,13 +17,11 @@ export default function Navbar(){
     const size = WindowSize();
 
     useEffect(() => {
-        // console.log("window.innerWidth: ", window.innerWidth);
         if(size.width > 768){
             console.log("WindowSize.width :", size.width);
             setShowMenu(false);
             setSearchClicked(false)
         }
-        // console.log("show Menu useEffect: ", showMenu)
     }, [size.width])
     return(
         <nav className={`flex bg-[#5D62FF]-300 shadow-lg text-white bg-[#FFFFFF] top-0 z-10 items-center fixed w-full justify-between ${showMenu ? 'flex-col pb-[8rem] ' : 'flex'} ${showMenu &&  openUserAccount ?'flex-col fixed': 'relative'}` }> 
@@ -61,11 +59,11 @@ export default function Navbar(){
                 <li className="px-2 ml-3 py-2" ><a href=""><FaWhatsapp /> </a></li>
             </ul>
 
-            <ul className={`md:flex mb-2 w-1/3 md:text-sm ${showMenu ? 'flex': 'hidden'} ${!loggedIn && 'md:text-larger ml-12 xs:flex'}`}>
-                <li className={`px-2 py-2 ${searchClicked ? 'hidden': 'none'} `}><a href="" className='hover:text-gray-300'> Login </a></li>
-                <li className={`px-2 py-2 ${searchClicked ? 'hidden': 'none'} `} ><a href="" className='hover:text-gray-300'> Register </a></li>
+            <ul className={`md:flex mb-2 w-1/3 md:text-sm ${showMenu ? 'flex': 'hidden'} ${!loggedIn && 'md:text-xl ml-12 xs:flex'}`}>
+                <li className={`${searchClicked || loggedIn ? 'hidden': 'none'} `}><Link to={"/login"} className='px-2 py-2 hover:text-gray-300'> Login </Link></li>
+                <li className={` ${searchClicked || loggedIn ? 'hidden': 'none'} `} ><Link to={"/registerUser"} className='px-2 py-2 hover:text-gray-300'> Register </Link></li>
 
-                <div className={`mt-2 xs:hidden lg:block ${showMenu ? 'hidden': 'block'} ${searchClicked ? 'block md:block' : 'md:hidden'}`}>
+                <div className={`mt-2 lg:block ${showMenu ? 'hidden': 'block'} ${searchClicked || loggedIn && !showMenu ? 'xs:block' : 'xs:hidden'}`}>
                     <input type="search" 
                     id="search" 
                     placeholder='Search Blog' 
@@ -76,11 +74,11 @@ export default function Navbar(){
                     console.log("Search is Growing ", searchClicked)
                     setSearchClicked(!searchClicked)}
                 }
-                className={`lg:hidden text-black p-2 px-3 bg-none ${showMenu && 'hidden'}`}> <CiSearch /> </button>
+                className={`lg:hidden text-black p-2 px-3 bg-none ${showMenu && 'hidden'} ${loggedIn && 'xs:hidden'}`}> <CiSearch /> </button>
                 
             </ul>
 
-            <div className={` xs:hidden ${showMenu  || !loggedIn ? 'hidden' : 'md:block'} `}>
+            <div className={`${showMenu  || !loggedIn ? 'xs:hidden' : 'xs:block'} `}>
                 <button 
                 onClick={() => {
                     console.log("userAccount clicked")
