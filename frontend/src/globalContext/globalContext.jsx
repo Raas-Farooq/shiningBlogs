@@ -7,7 +7,7 @@ export const GlobalState = ({children}) => {
     const [openUserAccount, setOpenUserAccount] = useState(false);
     const [editProfile, setEditProfile] = useState(false);
     const [showMenu, setShowMenu] = useState(false);
-    const [loggedIn, setLoggedIn] = useState(true);
+    const [loggedIn, setLoggedIn] = useState(false);
 
 
     return <AppContext.Provider value={{
