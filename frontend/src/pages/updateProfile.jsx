@@ -2,8 +2,9 @@ import { useState } from "react";
 import { useGlobalContext } from "../globalContext/globalContext";
 import { Link } from "react-router-dom";
 import { FaImage } from "react-icons/fa";
+import axios from 'axios';
 
-const UpdateProfile = () => {
+const UpdateProfile = async () => {
 
     const {openUserAccount,editProfile,setEditProfile, setOpenUserAccount} = useGlobalContext();
     const [userImage, setUserImage] = useState('');
@@ -22,14 +23,25 @@ const UpdateProfile = () => {
         console.log("image Preview: ", imagePreview.length)
     }
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log("Preview after submit:", imagePreview);
+        const formInfo = new FormData();
 
-        console.log("Image of The User: ", userImage);
-        console.log("userName: ", username);
-        console.log("Password after submission: ", password);
+        if(username) formInfo.append(('username'), username);
+        if(userImage) formInfo.append('profileImg', userImage);
+        if(password) formInfo.append('password',password)
         
+        const id="this is the Id";
+        try{
+            const response = await axios.put(`http://localhost:3800/weblog/updateUserProfile${id}`, formInfo, {
+                headers:{
+                    "Content-Type":"multipart/form-data"
+                }
+            })
+            console.log("successfully sent Data: ", response.data);
+        }catch(err){
+            console.log("err: ", err);
+        }
     }
     
     return (

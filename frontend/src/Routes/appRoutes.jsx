@@ -8,6 +8,8 @@ import Content from "../pages/content"
 import { CSSTransition, Transition, TransitionGroup } from "react-transition-group"
 import UserAccount from "../Components/userAccount/userAccout"
 import UpdateProfile from "../pages/updateProfile"
+import Register from "../pages/register"
+import Login from "../pages/login"
 
 
 
@@ -29,8 +31,9 @@ const PageTransition = () => {
                     <Route path="/write" element={<Write />} />
                     <Route path="/content" element={<Content />} />
                     <Route path="/userAccount" element={<UserAccount />} />
-                    <Route path="/updateProfile" element={<UpdateProfile />} />
-                    
+                    <Route path="/updateProfile" element={<UpdateProfile />} /> 
+                    <Route path="/registerUser" element ={<Register />} />   
+                    <Route path="/login" element ={<Login />} /> 
                 </Routes>
             </div>
             </CSSTransition>

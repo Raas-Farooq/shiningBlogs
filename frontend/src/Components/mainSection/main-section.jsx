@@ -1,8 +1,5 @@
 import { useGlobalContext } from "../../globalContext/globalContext"
 
-// WHY NOT USER ACCOUNT DISPLAY CENTER
-// WHY THE HERO CONTENT VISIBLE TOF OF USERaCCOUNT
-// HOW CAN ONLY SHOW THE INTENDED PAGE AND HIDE OTHER
 
 const MainSection = () => {
 
