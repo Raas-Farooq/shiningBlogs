@@ -23,7 +23,7 @@ const registerUser = async (req,res) => {
     try{
             
         console.log("webLog is Growing faster than Plant ");
-        const {profileImage, username, email, password} = req.body;
+        const {username, email, password} = req.body;
         console.log("webLog is Growing faster than Plant ", username, " ", email);
         const isUserExist = await User.findOne({email});
 
@@ -37,7 +37,6 @@ const registerUser = async (req,res) => {
         const protectedPassword = await bcrypt.hash(password, saltRange);
         console.log("protected Password", protectedPassword);
         const newUser = new User({
-            profileImage:profileImage,
             username: username,
             email:email,
             password:protectedPassword
