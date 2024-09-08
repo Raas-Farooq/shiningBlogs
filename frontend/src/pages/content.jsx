@@ -1,8 +1,13 @@
+import { useEffect } from "react";
 import { Link } from "react-router-dom";
 
 
 export default function Content() {
 
+    useEffect(() => {
+        console.log("Content useEffect ran");
+        fetch(`http://localhost:4100/`)
+    }, [])
 
     return(
         <div className="page-content">

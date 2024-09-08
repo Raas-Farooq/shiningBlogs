@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import { FaImage } from "react-icons/fa";
 import axios from 'axios';
 
-const UpdateProfile = async () => {
+const UpdateProfile = () => {
 
     const {openUserAccount,editProfile,setEditProfile, setOpenUserAccount} = useGlobalContext();
     const [userImage, setUserImage] = useState('');
@@ -46,7 +46,6 @@ const UpdateProfile = async () => {
     
     return (
         <div className="mt-16">
-            {/* {editProfile && ( */}
                 <>
                     <h1> UPDATE Your Profile</h1>
                     <form className="flex flex-col p-5" method="post" >
@@ -88,7 +87,6 @@ const UpdateProfile = async () => {
                     className="bg-green-400 border p-3 ml-8"
                     to="/userAccount">Go Back </Link></button>
                 </>
-            {/* )} */}
             
         </div>
     )

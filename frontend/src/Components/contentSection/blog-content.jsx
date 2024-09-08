@@ -15,7 +15,7 @@ export default function BlogContent(){
                 <div className="flex flex-wrap gap-5 text-center justify-center">
                 {listArr.map((item,index) => {
                     return (
-                        <div className="flex flex-col">
+                        <div key={index} className="flex flex-col">
                             <h2 key={index} className="ml-3 p-4 text-xl"> {item.name} </h2>
                             <img src={item.image} className="w-[260px] h-[210px] object-cover" alt={item.name} /> 
                             <h2 className="ml-3 p-4 text-xl"> {item.goal} </h2>                       

@@ -74,7 +74,7 @@ const Register = () => {
                 password
             }
             try{
-                const registerResponse = await axios.post(`http://localhost:3800/weblog/registerUser`, registrationData);
+                const registerResponse = await axios.post(`http://localhost:4100/weblog/registerUser`, registrationData);
 
                 console.log("successfully got response during registration: ", registerResponse);
 

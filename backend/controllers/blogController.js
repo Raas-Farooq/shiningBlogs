@@ -95,10 +95,11 @@ const updateUserProfile = async (req, res) => {
     const {profileImage, username, email, password} = req.body;
     const user = await User.findById(id);
     if(user.userId.toString() !== userId){
-        return res.status(403).json({
-            success:false,
-            message:"You are not authorized to Edit this Profile"
-        })
+        return res.status(403).json(
+            {
+                success:false,
+                message:"You are not authorized to Edit this Profile"
+            })
     }
 
     

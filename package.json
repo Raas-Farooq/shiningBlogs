@@ -3,14 +3,15 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "frontend":"cd frontend && npm run dev",
+    "frontend": "cd frontend && npm run dev",
     "backend": "cd backend && npm run dev",
-    "dev":"concurrently \" npm run frontend \" \" npm run backend \" "
+    "dev": "concurrently \" npm run frontend \" \" npm run backend \" "
   },
   "author": "",
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "concurrently": "^8.2.2"
+    "concurrently": "^8.2.2",
+    "node-fetch": "^3.3.2"
   }
 }
