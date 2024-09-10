@@ -6,6 +6,10 @@ import jwt from 'jsonwebtoken';
 import authMiddleware from '../middleAuthentication/authMiddleware.js';
 
 
+// mera focus kaam or study ha .. salary itni matter nahi krti 
+// allah ka shukr ha nazam chal raha  ha 
+// allah ka shukr ha system chal raha ha mere kharacha chal raha ha sath sath study b ho rahi ha
+// 
 
 
 const registerUser = async (req,res) => {
@@ -22,9 +26,7 @@ const registerUser = async (req,res) => {
 
     try{
             
-        console.log("webLog is Growing faster than Plant ");
         const {username, email, password} = req.body;
-        console.log("webLog is Growing faster than Plant ", username, " ", email);
         const isUserExist = await User.findOne({email});
 
         if (isUserExist){
@@ -35,7 +37,6 @@ const registerUser = async (req,res) => {
         }
         const saltRange = 10;
         const protectedPassword = await bcrypt.hash(password, saltRange);
-        console.log("protected Password", protectedPassword);
         const newUser = new User({
             username: username,
             email:email,
@@ -49,14 +50,36 @@ const registerUser = async (req,res) => {
            console.log("newUserObject", newUserObject);
 
            delete newUserObject.password;
+            jwt.sign({user: {userId:newUserObject._id, email:newUserObject.email}}, 
+            process.env.JWT_SECRET, 
+            {expiresIn:'1h'},
+            (err,token) => {
+                if(err){
+                    return res.status(500).json({
+                        success: false,
+                        message: "Error while signing the token",
+                    });
+                }
 
-            res.status(201).json({
-                success:true,
-                message:"User Has been added",
-                
-            })
-        
-        
+                res.cookie('token', token, {
+                    httpOnly:true,
+                    secure:process.env.NODE_ENV === 'production',
+                    maxAge:3600000,
+                    sameSite:'Strict'
+
+                })
+                res.status(201).json({
+                    success:true,
+                    message:"User Has been added",
+                    newUser:{
+                        username: newUserObject.username,
+                        email:newUserObject.email,
+                        _id: newUserObject._id,
+                    }
+                    
+                })
+            }
+        )
     }
     catch(err){
             res.status(500).json({
@@ -83,7 +106,7 @@ const updateUserProfile = async (req, res) => {
     const errors = validationResult(req);
     const userId = req.user.userId;
     const id = req.params.id;
-
+    console.log("User Profile Update Wanted to Change")
 
     if(!errors.isEmpty()){
         return res.status(400).json({
@@ -92,7 +115,8 @@ const updateUserProfile = async (req, res) => {
         })
     }
     
-    const {profileImage, username, email, password} = req.body;
+    const {profileImage, username, email, password, interests, goal} = req.body;
+    console.log(`goal ${goal} interests ${interests} email ${email}`)
     const user = await User.findById(id);
     if(user.userId.toString() !== userId){
         return res.status(403).json(
@@ -160,6 +184,9 @@ const updateUserProfile = async (req, res) => {
 
 const logging =  async(req,res) => {
     //checking Result of Validation
+    const {email, password}= req.body;
+    console.log("Login User is Looking straight towards its Goal")
+    console.log(`email ${email} , password ${password} inside login`)
     const loginErros = validationResult(req);
     if(!loginErros.isEmpty()){
         return res.status(400).json({
@@ -171,10 +198,11 @@ const logging =  async(req,res) => {
     
     try{
 
-        const {email, password}= req.body;
+        // const {email, password}= req.body;
         // accessing User
+        
         const user = await User.findOne({email});
-
+        console.log("user: inside login ", user);
         // if user didn't exist
         if(!user) {
             return res.status(404).json({
@@ -204,7 +232,12 @@ const logging =  async(req,res) => {
                     throw(console.error)
                 }
 
-                return res.status(201).json({success:true, message:"logged in and Successfully created the token", token})
+                return res.status(201).json({
+                    success:true, 
+                    message:"logged in and Successfully created the token",
+                    user, 
+                    token
+                })
 
              }
             )
@@ -368,4 +401,30 @@ const deleteBlog = async(req, res) => {
         })
     }
 }
-export {registerUser, logging, addBlog, updateBlogPost, deleteBlog, updateUserProfile}
+
+const allBlogs = async(req,res) => {
+    console.log("Alhamdulila, backend is running");
+    const myBlogs = await User.find({});
+    // console.log("myBlogs: ", myBlogs);
+    try{
+        if(!myBlogs.length){
+            return res.status(400).json({
+                success:false,
+                message:"no blog found"
+            })
+        }
+
+        return res.status(200).json({
+            success:true,
+            message:"Successfully accessed Blogs",
+            myBlogs
+        })
+    }
+    catch(err){
+        return res.status(500).json({
+            success:false,
+            message:"Server Error"
+        })
+    }
+}
+export {registerUser, logging, addBlog, updateBlogPost, deleteBlog, updateUserProfile, allBlogs}

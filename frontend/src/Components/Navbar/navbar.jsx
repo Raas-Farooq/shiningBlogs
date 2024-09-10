@@ -9,16 +9,18 @@ import '../../App.css';
 
 export default function Navbar(){
 
-    const {setOpenUserAccount, openUserAccount, setShowMenu, showMenu, loggedIn, setLoggedIn} = useGlobalContext();
+    const {setOpenUserAccount, openUserAccount, setShowMenu, showMenu, loggedIn, registerData} = useGlobalContext();
     
-    console.log("openUserAccount: ", openUserAccount);
-    console.log("showMenu: ", showMenu);
+    // console.log("openUserAccount: ", openUserAccount);
+    // console.log("showMenu: ", showMenu);
     const [searchClicked, setSearchClicked] = useState(false);
     const size = WindowSize();
 
     useEffect(() => {
+        console.log("LOGGED IN: ", loggedIn);
         if(size.width > 768){
-            console.log("WindowSize.width :", size.width);
+            // console.log("WindowSize.width :", size.width);
+            // console.log("register Data: ", registerData)
             setShowMenu(false);
             setSearchClicked(false)
         }

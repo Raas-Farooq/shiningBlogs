@@ -2,7 +2,7 @@ import { ExpressValidator } from "express-validator";
 import express from 'express';
 import rateLimit from "express-rate-limit";
 import { body} from "express-validator";
-import {registerUser, logging, addBlog, updateBlogPost, deleteBlog, updateUserProfile} from "../controllers/blogController.js";
+import {registerUser, logging, addBlog, updateBlogPost, deleteBlog, updateUserProfile, allBlogs} from "../controllers/blogController.js";
 import authMiddleware from "../middleAuthentication/authMiddleware.js";
 
 
@@ -25,10 +25,12 @@ const loginLimiter = rateLimit({
     max:5
 })
 
-router.get('/userLogin',loginLimiter, [
+router.post('/userLogin',loginLimiter, [
     body('email').isEmail().normalizeEmail(),
     body('password').notEmpty()
-], logging)
+], logging), async(req,res) => {
+    console.log("req. email: ", req.body.email)
+}
 
 
 const newBlogLimiter = rateLimit({
@@ -71,12 +73,15 @@ const updateUserLimit = rateLimit({
     max: 2
 })
 
-router.put('/updateUserProfile/:id', updateUserLimit, authMiddleware,
+router.put('/updateUserProfile', updateUserLimit, authMiddleware,
     [
         body('username').isLength({min:3}).trim().escape().withMessage("Username length should be atleast 3 characters"),
-        body('email').isEmail().normalizeEmail().withMessage('Enter Valid Email Address'),
         body('password').isLength({min:8}).withMessage("Password Length Should be More than 8 characters")
     ],
 updateUserProfile
 )
+
+router.get('/getAllBlogs', allBlogs);
+
+
 export default router;

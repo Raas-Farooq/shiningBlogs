@@ -10,21 +10,24 @@ import UserAccount from "../Components/userAccount/userAccout"
 import UpdateProfile from "../pages/updateProfile"
 import Register from "../pages/register"
 import Login from "../pages/login"
+import { useRef } from "react"
 
 
 
 const PageTransition = () => {
     const location = useLocation();
+    const nodeRef = useRef(null);
 
     return (
 
         <TransitionGroup className="page-container">
             <CSSTransition 
-            key={location.key}
+            nodeRef={nodeRef}
+            // key={location.key}
             classNames="slide"
             timeout={500}
             >
-            <div className="page-wrapper">
+            <div className="page-wrapper" ref={nodeRef}>
                 <Routes location={location}>
                     <Route path="/" element={<App />} />
                     <Route path="/about" element={<About />} />

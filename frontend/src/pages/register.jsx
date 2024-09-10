@@ -1,26 +1,34 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useGlobalContext } from "../globalContext/globalContext";
-import { Link } from "react-router-dom";
+import { Link, Navigate, useNavigate } from "react-router-dom";
 import { FaImage } from "react-icons/fa";
 import axios from "axios";
 
 const Register = () => {
-    const {openUserAccount,editProfile,setEditProfile, setOpenUserAccount} = useGlobalContext();
-    // const [userImage, setUserImage] = useState('');
-    // const [imagePreview, setImagePreview] = useState('');
-    
+    const {setLoggedIn, setRegisterData, loggedIn} = useGlobalContext();
+
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [errors, setErrors] = useState({});
     const [confirmMessage, setConfirmMessage] = useState('');
 
+    const navigateTo = useNavigate();
     
     const validEmail = (email_text) => {
         const emailTest = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
         return emailTest.test(email_text);
     } 
 
+    useEffect(() => {
+        if(loggedIn){
+            navigateTo("/")
+        };
+        // if(errors){
+        //     console.log("server Errors: ", errors);
+        // }
+        
+    }, [loggedIn])
     const validateRegistration = () => {
         let errors = {};
         if(!username){
@@ -56,30 +64,62 @@ const Register = () => {
         console.log(Object.keys(validationResult).length === 0);
 
         if(Object.keys(validationResult).length === 0){
-            alert("Success! You will find an Confirmation Email Soon")
-            
-            setEmail('');
-            setUsername('');
-            setPassword('');
             setErrors({});
-            setConfirmMessage("Your Information Submitted Successfully");
-
-            setTimeout(() => {
-                setConfirmMessage("");
-            }, 3000)
-            
             const registrationData = {
                 username,
                 email,
                 password
             }
             try{
-                const registerResponse = await axios.post(`http://localhost:4100/weblog/registerUser`, registrationData);
-
-                console.log("successfully got response during registration: ", registerResponse);
-
-            }catch(err){
-                console.log("the error while registering: ", err)
+                const registerResponse = await axios.post(`http://localhost:4100/weblog/registerUser`, 
+                registrationData,
+                {
+                    withCredentials:true
+                }
+                )
+                console.log("successfully got response during registration: ", registerResponse.data);
+                setRegisterData(registerResponse.data);
+                setLoggedIn(true);
+                alert("Success! You will find an Confirmation Email Soon")
+            
+                setEmail('');
+                setUsername('');
+                setPassword('');
+                
+                setConfirmMessage("Your Information Submitted Successfully");
+    
+                setTimeout(() => {
+                    setConfirmMessage("");
+                }, 3000)
+                
+                
+                
+                
+            }catch (err) {
+                // console.log("err.: ", err.response.data.message);
+                if (err.response) {
+                    // The request was made and the server responded with a status code
+                    // that falls out of the range of 2xx
+                    if (err.response.data && err.response.data.error) {
+                        // If the server sent validation errors
+                        const serverErrors = err.response.data.error.reduce((acc, curr) => {
+                            acc[curr.param] = curr.msg;
+                            return acc;
+                        }, {});
+                        setErrors(serverErrors);
+                    } else if (err.response.data && err.response.data.message) {
+                        // If the server sent a general error message
+                        setErrors({ general: err.response.data.message });
+                    } else {
+                        setErrors({ general: "An error occurred. Please try again." });
+                    }
+                } else if (err.request) {
+                    // The request was made but no response was received
+                    setErrors({ general: "No response from server. Please try again." });
+                } else {
+                    // Something happened in setting up the request that triggered an Error
+                    setErrors({ general: "An error occurred. Please try again." });
+                }
             }
             
         }else
@@ -93,7 +133,7 @@ const Register = () => {
     
     return (
         <div className="mt-16 flex justify-center">
-            {/* {editProfile && ( */}
+            {console.log("server Errors inside return: ", errors)}
                 <div>
                     <h1> Create New Account</h1>
                     <form className="flex flex-col p-5" method="post" >
@@ -114,7 +154,7 @@ const Register = () => {
                         value={email}
                         />
                         {errors.email && <p className="ml-5 text-red-500"> {errors.email}!</p>}
-
+                        {errors.general && <p className="ml-5 text-red-500"> {errors.general}!</p> }
 
                         <input type="password" 
                         name="password" 
@@ -124,7 +164,7 @@ const Register = () => {
                         value={password}
                         />
                         {errors.password && errors  ? <p className="ml-5 text-red-500"> {errors.password}!</p> : ''}
-                        {console.log("erros length: ", errors)}
+                      
                         <button type="submit" onClick={handleSubmit} className="border border-gray-300 w-[15vw] p-2 m-5 bg-red-400 hover:bg-red-300 ">Create Account</button>
                         {confirmMessage && <p className="text-green-600 text-lg"> {confirmMessage}</p>}
                     </form>
@@ -140,3 +180,38 @@ const Register = () => {
 }
 
 export default Register
+
+
+// try{
+//     const registerResponse = await axios.post(`http://localhost:4100/weblog/registerUser`, registrationData)
+//     console.log("successfully got response during registration: ", registerResponse.data);
+//     setRegisterData(registerResponse.data);
+//     setLoggedIn(true);
+//     alert("Success! You will find an Confirmation Email Soon")
+
+//     setEmail('');
+//     setUsername('');
+//     setPassword('');
+    
+
+// will token be receive somewhere here around 'axios or fetch' or it could be received anywhere like start of the function like here
+// "const {setLoggedIn, setRegisterData, loggedIn} = useGlobalContext();
+// // const [userImage, setUserImage] = useState('');
+// // const [imagePreview, setImagePreview] = useState('');
+// const token = req.cookies.token;
+// console.log("token from cookies: ", token);
+// const [username, setUsername] = useState('');
+// const [email, setEmail] = useState('');
+// const [password, setPassword] = useState('');
+// const [errors, setErrors] = useState({});
+// const [confirmMessage, setConfirmMessage] = useState('');
+
+// const navigateTo = useNavigate();
+
+// const validEmail = (email_text) => {
+// const emailTest = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+// return emailTest.test(email_text);
+// } 
+// "
+
+// and further now how my site won't effect after refresh. i didn't get it ?

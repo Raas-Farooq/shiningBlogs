@@ -1,3 +1,4 @@
+import axios from "axios";
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
 
@@ -6,7 +7,11 @@ export default function Content() {
 
     useEffect(() => {
         console.log("Content useEffect ran");
-        fetch(`http://localhost:4100/`)
+        
+        axios.get(`http://localhost:4100/weblog/getAllBlogs`, {timeout:3000})
+        .then(response => console.log("using axios", response.data))
+        .catch(err => console.log("err while fetching all blogs: ", err))
+
     }, [])
 
     return(

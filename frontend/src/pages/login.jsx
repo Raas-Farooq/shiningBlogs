@@ -1,27 +1,105 @@
 import { useState } from "react";
 import { useGlobalContext } from "../globalContext/globalContext";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { FaImage } from "react-icons/fa";
+import { set } from "mongoose";
+import axios from "axios";
 
 const Login = () => {
 
-    const {openUserAccount,editProfile,setEditProfile, setOpenUserAccount} = useGlobalContext();
-    
+    const {openUserAccount,editProfile,setEditProfile, setLoggedIn} = useGlobalContext();
     const [email, setEmail] = useState('');
+    const [message, setMessage] = useState('');
     const [password, setPassword] = useState('');
+    const [errors, setErrors] =useState({});
+    const navigate = useNavigate();
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        console.log("Email after submission: ", email);
-        console.log("Password after submission: ", password);
+    const emailValid = (email_text) => {
+        const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+        return regex.test(email_text);
+    }
+
+    // console.log("handle Validation outside; ", handleValidation());
+    function handleValidation(){
+        let newErrors = {};
+        console.log("email validity: ", email);
+        console.log("password : ", password);
+        if(!email){
+            newErrors.email="Email field is empty!"
+        }
         
-        setEmail('');
-        setPassword('');
+        else if(!emailValid(email)){
+            newErrors.email = "Email Should be Valid like example@gmail.com"
+        }
+        if(password.length === 0){
+            newErrors.password = "Enter Your Password! ";
+        }
+        else if(password.length < 8){
+            newErrors.password = "Password must contains minimum 8 characters"
+        }
+        return newErrors
+    }
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        const validationErrors = handleValidation();
+
+        console.log("new Way: ", validationErrors);
+        if(Object.keys(validationErrors).length > 0){
+            console.log("you have validation errors ")
+            setErrors(validationErrors);
+        }
+        else{
+            setErrors({});
+            const loginData = {
+                email,
+                password
+            }
+            
+            try{
+                const login_response = await axios.post(`http://localhost:4100/weblog/userLogin`,loginData);
+                console.log("login result: ", login_response.data);
+                setLoggedIn(true);
+                setEmail('');
+                setPassword('');
+                navigate('/');
+               
+            }catch(err){
+                console.log("err while Login: ", err.response.data.message);
+                if(err.response){
+                    if(err.response.data && err.response.data.error){
+                       const serverErr = err.response.data.errors.reduce((acc, curr) => {
+                            acc[curr.param ] = curr.msg;
+                            return acc;
+                        }, {});
+                        setErrors(serverErr)
+                    }
+                    else if(err.response.data && err.response.data.message){
+                        setErrors({general:err.response.data.message})
+                    }else {
+                        setErrors({ general: "An error occurred. Please try again." });
+                    }
+                    
+                }
+                else if(err.request){
+                    setErrors({general:"No response from the server. Try Again later!"})
+                }
+                else{
+                    setErrors({general:"An Error occurred. Try anytime Soon!"})
+                }
+            }   
+            
+        }
+ 
+        // one how to check the object is it empty or contains
+        // second you can also setErrors first then check from the errors lengt
     }
     
     return (
+
+
         <div className="mt-16 flex justify-center">
-            {/* {editProfile && ( */}
+           
                 <div>
                     <h1> Login Here</h1>
                     <form className="flex flex-col p-5" method="post" >
@@ -32,7 +110,7 @@ const Login = () => {
                         value={email}
 
                         />
-
+                        {errors.email && <p className="ml-5 text-red-500"> {errors.email}!</p>}
                         <input type="password" 
                         name="password" 
                         className="border border-gray-300 w-[25vw] p-2 m-5" 
@@ -40,9 +118,11 @@ const Login = () => {
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         />
-
+                            {errors.password && <p className="ml-5 text-red-500"> {errors.password}!</p>}
+                            {errors.general && <p className="ml-5 text-red-500"> {errors.general}!</p>}
                         <button type="submit" onClick={handleSubmit} className="border border-gray-300 w-[15vw] p-2 m-5 bg-red-400 hover:bg-red-300 ">Login</button>
-
+                        {message && <p> {message} </p>}
+                        
                     </form>
 
                     <button ><Link 

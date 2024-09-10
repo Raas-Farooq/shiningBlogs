@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 import { useGlobalContext } from "../../globalContext/globalContext";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { FaImage } from "react-icons/fa";
 import updateProfile from "../../pages/updateProfile";
 import UpdateProfile from "../../pages/updateProfile";
-
+// eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7InVzZXJJZCI6IjY2ZGQ5YTZiMDllN2VjNzNjYjEzMThmOSIsImVtYWlsIjoiaG93bXVjaEBnbWFpbC5jb20ifSwiaWF0IjoxNzI1Nzk5MDE5LCJleHAiOjE3MjU4MDI2MTl9.30d-8wrkgIIbNR5iTJs-kpjV-6fhYYMoJtO68M_My-0
 const UserAccount = () => {
-  const { openUserAccount, setOpenUserAccount, setEditProfile,editProfile } = useGlobalContext();
+  const { openUserAccount, setOpenUserAccount, setEditProfile,editProfile,setLoggedIn } = useGlobalContext();
   console.log("inside user Account: openUser ",openUserAccount);
 
     const [userImage, setUserImage] = useState('');
@@ -14,7 +14,7 @@ const UserAccount = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
 
-
+    const navigate = useNavigate();
     const handleImageSubmit = (e) => {
         e.preventDefault();
         const new_file = e.target.files[0];
@@ -36,7 +36,12 @@ const UserAccount = () => {
         
     }
     
-
+    const handleLogout = (e) => {
+      e.preventDefault();
+      console.log("handle Logout worked")
+      setLoggedIn(false); 
+      navigate("/");
+    }
     // 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
 
   return (
@@ -74,11 +79,19 @@ const UserAccount = () => {
               <h5>Innovation</h5>
             </div>
           </div>
+
+          <div>
+            <button className="border mt-3 border-blue bg-red-400 p-2 text-white hover:bg-red-200" 
+            onClick={handleLogout}>
+            LogOut
+             
+            </button>
+          </div>
         </div>
-        <div className="mt-5">
+        <div className="mt-5 xs:flex flex-col gap-5">
           <button onClick={() => setOpenUserAccount(false)}>
             <Link
-              className="p-2 border bg-green-400 mr-2 hover:bg-green-300 text-white text-bolder xs:mb-4"
+              className="p-2 border bg-green-400 mr-2 hover:bg-green-300 text-white text-bolder xs:mb-4 xs:text-sm sm:text-lg"
               to="/"
             >
               Back To Home{" "}
@@ -90,7 +103,7 @@ const UserAccount = () => {
               setEditProfile(true);
             }}
           >
-              <Link className=" border bg-green-400 hover:bg-green-300 text-white text-bolder p-2"
+              <Link className=" border bg-green-400 hover:bg-green-300 text-white text-bolder xs:mt-4 p-2"
               to={"/updateProfile"}>
                 Edit Profile</Link>  
             </button>
