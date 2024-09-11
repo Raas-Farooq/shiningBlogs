@@ -1,6 +1,6 @@
 // import BrowserRouter, {routes, Route} from 'react-router-dom';
 
-import { BrowserRouter, Route,Routes, useLocation } from "react-router-dom"
+import { BrowserRouter, Navigate, Route,Routes, useLocation } from "react-router-dom"
 import App from "../App"
 import About from "../pages/About"
 import Write from "../pages/write"
@@ -11,6 +11,7 @@ import UpdateProfile from "../pages/updateProfile"
 import Register from "../pages/register"
 import Login from "../pages/login"
 import { useRef } from "react"
+import { useGlobalContext } from "../globalContext/globalContext"
 
 
 
@@ -31,12 +32,13 @@ const PageTransition = () => {
                 <Routes location={location}>
                     <Route path="/" element={<App />} />
                     <Route path="/about" element={<About />} />
-                    <Route path="/write" element={<Write />} />
+                    <Route path="/write" element={<ProtecedRoute><Write /></ProtecedRoute>} />
                     <Route path="/content" element={<Content />} />
                     <Route path="/userAccount" element={<UserAccount />} />
                     <Route path="/updateProfile" element={<UpdateProfile />} /> 
                     <Route path="/registerUser" element ={<Register />} />   
                     <Route path="/login" element ={<Login />} /> 
+                    
                 </Routes>
             </div>
             </CSSTransition>
@@ -46,6 +48,20 @@ const PageTransition = () => {
     )
 }
 
+const ProtecedRoute = ({children}) => {
+    const {loggedIn, loading, setLoggedIn} = useGlobalContext();
+
+    if(loading){
+        return <h1> Loading.. </h1>
+    }
+
+    if(!loggedIn){
+        alert("You Should Login in order to Create Blog")
+        return <Navigate to="/login" />
+    }
+
+    return children
+}
 const AppRoutes = () => {
 
     return (

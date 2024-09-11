@@ -4,6 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { FaImage } from "react-icons/fa";
 import updateProfile from "../../pages/updateProfile";
 import UpdateProfile from "../../pages/updateProfile";
+import axios from "axios";
 // eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7InVzZXJJZCI6IjY2ZGQ5YTZiMDllN2VjNzNjYjEzMThmOSIsImVtYWlsIjoiaG93bXVjaEBnbWFpbC5jb20ifSwiaWF0IjoxNzI1Nzk5MDE5LCJleHAiOjE3MjU4MDI2MTl9.30d-8wrkgIIbNR5iTJs-kpjV-6fhYYMoJtO68M_My-0
 const UserAccount = () => {
   const { openUserAccount, setOpenUserAccount, setEditProfile,editProfile,setLoggedIn } = useGlobalContext();
@@ -36,10 +37,14 @@ const UserAccount = () => {
         
     }
     
-    const handleLogout = (e) => {
+    const handleLogout = async(e) => {
       e.preventDefault();
-      console.log("handle Logout worked")
-      setLoggedIn(false); 
+      try{
+        await axios.post('http://localhost:4100/weblog/logout', {}, {withCredentials:true});
+        setLoggedIn(false)
+      }catch(err){
+        console.log("Error while logging out ")
+      }
       navigate("/");
     }
     // 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

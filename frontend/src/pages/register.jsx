@@ -72,14 +72,10 @@ const Register = () => {
             }
             try{
                 const registerResponse = await axios.post(`http://localhost:4100/weblog/registerUser`, 
-                registrationData,
-                {
-                    withCredentials:true
-                }
+                registrationData
                 )
                 console.log("successfully got response during registration: ", registerResponse.data);
                 setRegisterData(registerResponse.data);
-                setLoggedIn(true);
                 alert("Success! You will find an Confirmation Email Soon")
             
                 setEmail('');
@@ -180,38 +176,3 @@ const Register = () => {
 }
 
 export default Register
-
-
-// try{
-//     const registerResponse = await axios.post(`http://localhost:4100/weblog/registerUser`, registrationData)
-//     console.log("successfully got response during registration: ", registerResponse.data);
-//     setRegisterData(registerResponse.data);
-//     setLoggedIn(true);
-//     alert("Success! You will find an Confirmation Email Soon")
-
-//     setEmail('');
-//     setUsername('');
-//     setPassword('');
-    
-
-// will token be receive somewhere here around 'axios or fetch' or it could be received anywhere like start of the function like here
-// "const {setLoggedIn, setRegisterData, loggedIn} = useGlobalContext();
-// // const [userImage, setUserImage] = useState('');
-// // const [imagePreview, setImagePreview] = useState('');
-// const token = req.cookies.token;
-// console.log("token from cookies: ", token);
-// const [username, setUsername] = useState('');
-// const [email, setEmail] = useState('');
-// const [password, setPassword] = useState('');
-// const [errors, setErrors] = useState({});
-// const [confirmMessage, setConfirmMessage] = useState('');
-
-// const navigateTo = useNavigate();
-
-// const validEmail = (email_text) => {
-// const emailTest = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-// return emailTest.test(email_text);
-// } 
-// "
-
-// and further now how my site won't effect after refresh. i didn't get it ?

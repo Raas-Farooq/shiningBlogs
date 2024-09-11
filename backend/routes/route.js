@@ -2,17 +2,22 @@ import { ExpressValidator } from "express-validator";
 import express from 'express';
 import rateLimit from "express-rate-limit";
 import { body} from "express-validator";
-import {registerUser, logging, addBlog, updateBlogPost, deleteBlog, updateUserProfile, allBlogs} from "../controllers/blogController.js";
+import {registerUser, logging, addBlog, updateBlogPost, deleteBlog, updateUserProfile, allBlogs, logout} from "../controllers/blogController.js";
 import authMiddleware from "../middleAuthentication/authMiddleware.js";
-
+import CheckAuthen from "../checkUserAuthen/checkAuthen.js";
 
 const router = express.Router();
 
+
+router.get('/checkAuthen', CheckAuthen);
+
 const registerLimiter= rateLimit({
     WindowMs:15 * 60 * 1000,
-    max:5
+    max:5,
+    message:"Too many attempts plz try again after 15 minutes"
 })
 
+router.post('/logout', logout);
 
 router.post('/registerUser', registerLimiter, [
     body('username').isLength({min:3}).trim().escape().withMessage('Enter at Least 3 characters'),

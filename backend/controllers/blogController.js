@@ -50,7 +50,7 @@ const registerUser = async (req,res) => {
            console.log("newUserObject", newUserObject);
 
            delete newUserObject.password;
-            jwt.sign({user: {userId:newUserObject._id, email:newUserObject.email}}, 
+            jwt.sign({user: {userId:newUserObject._id}}, 
             process.env.JWT_SECRET, 
             {expiresIn:'1h'},
             (err,token) => {
@@ -223,20 +223,29 @@ const logging =  async(req,res) => {
         // Create a JWT token for the user
         console.log("user._id: ", user._id);
         jwt.sign(
-            ({user:{userId:user._id, email:user.email}}), 
+            ({user:{userId:user._id}}), 
             process.env.JWT_SECRET,
              {expiresIn: '1h'}
              , (err, token) => {
                 if(err){
-                    console.log(' error occured ');
-                    throw(console.error)
+                    return res.status(500).json({
+                        success:false,
+                        message:"Got Error, Didn't able to sign the token!"
+                    })
                 }
-
+                res.cookie('token', token, {
+                    httpOnly:true,
+                    secure:process.env.NODE_ENV="production",
+                    maxAsge:3600000,
+                    sameSite:'Strict'
+                })
                 return res.status(201).json({
                     success:true, 
                     message:"logged in and Successfully created the token",
-                    user, 
-                    token
+           
+                    email:user.email,
+                    name:user.username,
+                    id:user.id,
                 })
 
              }
@@ -427,4 +436,12 @@ const allBlogs = async(req,res) => {
         })
     }
 }
-export {registerUser, logging, addBlog, updateBlogPost, deleteBlog, updateUserProfile, allBlogs}
+
+const logout = (req,res) => {
+    res.clearCookie('token');
+    return res.status(200).json({
+        success:true,
+        message:"Logout Successfully"
+    })
+}
+export {registerUser, logging, addBlog, updateBlogPost, deleteBlog, updateUserProfile, allBlogs, logout}

@@ -5,15 +5,21 @@ import './App.css'
 import Navbar from './Components/Navbar/navbar';
 import MainSection from './Components/mainSection/main-section.jsx';
 import BlogContent from './Components/contentSection/blog-content';
+import { useGlobalContext } from './globalContext/globalContext.jsx';
 
 function App() {
-
+  const {loading} = useGlobalContext();
 
   return (
     <>
+    {loading ? <h2> ..Loading </h2> : (
+     <>
       <Navbar />
       <MainSection />
       <BlogContent />
+     </>
+    )}
+      
     </>
   )
 }

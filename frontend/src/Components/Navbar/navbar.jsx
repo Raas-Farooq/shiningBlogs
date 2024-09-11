@@ -6,10 +6,11 @@ import {CiSearch} from 'react-icons/ci';
 import WindowSize from '../../windowSize';
 import { Link } from 'react-router-dom';
 import '../../App.css';
+import axios from 'axios';
 
 export default function Navbar(){
 
-    const {setOpenUserAccount, openUserAccount, setShowMenu, showMenu, loggedIn, registerData} = useGlobalContext();
+    const {setOpenUserAccount, openUserAccount, setShowMenu, showMenu, loggedIn, loading, setLoggedIn} = useGlobalContext();
     
     // console.log("openUserAccount: ", openUserAccount);
     // console.log("showMenu: ", showMenu);
@@ -17,14 +18,15 @@ export default function Navbar(){
     const size = WindowSize();
 
     useEffect(() => {
-        console.log("LOGGED IN: ", loggedIn);
         if(size.width > 768){
-            // console.log("WindowSize.width :", size.width);
-            // console.log("register Data: ", registerData)
+            console.log("logeed In inside navbar: ", loggedIn);
             setShowMenu(false);
             setSearchClicked(false)
         }
-    }, [size.width])
+    }, [size.width, loggedIn])
+    if(loading){
+        return <h1> Loading.. </h1>
+    }
     return(
         <nav className={`flex bg-[#5D62FF]-300 shadow-lg text-white bg-[#FFFFFF] top-0 z-10 items-center fixed w-full justify-between ${showMenu ? 'flex-col pb-[8rem] ' : 'flex'} ${showMenu &&  openUserAccount ?'flex-col fixed': 'relative'}` }> 
             

@@ -1,6 +1,6 @@
 import React, { useContext,useEffect,useState } from "react"
 const AppContext = React.createContext();
-
+import axios from 'axios';
 // cani  
 // cani@gmail.com
 // chooseyourhard
@@ -15,18 +15,56 @@ const AppContext = React.createContext();
 // email: 'courage@gmail.com',
 // courageous
 
+//faster
+// faster@gmail.com
+// fasterwork
+
+//natureOfAllah
+//nature@gmail.com
+//natureoflife
+
+
 export const GlobalState = ({children}) => {
 
     const [openUserAccount, setOpenUserAccount] = useState(false);
     const [editProfile, setEditProfile] = useState(false);
     const [showMenu, setShowMenu] = useState(false);
     const [loggedIn, setLoggedIn] = useState(false);
-    const [myToken , setMyToken] = useState(false);
+    const [loading, setLoading]  = useState(true);
     const [registerData, setRegisterData] = useState({});
     
     useEffect(() => {
-        console.log("Logged In value Context: ", loggedIn);
-    }, [])
+        
+        const userAuthentication = async () => {
+            try{
+                const isValidUser = await axios.get('http://localhost:4100/weblog/checkAuthen', {withCredentials:true});
+                console.log("isValidUser.data ", isValidUser.data);
+                if(isValidUser.data.isAuthenticated){
+                    setLoggedIn(true);
+                    setLoading(false)
+                }else{
+                    setLoggedIn(false)
+                }
+            }
+            catch (err) {
+                console.error("Authentication error:", err);
+                if (err.response) {
+                  console.error("Error response:", err.response.data);
+                  console.error("Error status:", err.response.status);
+                } else if (err.request) {
+                  console.error("No response received:", err.request);
+                } else {
+                  console.error("Error setting up request:", err.message);
+                }
+                setLoggedIn(false);
+              } finally {
+                setLoading(false);
+              }
+            }
+        userAuthentication();
+
+        }
+    ,[])
    
     return <AppContext.Provider value={{
         openUserAccount,
@@ -38,7 +76,9 @@ export const GlobalState = ({children}) => {
         loggedIn,
         setLoggedIn,
         registerData,
-        setRegisterData
+        setRegisterData,
+        loading, 
+
     }}>
         {children}
     </AppContext.Provider>

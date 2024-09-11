@@ -14,6 +14,7 @@ const Login = () => {
     const [errors, setErrors] =useState({});
     const navigate = useNavigate();
 
+    
     const emailValid = (email_text) => {
         const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
         return regex.test(email_text);
@@ -57,13 +58,16 @@ const Login = () => {
             }
             
             try{
-                const login_response = await axios.post(`http://localhost:4100/weblog/userLogin`,loginData);
+                const login_response = await axios.post(`http://localhost:4100/weblog/userLogin`,
+                loginData,
+            {
+                withCredentials:true
+            });
                 console.log("login result: ", login_response.data);
-                setLoggedIn(true);
                 setEmail('');
                 setPassword('');
                 navigate('/');
-               
+                setLoggedIn(true)
             }catch(err){
                 console.log("err while Login: ", err.response.data.message);
                 if(err.response){
@@ -124,6 +128,11 @@ const Login = () => {
                         {message && <p> {message} </p>}
                         
                     </form>
+                    <h3 className="mb-5"> Do not have Account ?</h3>
+                    <button ><Link 
+                    className="bg-green-400 border p-3 ml-8"
+                    to="/registerUser">Register Here </Link></button>
+
 
                     <button ><Link 
                     className="bg-green-400 border p-3 ml-8"
