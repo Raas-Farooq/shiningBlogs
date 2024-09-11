@@ -1,7 +1,7 @@
 import jwt, {decode} from 'jsonwebtoken';
 
 const authMiddleware = async(req,res, next) => {
-    const token = req.header("Authorization")?.replace('Bearer ', '');
+    const token = req.cookies.token;
 
     if(!token) return res.status(404).json({success:false, message:"Unable to get Token Bearer"});
 
@@ -20,4 +20,4 @@ const authMiddleware = async(req,res, next) => {
     
 }
 
-export default authMiddleware;
+export default authMiddleware; 

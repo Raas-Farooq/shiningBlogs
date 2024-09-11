@@ -34,7 +34,7 @@ const Register = () => {
         if(!username){
             errors.username = "Username is required"
         }
-        else if (username.length <= 3){
+        else if (username.length < 3){
             errors.username = "username length should be atleast 3 digits"
         }
         if(!isNaN(username[0])){

@@ -2,7 +2,7 @@ import { ExpressValidator } from "express-validator";
 import express from 'express';
 import rateLimit from "express-rate-limit";
 import { body} from "express-validator";
-import {registerUser, logging, addBlog, updateBlogPost, deleteBlog, updateUserProfile, allBlogs, logout} from "../controllers/blogController.js";
+import {registerUser, logging, addBlog, updateBlogPost, deleteBlog, updateUserProfile, logout, allUsers, getUser} from "../controllers/blogController.js";
 import authMiddleware from "../middleAuthentication/authMiddleware.js";
 import CheckAuthen from "../checkUserAuthen/checkAuthen.js";
 
@@ -81,12 +81,13 @@ const updateUserLimit = rateLimit({
 router.put('/updateUserProfile', updateUserLimit, authMiddleware,
     [
         body('username').isLength({min:3}).trim().escape().withMessage("Username length should be atleast 3 characters"),
-        body('password').isLength({min:8}).withMessage("Password Length Should be More than 8 characters")
+        body('goal').isLength({min:30}).withMessage("Your goal should consist of atleast 30 characters")
     ],
 updateUserProfile
 )
 
-router.get('/getAllBlogs', allBlogs);
+router.get('/allUsers', allUsers);
 
+router.get('/getUser', authMiddleware, getUser);
 
 export default router;

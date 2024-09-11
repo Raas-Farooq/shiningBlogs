@@ -4,6 +4,7 @@ import rateLimit from 'express-rate-limit';
 import { body, validationResult } from 'express-validator';
 import jwt from 'jsonwebtoken';
 import authMiddleware from '../middleAuthentication/authMiddleware.js';
+import { RestartProcess } from 'concurrently';
 
 
 // mera focus kaam or study ha .. salary itni matter nahi krti 
@@ -185,8 +186,6 @@ const updateUserProfile = async (req, res) => {
 const logging =  async(req,res) => {
     //checking Result of Validation
     const {email, password}= req.body;
-    console.log("Login User is Looking straight towards its Goal")
-    console.log(`email ${email} , password ${password} inside login`)
     const loginErros = validationResult(req);
     if(!loginErros.isEmpty()){
         return res.status(400).json({
@@ -198,7 +197,6 @@ const logging =  async(req,res) => {
     
     try{
 
-        // const {email, password}= req.body;
         // accessing User
         
         const user = await User.findOne({email});
@@ -411,9 +409,9 @@ const deleteBlog = async(req, res) => {
     }
 }
 
-const allBlogs = async(req,res) => {
+const allUsers = async(req,res) => {
     console.log("Alhamdulila, backend is running");
-    const myBlogs = await User.find({});
+    const users = await User.find({});
     // console.log("myBlogs: ", myBlogs);
     try{
         if(!myBlogs.length){
@@ -426,7 +424,7 @@ const allBlogs = async(req,res) => {
         return res.status(200).json({
             success:true,
             message:"Successfully accessed Blogs",
-            myBlogs
+            users
         })
     }
     catch(err){
@@ -437,6 +435,37 @@ const allBlogs = async(req,res) => {
     }
 }
 
+const getUser = async(req,res) => {
+    const userId = req.user.userId;
+    console.log("getUser Runs")
+    console.log("userId : ", userId);
+
+
+    try{
+        const user = await User.findById(userId);
+
+        if(!user){
+            return res.status(401).json({
+                success:false,
+                message:'Unable to find User Id'
+            })
+
+        }
+
+        return res.status(200).json({
+            success:true,
+            message:"The User has been Found Successfully",
+            user
+        })
+    }catch(err){
+        return res.status(500).json({
+            success:false,
+            message:"Server Error while finding a User"
+        })
+    }
+}
+
+
 const logout = (req,res) => {
     res.clearCookie('token');
     return res.status(200).json({
@@ -444,4 +473,4 @@ const logout = (req,res) => {
         message:"Logout Successfully"
     })
 }
-export {registerUser, logging, addBlog, updateBlogPost, deleteBlog, updateUserProfile, allBlogs, logout}
+export {registerUser, logging, addBlog, updateBlogPost, deleteBlog, updateUserProfile, allUsers, getUser, logout}

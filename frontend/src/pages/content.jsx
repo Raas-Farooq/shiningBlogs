@@ -8,7 +8,7 @@ export default function Content() {
     useEffect(() => {
         console.log("Content useEffect ran");
         
-        axios.get(`http://localhost:4100/weblog/getAllBlogs`, {timeout:3000})
+        axios.get(`http://localhost:4100/weblog/allUsers`, {timeout:3000})
         .then(response => console.log("using axios", response.data))
         .catch(err => console.log("err while fetching all blogs: ", err))
 

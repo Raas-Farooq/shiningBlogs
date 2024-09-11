@@ -16,6 +16,13 @@ const usersSchema = new mongoose.Schema({
         required:true,
         type:String
     },
+    
+    TopicsInterested:{
+        type:[String]
+    },
+    goal:{
+        type:String
+    },
     createdAt:{
         type:Date,
         default:Date.now
