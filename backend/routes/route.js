@@ -5,6 +5,7 @@ import { body} from "express-validator";
 import {registerUser, logging, addBlog, updateBlogPost, deleteBlog, updateUserProfile, logout, allUsers, getUser} from "../controllers/blogController.js";
 import authMiddleware from "../middleAuthentication/authMiddleware.js";
 import CheckAuthen from "../checkUserAuthen/checkAuthen.js";
+import multer from 'multer';
 
 const router = express.Router();
 
@@ -78,11 +79,14 @@ const updateUserLimit = rateLimit({
     max: 2
 })
 
-router.put('/updateUserProfile', updateUserLimit, authMiddleware,
-    [
-        body('username').isLength({min:3}).trim().escape().withMessage("Username length should be atleast 3 characters"),
-        body('goal').isLength({min:30}).withMessage("Your goal should consist of atleast 30 characters")
-    ],
+const storage = multer.memoryStorage();
+const uploads = multer({storage:storage});
+
+router.put('/updateUserProfile', uploads.single('profileImg'), updateUserLimit, authMiddleware,
+    // [
+    //     body('username').isLength({min:3}).trim().escape().withMessage("Username length should be atleast 3 characters"),
+    //     body('goal').isLength({min:30}).withMessage("Your goal should consist of atleast 30 characters")
+    // ],
 updateUserProfile
 )
 

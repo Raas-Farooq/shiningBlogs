@@ -6,8 +6,10 @@ export default function Write() {
     return(
         <div className="page-content">
             <h1> I am Write </h1> 
-            <h2> I know by Putting Your best Effort on doing the righteous deeds by keeping your intentions with Allah(SWT) you can WRITE Your destination</h2>
-
+            <form method="post">
+                <input type="text" name="title" />
+                <input type="file" image=""  />
+            </form>
             <button><Link to={'/'} className=''> Back To Home</Link></button>
         </div>
     )

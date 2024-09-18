@@ -1,7 +1,9 @@
+import { useGlobalContext } from "../../globalContext/globalContext";
 
 
 export default function BlogContent(){
 
+    const {loggedIn} = useGlobalContext()
     const listArr = [{name: 'Raas',goal: 'Be Positive', image:"https://images.unsplash.com/photo-1432298026442-0eabd0a98870?w=400&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Nnx8Z3JlZW4lMjBuYXR1cmV8ZW58MHx8MHx8fDA%3D"},
     {name: 'Faiq',goal: 'Be Polite', image:"https://images.unsplash.com/photo-1717647439287-f3e94e3fb924?w=400&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OHx8Z3JlZW4lMjBuYXR1cmV8ZW58MHx8MHx8fDA%3D"},
     {name: 'Raza',goal: 'Be strong', image:"https://images.unsplash.com/photo-1715731456084-2165629dfe4f?w=400&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTZ8fGdyZWVuJTIwbmF0dXJlfGVufDB8fDB8fHww"},
@@ -9,8 +11,10 @@ export default function BlogContent(){
     {name: 'Fatima',goal: 'Believer', image:"https://m.media-amazon.com/images/I/610+t0Qk54L._AC_UF1000,1000_QL80_.jpg"}
     ];
 
+    
+
     return (
-        <div className="flex xs:flex-col sm:flex-row">
+        <div className="flex xs:flex-col sm:flex-row" >
             <div className="blogsContainer xs:w-[95vw] w-[70vw] ">
                 <div className="flex flex-wrap gap-5 text-center justify-center">
                 {listArr.map((item,index) => {
@@ -25,7 +29,7 @@ export default function BlogContent(){
                 })}
                 </div>
             </div>
-            <div className="mt-5 p-4 w-[30vw] text-center relative xs:hidden sm:block">
+            <div className={`mt-5 p-4 w-[30vw] text-center relative xs:hidden sm:block ${!loggedIn && 'xs: sm:hidden'} `}>
                 <>
                     <h2 className="font-extrabold "> About Raas </h2>
                     <img src="https://wallpapers.com/images/hd/greenery-background-abj04ct0og086pp4.jpg" 

@@ -3,8 +3,8 @@ import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
 import Navbar from './Components/Navbar/navbar';
-import MainSection from './Components/mainSection/main-section.jsx';
-import BlogContent from './Components/contentSection/blog-content';
+import MainSection from  './Components/mainSection/main-section.jsx';
+import BlogContent from './Components/contentSection/blog-content.jsx';
 import { useGlobalContext } from './globalContext/globalContext.jsx';
 
 function App() {

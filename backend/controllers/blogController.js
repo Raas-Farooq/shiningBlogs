@@ -7,11 +7,6 @@ import authMiddleware from '../middleAuthentication/authMiddleware.js';
 import { RestartProcess } from 'concurrently';
 
 
-// mera focus kaam or study ha .. salary itni matter nahi krti 
-// allah ka shukr ha nazam chal raha  ha 
-// allah ka shukr ha system chal raha ha mere kharacha chal raha ha sath sath study b ho rahi ha
-// 
-
 
 const registerUser = async (req,res) => {
     
@@ -106,9 +101,10 @@ const updateUserProfile = async (req, res) => {
 
     const errors = validationResult(req);
     const userId = req.user.userId;
-    const id = req.params.id;
-    console.log("User Profile Update Wanted to Change")
-
+  
+    console.log("userId: ", userId);
+    console.log("Update User profile run")
+    console.log("req.body ", req.body);
     if(!errors.isEmpty()){
         return res.status(400).json({
             success:false,
@@ -116,10 +112,12 @@ const updateUserProfile = async (req, res) => {
         })
     }
     
-    const {profileImage, username, email, password, interests, goal} = req.body;
-    console.log(`goal ${goal} interests ${interests} email ${email}`)
-    const user = await User.findById(id);
-    if(user.userId.toString() !== userId){
+    const {username, email, password,goal} = req.body;
+    console.log(`goal ${goal} username ${username} email ${email}`);
+    const interests = req.body.interests ? JSON.parse(req.body.interests) : undefined;
+    console.log("interests after parsing: ", interests);
+    const user = await User.findById(userId);
+    if(user._id.toString() !== userId){
         return res.status(403).json(
             {
                 success:false,
@@ -130,15 +128,19 @@ const updateUserProfile = async (req, res) => {
     
     try{
         let updatingUser = {};
-        if(profileImage) updatingUser.profileImage = profileImage;
         if(username) updatingUser.username = username;
         if(email) updatingUser.email = email;
-        if(password){
-            const hashedPassword = await bcrypt.hash(password, 10);
-            updatingUser.password = hashedPassword;
+        // if(password){
+        //     const hashedPassword = await bcrypt.hash(password, 10);
+        //     updatingUser.password = hashedPassword;
+        // }
+        if(req.file){
+            console.log("req.file: ", req.file);
         }
-
-        const updated = await User.findByIdAndUpdate(id,
+        if(goal) updatingUser.goal = goal;
+        if(interests) updatingUser.TopicsInterested = interests;
+        
+        const updated = await User.findByIdAndUpdate(userId,
             {
                 $set:updatingUser,
             },
@@ -237,6 +239,7 @@ const logging =  async(req,res) => {
                     maxAsge:3600000,
                     sameSite:'Strict'
                 })
+
                 return res.status(201).json({
                     success:true, 
                     message:"logged in and Successfully created the token",
@@ -414,7 +417,7 @@ const allUsers = async(req,res) => {
     const users = await User.find({});
     // console.log("myBlogs: ", myBlogs);
     try{
-        if(!myBlogs.length){
+        if(!users.length){
             return res.status(400).json({
                 success:false,
                 message:"no blog found"

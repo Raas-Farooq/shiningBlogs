@@ -23,6 +23,10 @@ const usersSchema = new mongoose.Schema({
     goal:{
         type:String
     },
+    profileImg:{
+        type:String,
+    },
+
     createdAt:{
         type:Date,
         default:Date.now

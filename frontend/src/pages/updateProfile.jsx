@@ -10,27 +10,38 @@ import axios from 'axios';
 const UpdateProfile = () => {
 
     const {openUserAccount,editProfile,setEditProfile, setOpenUserAccount} = useGlobalContext();
-    const [userImage, setUserImage] = useState('');
-    const [interests, setInterest]=useState([]);
+    // const [userImage, setUserImage] = useState('');
     const [userReceived, setUserReceived] = useState({});
-
-    
-    const [goal, setGoal] = useState('');
     const [imagePreview, setImagePreview] = useState('');
-    const [username, setUsername] = useState(userReceived.username);
-    const [password, setPassword] = useState('');
+    const [formData, setFormData] = useState({
+        username:'',
+        goal:'',
+        interests:[],
+        userImage:null,
+        imgPreview:''
+        
+    }) 
+    // const [password, setPassword] = useState('');
     const [localLoading, setLocalLoading] = useState(true)
 
-    useEffect(() => {
-        console.log("loading ");
-
-    }, [localLoading])
+    
     useEffect(() => {
         const get_current_user = async () => {
             try{
                 const response = await axios.get('http://localhost:4100/weblog/getUser', {withCredentials:true});
-                console.log("response.data: ", response.data.user);
-                setUserReceived(response.data.user);
+                const user =  response.data.user;
+                setUserReceived(user);
+                console.log("TopicsInterested",response.data.user.TopicsInterested);
+                console.log("response.data.user",response.data.user);
+                setFormData((prev) => ({
+                    ...prev,
+                    username:user.username || '',
+                    goal:user.goal || '',
+                    interests:user.TopicsInterested || [],
+                    userImage:user.profileImg,
+    
+                   }))
+                   console.log("formData inside axios: ", formData)
                 setLocalLoading(false)
             }catch(err){
                 console.log("got this error while working with getUser: ", err);
@@ -39,47 +50,83 @@ const UpdateProfile = () => {
         }
 
         get_current_user();
-        console.log("userReceived: ", userReceived.username);
+      
     },[])
 
-    const detailsValidation = () => {
+    // useEffect(() => {
+    //     console.log("UserReceived Inside Newly Created useEffect: ", userReceived)
+    //     if(Object.keys(userReceived).length > 0 ){
+            
 
-        let errors = {};
+               
+    //             console.log("username UseEffect: ", formData.username);
+    //         }
+        
+    
+    // }, [userReceived])
 
-        if(!username){
-            errors.username="Pla"
-        }
+    const handleChange = (e) => {
+        const {name, value} = e.target;
+
+        setFormData(prev => ({
+            ...prev,
+            [name]:value
+        }))
+        console.log('e.target: ', formData);
+        
     }
-    console.log("edit Profile: inside update Profile", editProfile);
+
     const handleImageSubmit = (e) => {
         e.preventDefault();
-        console.log("handleImageSubmit: ", e.target.files[0]);
-        setUserImage(e.target.files[0]);
+        const imgFile =  e.target.files[0];
+        // setUserImage(e.target.files[0]);
+        console.log("imgFile: ",imgFile)
+        setFormData((prevState) => ({
+            ...prevState,
+            userImage:imgFile,
+            imgPreview:URL.createObjectURL(imgFile)
+        }))
 
-        const preview = URL.createObjectURL(userImage);
-        setImagePreview(preview);
-        console.log("image Preview: ", imagePreview.length)
+        // const preview = URL.createObjectURL(userImage);
+        // setImagePreview(preview);
+        // console.log("image Preview: ", imagePreview.length)
     }
     const handleInterests = (e) => {
-        const newInterest = e.target.value
+        let newInterest = e.target.value
         .split(/[\n,]+/)
         .map(interest => interest.trim())
-        .filter(interest => interest !== '')
+        .filter(interest => interest !== '');
 
-        setInterest(newInterest)
+        console.log("newInterests: ", newInterest);
+        console.log("formData: ", formData);
+        setFormData((prev) => ({
+            ...prev,
+            interests:newInterest
+        }))
     }
     const handleSubmit = async (e) => {
         e.preventDefault();
-        
-        const formInfo = new FormData();
+        console.log("handle Submit is running: ", formData);
 
-        if(username) formInfo.append(('username'), username);
-        if(userImage) formInfo.append('profileImg', userImage);
+        const formInfo = new FormData();
+        if(formData.username) formInfo.append('username', formData.username);
+        if(userReceived.email) formInfo.append('email', userReceived.email);
+        if(userReceived.password) formInfo.append('password', userReceived.password);
+        if(formData.userImage) formInfo.append('profileImg', formData.userImage);
         // if(password) formInfo.append('password',password)
-        if(goal) formInfo.append('goal', goal);
-        if(interests) formInfo.append('interests', interests);
+        if(formData.goal) formInfo.append('goal', formData.goal);
+        
+        if(formData.interests && formData.interests.length > 0){
+            console.log("interestes before parsing:", formData.interests);
+            formInfo.append('interests', JSON.stringify(formData.interests));
+        } 
+
+        console.log("form info before submitting: ", formInfo);
         try{
-            const response = await axios.put(`http://localhost:3800/weblog/updateUserProfile`, formInfo, {
+            const response = await axios.put(
+                `http://localhost:4100/weblog/updateUserProfile`,
+                 formInfo,
+                {
                 headers:{
                     "Content-Type":"multipart/form-data"
                 },
@@ -90,72 +137,78 @@ const UpdateProfile = () => {
         }catch(err){
             console.log("err: ", err);
         }
+        
     }
-    
+    // {localLoading && userReceived ? <h1> Loading..</h1>:
+
+    if(localLoading) return <h1> Loading...</h1>
     return (
         <div className="">
-                {localLoading ? <h1> Loading..</h1>:
-                    <>
-                        <h1> UPDATE Your Profile</h1>
-                        <form className="flex flex-col p-5" method="post" >
-                            <label className="mb-3 text-blue-600"> Select the Profile Image</label>
-                            <input type="file" accept="image/*" className="w-fit" onChange={handleImageSubmit}
-                            />
-                            {imagePreview && (
-                                
+               
+                <>
+                    <h1> UPDATE Your Profile</h1>
+                    <form className="flex flex-col p-5" method="post" >
+                        <label className="mb-3 text-blue-600"> Select the Profile Image</label>
+                        <input type="file" accept="image/*" className="w-fit" onChange={handleImageSubmit}
+                        />
+                        {formData.imgPreview && (
+                            <>
+                                {console.log("formData img: ", formData.imgPreview)}
                                 <img src={imagePreview} alt="profile Image" className="w-[100px] h-[90px] p-2 m-5" />
-            
-                            )
-                            // : 
-                            // (   <div  className="p-2 m-5">
-                            //         <label> Upload Profile Picture</label>
-                            //         <div><FaImage /></div>
-                            //     </div>
+                            </>
                             
-                            //     )
-                            }
+        
+                        )
+                        // : 
+                        // (   <div  className="p-2 m-5">
+                        //         <label> Upload Profile Picture</label>
+                        //         <div><FaImage /></div>
+                        //     </div>
+                        
+                        //     )
+                        }
 
-                            <input type="input" 
-                            name="input" 
-                            className="border border-gray-300 w-[25vw] p-2 m-5" 
-                            placeholder="Enter New Username" 
-                            onChange={(e) => setUsername(e.target.value)}
-                            value={username}
-                            />
+                        <input type="input" 
+                        name="username" 
+                        className="border border-gray-300 w-[25vw] p-2 m-5" 
+                        placeholder="Enter New Username" 
+                        onChange={handleChange}
+                        value={formData.username}
+                        />
 
-                
-                            {/* <input type="password" 
-                            name="password" 
-                            className="border border-gray-300 w-[25vw] p-2 m-5" 
-                            placeholder="Enter New Password" 
-                            onChange={(e) => setPassword(e.target.value)}
-                            /> */}
+            
+                        {/* <input type="password" 
+                        name="password" 
+                        className="border border-gray-300 w-[25vw] p-2 m-5" 
+                        placeholder="Enter New Password" 
+                        onChange={(e) => setPassword(e.target.value)}
+                        /> */}
 
-                            <label className="text-blue-600" > What is Your Goal </label>
-                            <textarea id="goal"
-                                placeholder="Write Your Objective here.."
-                                onChange={(e) => setGoal(e.target.value)}
-                                className="border border-gray-400 p-12 h-44 w-72"
-                                value={goal}
-                            />
+                        <label className="text-blue-600" > What is Your Goal </label>
+                        <textarea id="goal"
+                            name="goal"
+                            placeholder="Write Your Objective here.."
+                            onChange={handleChange}
+                            className="border border-gray-400 p-12 h-44 w-72"
+                            value={formData.goal}
+                        />
 
-                            <label className=" mt-5 text-blue-600"> Which topics are you Interested</label>
-                            <textarea 
-                            placeholder="Enter Your Interests (Separated by commas or new line)"
-                            className="border w-60 h-32 mt-2 border-gray-500"
-                            value={interests.join('\n')}
-                            onChange={handleInterests}
-                            />
-                            {console.log("interest: ", interests)}
-                            <button type="submit" onClick={handleSubmit} className="border border-gray-300 w-[15vw] p-2 m-5 bg-red-400 hover:bg-red-300 ">Update Account</button>
+                        <label className=" mt-5 text-blue-600"> Which topics are you Interested</label>
+                        <textarea 
+                        placeholder="Enter Your Interests (Separated by commas or new line)"
+                        className="border w-60 h-32 mt-2 border-gray-500"
+                        value={formData.interests}
+                        onChange={handleInterests}
+                        />
+                    
+                        <button type="submit" onClick={handleSubmit} className="border border-gray-300 w-[15vw] p-2 m-5 bg-red-400 hover:bg-red-300 ">Update Account</button>
 
-                        </form>
+                    </form>
 
-                        <button onClick={()=> setEditProfile(false)} ><Link 
-                        className="bg-green-400 border p-3 ml-8"
-                        to="/userAccount">Go Back </Link></button>
-                    </>
-                }
+                    <button onClick={()=> setEditProfile(false)} ><Link 
+                    className="bg-green-400 border p-3 ml-8"
+                    to="/userAccount">Go Back </Link></button>
+                </>
         </div>
     )
 }
