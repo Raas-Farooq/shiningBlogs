@@ -33,7 +33,10 @@ export const GlobalState = ({children}) => {
     const [loading, setLoading]  = useState(true);
     const [registerData, setRegisterData] = useState({});
     const [isAuthenticated, setIsAuthenticated] = useState(false);
-  
+    const [currentUser, setCurrentUser] = useState({});
+    const [imagePreview, setImagePreview] = useState('');
+    const [email, setEmail] = useState('');
+
     useEffect(() => {
         console.log("isAuthenticated: ", isAuthenticated);
         const userAuthentication = async () => {
@@ -43,7 +46,8 @@ export const GlobalState = ({children}) => {
                 if(isValidUser.data.isAuthenticated){
                     setLoggedIn(true);
                     setLoading(false)
-                }else{
+                }
+                else{
                     setLoggedIn(false)
                 }
             }
@@ -81,7 +85,13 @@ export const GlobalState = ({children}) => {
         setRegisterData,
         loading, 
         isAuthenticated,
-        setIsAuthenticated
+        setIsAuthenticated,
+        currentUser,
+        setCurrentUser,
+        imagePreview,
+        setImagePreview,
+        email,
+        setEmail
 
     }}>
         {children}

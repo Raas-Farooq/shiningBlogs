@@ -10,13 +10,17 @@ import axios from 'axios';
 
 export default function Navbar(){
 
-    const {setOpenUserAccount, openUserAccount, setShowMenu, showMenu, loggedIn, loading, setLoggedIn} = useGlobalContext();
+    const {currentUser, setOpenUserAccount, openUserAccount, setShowMenu, showMenu, loggedIn, loading, setLoggedIn} = useGlobalContext();
     
     // console.log("openUserAccount: ", openUserAccount);
     // console.log("showMenu: ", showMenu);
     const [searchClicked, setSearchClicked] = useState(false);
     const size = WindowSize();
 
+    useEffect(() => {
+        console.log("is Login: ", loggedIn);
+        console.log("currentUser inside navbar: ", currentUser);
+    }, [])
     useEffect(() => {
         if(size.width > 768){
             console.log("logeed In inside navbar: ", loggedIn);

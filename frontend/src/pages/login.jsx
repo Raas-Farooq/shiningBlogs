@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useGlobalContext } from "../globalContext/globalContext";
 import { Link, useNavigate } from "react-router-dom";
 import { FaImage } from "react-icons/fa";
@@ -7,13 +7,17 @@ import axios from "axios";
 
 const Login = () => {
 
-    const {openUserAccount,editProfile,setEditProfile, setLoggedIn} = useGlobalContext();
+    const {currentUser, setCurrentUser, setLoggedIn, imagePreview, setImagePreview} = useGlobalContext();
     const [email, setEmail] = useState('');
     const [message, setMessage] = useState('');
     const [password, setPassword] = useState('');
     const [errors, setErrors] =useState({});
     const navigate = useNavigate();
 
+
+    useEffect(() => {
+        console.log("current User: ", currentUser)
+    }, [currentUser])
     
     const emailValid = (email_text) => {
         const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
@@ -23,8 +27,6 @@ const Login = () => {
     // console.log("handle Validation outside; ", handleValidation());
     function handleValidation(){
         let newErrors = {};
-        console.log("email validity: ", email);
-        console.log("password : ", password);
         if(!email){
             newErrors.email="Email field is empty!"
         }
@@ -63,13 +65,26 @@ const Login = () => {
             {
                 withCredentials:true
             });
-                console.log("login result: ", login_response.data);
+                const user =  login_response.data.user;
+                console.log("user inside login: ", user);
+                let imgPreview= '';
+                if (user.profileImg && user.profileImg.data) {
+                    const base64String = btoa(
+                        new Uint8Array(user.profileImg.data.data)
+                            .reduce((data, byte) => data + String.fromCharCode(byte), '')
+                    );
+                    imgPreview = `data:${user.profileImg.contentType};base64,${base64String}`;
+                }
+                setImagePreview(imgPreview);
+
+                console.log("img Preview inside login: ", imgPreview);
+                setCurrentUser(login_response.data.user);
                 setEmail('');
                 setPassword('');
                 navigate('/');
                 setLoggedIn(true)
             }catch(err){
-                console.log("err while Login: ", err.response.data.message);
+                // console.log("err while Login: ", err.response.data.message);
                 if(err.response){
                     if(err.response.data && err.response.data.error){
                        const serverErr = err.response.data.errors.reduce((acc, curr) => {

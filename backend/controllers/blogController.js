@@ -97,6 +97,41 @@ const registerUser = async (req,res) => {
  * @param {body} profileImage - title image of the user
  * @param {body} username - name of the user 
  */
+
+const current = async (req,res) => {
+    const errors = validationResult(req);
+    if(!errors.isEmpty()){
+        return res.status(401).json({
+            success:false,
+            message:"Vaidation Error Occured"
+        })
+    }
+    try{
+        const {email} = req.body;
+        
+        const user = await User.find({email});
+
+        if(!user){
+            return res.status(401).json({
+                success:false,
+                message:"Unable to find the requested user. Try Again"
+            })
+        }
+        return res.status(200).json({
+            success:true,
+            message:"Successfully access the User"
+        })
+    }
+
+    catch(err){
+        res.status(500).json({
+            success:false,
+            message:"Got server error while getting the user"
+        })
+    }
+}
+
+
 const updateUserProfile = async (req, res) => {
 
     const errors = validationResult(req);
@@ -191,12 +226,12 @@ const updateUserProfile = async (req, res) => {
 const logging =  async(req,res) => {
     //checking Result of Validation
     const {email, password}= req.body;
-    const loginErros = validationResult(req);
-    if(!loginErros.isEmpty()){
+    const loginErrors = validationResult(req);
+    if(!loginErrors.isEmpty()){
         return res.status(400).json({
             success:false,
             message:"email or password not Valid",
-            errors:loginErros.array()
+            errors:loginErrors.array()
         })
     }
     
@@ -219,7 +254,8 @@ const logging =  async(req,res) => {
             return res.status(404).json(
                 {
                     success:false,
-                    message:"password didn't Match. Try again please"
+                    message:"password didn't Match. Try again please",
+                    
                 }
             )
         }
@@ -246,10 +282,7 @@ const logging =  async(req,res) => {
                 return res.status(201).json({
                     success:true, 
                     message:"logged in and Successfully created the token",
-           
-                    email:user.email,
-                    name:user.username,
-                    id:user.id,
+                    user
                 })
 
              }
@@ -479,4 +512,5 @@ const logout = (req,res) => {
         message:"Logout Successfully"
     })
 }
-export {registerUser, logging, addBlog, updateBlogPost, deleteBlog, updateUserProfile, allUsers, getUser, logout}
+
+export {current, registerUser, logging, addBlog, updateBlogPost, deleteBlog, updateUserProfile, allUsers, getUser, logout}

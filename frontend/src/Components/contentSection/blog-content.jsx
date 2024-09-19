@@ -4,45 +4,42 @@ import axios from "axios";
 
 export default function BlogContent(){
 
-    const {loggedIn} = useGlobalContext()
+    const {loggedIn, currentUser, setCurrentUser,imagePreview} = useGlobalContext()
     const listArr = [{name: 'Raas',goal: 'Be Positive', image:"https://images.unsplash.com/photo-1432298026442-0eabd0a98870?w=400&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Nnx8Z3JlZW4lMjBuYXR1cmV8ZW58MHx8MHx8fDA%3D"},
     {name: 'Faiq',goal: 'Be Polite', image:"https://images.unsplash.com/photo-1717647439287-f3e94e3fb924?w=400&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OHx8Z3JlZW4lMjBuYXR1cmV8ZW58MHx8MHx8fDA%3D"},
     {name: 'Raza',goal: 'Be strong', image:"https://images.unsplash.com/photo-1715731456084-2165629dfe4f?w=400&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTZ8fGdyZWVuJTIwbmF0dXJlfGVufDB8fDB8fHww"},
     {name: 'Bashir',goal: 'Shinning', image:"https://images.unsplash.com/photo-1700831359498-7e367ee09472?w=400&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTh8fGdyZWVuJTIwbmF0dXJlfGVufDB8fDB8fHww"},
     {name: 'Fatima',goal: 'Believer', image:"https://m.media-amazon.com/images/I/610+t0Qk54L._AC_UF1000,1000_QL80_.jpg"}
     ];
-    const [currentUser, setCurrentUser] = useState('');
     const [profileImage, setProfileImage] = useState('');
-
-    useEffect(() => {
+    console.log("currentUser: ", currentUser);
+    // useEffect(() => {
         
-        const gettingUserProfile =  async() => {
-            try{
-                const response = await axios.get('http://localhost:4100/weblog/getUser', {withCredentials:true});
-
-                console.log("response.data inside BlogContent: ", response.data.user);
-                const activeUser = response.data.user;
-                setCurrentUser(response.data.user);
-                let previewImg = '';
-                if(activeUser.profileImg.data && activeUser.profileImg.data){
+    //     const gettingUserProfile =  async() => {
+    //         try{
+    //             const response = await axios.get('http://localhost:4100/weblog/getUser', {withCredentials:true});
+    //             const activeUser = response.data.user;
+    //             setCurrentUser(response.data.user);
+    //             let previewImg = '';
+    //             if(activeUser.profileImg.data && activeUser.profileImg.data){
                     
-                        const string64Convert = btoa(
-                            new Uint8Array(activeUser.profileImg.data.data).
-                            reduce((data,byte) => data + String.fromCharCode(byte), '')
-                        )
-                        previewImg = `data:${activeUser.profileImg.data.contentType}; base64, ${string64Convert} `
-                        setProfileImage(previewImg);
-                }
+    //                     const string64Convert = btoa(
+    //                         new Uint8Array(activeUser.profileImg.data.data).
+    //                         reduce((data,byte) => data + String.fromCharCode(byte), '')
+    //                     )
+    //                     previewImg = `data:${activeUser.profileImg.data.contentType}; base64, ${string64Convert} `
+    //                     setProfileImage(previewImg);
+    //             }
 
-                console.log("previewImg inside blog Contetn", previewImg);
                 
-            }catch(err){
-                console.log("unable to get the response inside blog Contetn:",err);
-            }
-        }
+                
+    //         }catch(err){
+    //             console.log("unable to get the response inside blog Contetn:",err);
+    //         }
+    //     }
 
-        gettingUserProfile();
-    }, [])
+    //     gettingUserProfile();
+    // }, [])
     
 
     return (
@@ -64,8 +61,8 @@ export default function BlogContent(){
             <div className={`mt-5 p-4 w-[30vw] text-center relative xs:hidden sm:block ${!loggedIn && 'xs: sm:hidden'} `}>
                     {currentUser ? (
                         <>
-                            <h2 className="font-extrabold "> {currentUser.username && currentUser.username.length ? `About ${currentUser.username.toUpperCase()}` : '' }</h2>
-                            {profileImage && (<img src={profileImage} 
+                            <h2 className="font-extrabold "> {currentUser.username && currentUser.username.length ? `About ${currentUser.username.toUpperCase()}` : 'About' }</h2>
+                            {imagePreview && (<img src={imagePreview} 
                             alt="greenry"
                             className="w-auto md:h-h-[210px] mx-auto " />)}
                             
@@ -75,7 +72,7 @@ export default function BlogContent(){
                             
                             <h3 className="text-bold text-lg font-bold mt-4 text-center border-t border-blue-400"> Interest </h3>
                             <span className="border-t border-blue-400"></span>
-                            {console.log("Interests: ", currentUser.TopicsInterested)}
+                           
                             {currentUser.TopicsInterested && currentUser.TopicsInterested.length ? (
                                 currentUser.TopicsInterested.map(interest => (
                                     <h5>{interest} </h5>

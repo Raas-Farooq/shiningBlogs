@@ -28,7 +28,7 @@ router.post('/registerUser', registerLimiter, [
 
 const loginLimiter = rateLimit({
     windowMs:15 * 60 * 1000,
-    max:5
+    max:15
 })
 
 router.post('/userLogin',loginLimiter, [
@@ -76,7 +76,7 @@ router.delete('/deleteBlog/:id', deleteLimit, authMiddleware, deleteBlog);
 
 const updateUserLimit = rateLimit({
     windowMs: 15 * 60 * 1000,
-    max: 15
+    max: 3
 })
 
 const storage = multer.memoryStorage();
@@ -88,6 +88,16 @@ router.put('/updateUserProfile', uploads.single('profileImg'), updateUserLimit, 
     //     body('goal').isLength({min:30}).withMessage("Your goal should consist of atleast 30 characters")
     // ],
 updateUserProfile
+)
+
+const getCurrentLimit = rateLimit({
+    WindowMs:15 * 60 * 1000,
+    max:10
+})
+router.get('/current', authMiddleware,
+    [
+        body('email').isEmail().normalizeEmail()
+    ]
 )
 
 router.get('/allUsers', allUsers);
