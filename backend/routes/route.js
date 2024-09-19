@@ -76,7 +76,7 @@ router.delete('/deleteBlog/:id', deleteLimit, authMiddleware, deleteBlog);
 
 const updateUserLimit = rateLimit({
     windowMs: 15 * 60 * 1000,
-    max: 2
+    max: 15
 })
 
 const storage = multer.memoryStorage();

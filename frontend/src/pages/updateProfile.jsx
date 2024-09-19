@@ -9,10 +9,12 @@ import axios from 'axios';
 // lifeLamha
 const UpdateProfile = () => {
 
-    const {openUserAccount,editProfile,setEditProfile, setOpenUserAccount} = useGlobalContext();
+    const {isAuthenticated, setEditProfile} = useGlobalContext();
     // const [userImage, setUserImage] = useState('');
     const [userReceived, setUserReceived] = useState({});
     const [imagePreview, setImagePreview] = useState('');
+    const [addInterest, setAddInterest] = useState('');
+
     const [formData, setFormData] = useState({
         username:'',
         goal:'',
@@ -22,26 +24,37 @@ const UpdateProfile = () => {
         
     }) 
     // const [password, setPassword] = useState('');
+    
     const [localLoading, setLocalLoading] = useState(true)
 
     
     useEffect(() => {
+        console.log("isAuthenticated inside updateProfile: ", isAuthenticated)
         const get_current_user = async () => {
             try{
                 const response = await axios.get('http://localhost:4100/weblog/getUser', {withCredentials:true});
                 const user =  response.data.user;
                 setUserReceived(user);
-                console.log("TopicsInterested",response.data.user.TopicsInterested);
-                console.log("response.data.user",response.data.user);
+                console.log("profileImg only data",response.data.user.profileImg);
+                let imgPreview = '';
+                if (user.profileImg && user.profileImg.data) {
+                    const base64String = btoa(
+                        new Uint8Array(user.profileImg.data.data)
+                            .reduce((data, byte) => data + String.fromCharCode(byte), '')
+                    );
+                    imgPreview = `data:${user.profileImg.contentType};base64,${base64String}`;
+                }
+                console.log("image preview inside update Profile: ", imgPreview);
                 setFormData((prev) => ({
                     ...prev,
                     username:user.username || '',
                     goal:user.goal || '',
                     interests:user.TopicsInterested || [],
                     userImage:user.profileImg,
-    
+                    imgPreview:imgPreview
                    }))
-                   console.log("formData inside axios: ", formData)
+                   setAddInterest(user.TopicsInterested ? user.TopicsInterested.join('\n'): '');
+                //    console.log("formData inside axios: ", formData)
                 setLocalLoading(false)
             }catch(err){
                 console.log("got this error while working with getUser: ", err);
@@ -92,10 +105,11 @@ const UpdateProfile = () => {
         // console.log("image Preview: ", imagePreview.length)
     }
     const handleInterests = (e) => {
+        setAddInterest(e.target.value);
         let newInterest = e.target.value
         .split(/[\n,]+/)
         .map(interest => interest.trim())
-        .filter(interest => interest !== '');
+        .filter(interest => interest.length > 0);
 
         console.log("newInterests: ", newInterest);
         console.log("formData: ", formData);
@@ -112,7 +126,10 @@ const UpdateProfile = () => {
         if(formData.username) formInfo.append('username', formData.username);
         if(userReceived.email) formInfo.append('email', userReceived.email);
         if(userReceived.password) formInfo.append('password', userReceived.password);
-        if(formData.userImage) formInfo.append('profileImg', formData.userImage);
+        if(formData.userImage instanceof File){
+            formInfo.append('profileImg', formData.userImage, formData.userImage.name )
+        }
+        // if(formData.userImage) formInfo.append('profileImg', formData.imgPreview);
         // if(password) formInfo.append('password',password)
         if(formData.goal) formInfo.append('goal', formData.goal);
         
@@ -121,7 +138,7 @@ const UpdateProfile = () => {
             formInfo.append('interests', JSON.stringify(formData.interests));
         } 
 
-        console.log("form info before submitting: ", formInfo);
+        console.log("before submitting: form Info", formInfo);
         try{
             const response = await axios.put(
                 `http://localhost:4100/weblog/updateUserProfile`,
@@ -154,7 +171,7 @@ const UpdateProfile = () => {
                         {formData.imgPreview && (
                             <>
                                 {console.log("formData img: ", formData.imgPreview)}
-                                <img src={imagePreview} alt="profile Image" className="w-[100px] h-[90px] p-2 m-5" />
+                                <img src={formData.imgPreview} alt="profile Image" className="w-[100px] h-[90px] p-2 m-5" />
                             </>
                             
         
@@ -197,7 +214,7 @@ const UpdateProfile = () => {
                         <textarea 
                         placeholder="Enter Your Interests (Separated by commas or new line)"
                         className="border w-60 h-32 mt-2 border-gray-500"
-                        value={formData.interests}
+                        value={addInterest}
                         onChange={handleInterests}
                         />
                     

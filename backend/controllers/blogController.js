@@ -102,9 +102,8 @@ const updateUserProfile = async (req, res) => {
     const errors = validationResult(req);
     const userId = req.user.userId;
   
-    console.log("userId: ", userId);
-    console.log("Update User profile run")
-    console.log("req.body ", req.body);
+    // console.log("req.file inside UpdateUsr ", req.file);
+    console.log("req.body", req.body);
     if(!errors.isEmpty()){
         return res.status(400).json({
             success:false,
@@ -115,7 +114,6 @@ const updateUserProfile = async (req, res) => {
     const {username, email, password,goal} = req.body;
     console.log(`goal ${goal} username ${username} email ${email}`);
     const interests = req.body.interests ? JSON.parse(req.body.interests) : undefined;
-    console.log("interests after parsing: ", interests);
     const user = await User.findById(userId);
     if(user._id.toString() !== userId){
         return res.status(403).json(
@@ -135,7 +133,11 @@ const updateUserProfile = async (req, res) => {
         //     updatingUser.password = hashedPassword;
         // }
         if(req.file){
-            console.log("req.file: ", req.file);
+            console.log("is Req.file okay ", req.file);
+            updatingUser.profileImg = {
+                data: req.file.buffer,
+                contentType: req.file.mimetype
+            }
         }
         if(goal) updatingUser.goal = goal;
         if(interests) updatingUser.TopicsInterested = interests;
@@ -157,6 +159,7 @@ const updateUserProfile = async (req, res) => {
         return res.status(500).json({
             success:false,
             message:"Unable to Update the User",
+            err:err.message
         })
     }
 

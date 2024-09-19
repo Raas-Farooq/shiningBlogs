@@ -1,5 +1,6 @@
+import { useEffect, useState } from "react";
 import { useGlobalContext } from "../../globalContext/globalContext";
-
+import axios from "axios";
 
 export default function BlogContent(){
 
@@ -10,7 +11,38 @@ export default function BlogContent(){
     {name: 'Bashir',goal: 'Shinning', image:"https://images.unsplash.com/photo-1700831359498-7e367ee09472?w=400&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTh8fGdyZWVuJTIwbmF0dXJlfGVufDB8fDB8fHww"},
     {name: 'Fatima',goal: 'Believer', image:"https://m.media-amazon.com/images/I/610+t0Qk54L._AC_UF1000,1000_QL80_.jpg"}
     ];
+    const [currentUser, setCurrentUser] = useState('');
+    const [profileImage, setProfileImage] = useState('');
 
+    useEffect(() => {
+        
+        const gettingUserProfile =  async() => {
+            try{
+                const response = await axios.get('http://localhost:4100/weblog/getUser', {withCredentials:true});
+
+                console.log("response.data inside BlogContent: ", response.data.user);
+                const activeUser = response.data.user;
+                setCurrentUser(response.data.user);
+                let previewImg = '';
+                if(activeUser.profileImg.data && activeUser.profileImg.data){
+                    
+                        const string64Convert = btoa(
+                            new Uint8Array(activeUser.profileImg.data.data).
+                            reduce((data,byte) => data + String.fromCharCode(byte), '')
+                        )
+                        previewImg = `data:${activeUser.profileImg.data.contentType}; base64, ${string64Convert} `
+                        setProfileImage(previewImg);
+                }
+
+                console.log("previewImg inside blog Contetn", previewImg);
+                
+            }catch(err){
+                console.log("unable to get the response inside blog Contetn:",err);
+            }
+        }
+
+        gettingUserProfile();
+    }, [])
     
 
     return (
@@ -30,26 +62,31 @@ export default function BlogContent(){
                 </div>
             </div>
             <div className={`mt-5 p-4 w-[30vw] text-center relative xs:hidden sm:block ${!loggedIn && 'xs: sm:hidden'} `}>
-                <>
-                    <h2 className="font-extrabold "> About Raas </h2>
-                    <img src="https://wallpapers.com/images/hd/greenery-background-abj04ct0og086pp4.jpg" 
-                    alt="greenry"
-                    className="w-auto md:h-h-[210px] mx-auto " />
-                    <h2 className="font-bold mt-4"> Goal</h2>
-                    <h3> Lorem ipsum dolor sit amet consectetur adipisicing elit. 
-                        Maxime, nobis tempore! Ea odit officiis laborum mollitia in accusantium, magni veritatis, 
-                        quae tenetur vero reprehenderit voluptas at non nemo dolor ducimus? </h3>
-                    <h3 className="text-bold text-lg font-bold mt-4 text-center border-t border-blue-400"> Interest </h3>
-                    <span className="border-t border-blue-400"></span>
-                    <div>
-
-                        <h5>Religions</h5>
-                        <h5>Islam</h5>
-                        <h5>International Politics</h5>
-                        <h5>Technology</h5>
-                        <h5>Innovation</h5>
-                    </div>
-                </>
+                    {currentUser ? (
+                        <>
+                            <h2 className="font-extrabold "> {currentUser.username && currentUser.username.length ? `About ${currentUser.username.toUpperCase()}` : '' }</h2>
+                            {profileImage && (<img src={profileImage} 
+                            alt="greenry"
+                            className="w-auto md:h-h-[210px] mx-auto " />)}
+                            
+                            <h2 className="font-bold mt-4"> Goal</h2>
+                            {currentUser.goal && currentUser.goal.length ? (<h3> {currentUser.goal} </h3>):
+                            <h3>Goal is Empty</h3>}
+                            
+                            <h3 className="text-bold text-lg font-bold mt-4 text-center border-t border-blue-400"> Interest </h3>
+                            <span className="border-t border-blue-400"></span>
+                            {console.log("Interests: ", currentUser.TopicsInterested)}
+                            {currentUser.TopicsInterested && currentUser.TopicsInterested.length ? (
+                                currentUser.TopicsInterested.map(interest => (
+                                    <h5>{interest} </h5>
+                                ))
+                            ):
+                            <h3> interests are not Added</h3>
+                            }
+                        </>
+                    ):
+                    <h2> Loading..</h2>
+                    }
                 
             </div>
 

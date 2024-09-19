@@ -32,13 +32,14 @@ export const GlobalState = ({children}) => {
     const [loggedIn, setLoggedIn] = useState(false);
     const [loading, setLoading]  = useState(true);
     const [registerData, setRegisterData] = useState({});
-    
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+  
     useEffect(() => {
-        
+        console.log("isAuthenticated: ", isAuthenticated);
         const userAuthentication = async () => {
             try{
                 const isValidUser = await axios.get('http://localhost:4100/weblog/checkAuthen', {withCredentials:true});
-                console.log("isValidUser.data ", isValidUser.data);
+                console.log("why isValidUser.data ", isValidUser);
                 if(isValidUser.data.isAuthenticated){
                     setLoggedIn(true);
                     setLoading(false)
@@ -50,6 +51,7 @@ export const GlobalState = ({children}) => {
                 console.error("Authentication error:", err);
                 if (err.response) {
                   console.error("Error response:", err.response.data);
+                  setIsAuthenticated(err.response.data.isAuthenticated);
                   console.error("Error status:", err.response.status);
                 } else if (err.request) {
                   console.error("No response received:", err.request);
@@ -78,6 +80,8 @@ export const GlobalState = ({children}) => {
         registerData,
         setRegisterData,
         loading, 
+        isAuthenticated,
+        setIsAuthenticated
 
     }}>
         {children}
