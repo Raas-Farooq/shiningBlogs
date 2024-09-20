@@ -34,6 +34,11 @@ const UserAccount = () => {
         console.log("Image of The User: ", userImage);
         console.log("userName: ", username);
         console.log("Password after submission: ", password);
+
+
+        // localStorage.setItem('thisUser', JSON.stringify(currentUser));
+        //         const thisUser = JSON.parse(localStorage.getItem('thisUser'));
+        //         console.log("this user inside login: ", thisUser);
         
     }
     

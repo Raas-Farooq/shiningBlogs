@@ -7,7 +7,7 @@ import axios from "axios";
 
 const Login = () => {
 
-    const {currentUser, setCurrentUser, setLoggedIn, imagePreview, setImagePreview} = useGlobalContext();
+    const {currentUser, setGlobalEmail, setCurrentUser, setLoggedIn, imagePreview, setImagePreview} = useGlobalContext();
     const [email, setEmail] = useState('');
     const [message, setMessage] = useState('');
     const [password, setPassword] = useState('');
@@ -15,9 +15,14 @@ const Login = () => {
     const navigate = useNavigate();
 
 
-    useEffect(() => {
-        console.log("current User: ", currentUser)
-    }, [currentUser])
+    // useEffect(() => {
+    //     if(currentUser){
+    //         const user =  login_response.data.user;
+    //             localStorage.setItem('thisUser', JSON.stringify(user));
+    //             const thisUser = JSON.parse(localStorage.getItem('thisUser'));
+    //             console.log("this user inside login: ", thisUser);
+    //     }
+    // }, [currentUser])
     
     const emailValid = (email_text) => {
         const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
@@ -51,6 +56,7 @@ const Login = () => {
         if(Object.keys(validationErrors).length > 0){
             console.log("you have validation errors ")
             setErrors(validationErrors);
+            return; 
         }
         else{
             setErrors({});
@@ -62,28 +68,30 @@ const Login = () => {
             try{
                 const login_response = await axios.post(`http://localhost:4100/weblog/userLogin`,
                 loginData,
-            {
-                withCredentials:true
-            });
-                const user =  login_response.data.user;
-                console.log("user inside login: ", user);
-                let imgPreview= '';
-                if (user.profileImg && user.profileImg.data) {
-                    const base64String = btoa(
-                        new Uint8Array(user.profileImg.data.data)
-                            .reduce((data, byte) => data + String.fromCharCode(byte), '')
-                    );
-                    imgPreview = `data:${user.profileImg.contentType};base64,${base64String}`;
-                }
-                setImagePreview(imgPreview);
+                {
+                    withCredentials:true
+                });
+                
+                console.log("login response: ", login_response);
+                // let imgPreview= '';
+                // if (user.profileImg && user.profileImg.data) {
+                //     const base64String = btoa(
+                //         new Uint8Array(user.profileImg.data.data)
+                //             .reduce((data, byte) => data + String.fromCharCode(byte), '')
+                //     );
+                //     imgPreview = `data:${user.profileImg.contentType};base64,${base64String}`;
+                // }
+                // setImagePreview(imgPreview);
 
-                console.log("img Preview inside login: ", imgPreview);
-                setCurrentUser(login_response.data.user);
+                // // console.log("img Preview inside login: ", imgPreview);
+                // setCurrentUser(login_response.data.user);
                 setEmail('');
                 setPassword('');
                 navigate('/');
-                setLoggedIn(true)
-            }catch(err){
+                setLoggedIn(true);
+               
+            }
+            catch(err){
                 // console.log("err while Login: ", err.response.data.message);
                 if(err.response){
                     if(err.response.data && err.response.data.error){

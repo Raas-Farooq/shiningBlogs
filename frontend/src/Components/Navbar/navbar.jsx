@@ -19,7 +19,8 @@ export default function Navbar(){
 
     useEffect(() => {
         console.log("is Login: ", loggedIn);
-        console.log("currentUser inside navbar: ", currentUser);
+        const thisUser = JSON.parse(localStorage.getItem('thisUser'));
+        console.log("this User inside navbar: ", thisUser);
     }, [])
     useEffect(() => {
         if(size.width > 768){

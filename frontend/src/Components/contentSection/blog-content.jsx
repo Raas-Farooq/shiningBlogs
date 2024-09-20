@@ -40,7 +40,18 @@ export default function BlogContent(){
 
     //     gettingUserProfile();
     // }, [])
-    
+
+
+    useEffect(() => {
+        const user= {
+            motto:"Believe in One and Only Allah(SWT)",
+            strength:'Be courageous'
+        }
+        
+        localStorage.setItem('activeUser', JSON.stringify(user));
+        const activeUser = JSON.parse(localStorage.getItem('activeUser'));
+        console.log("active user from localStorage: ", activeUser);
+    }, [])
 
     return (
         <div className="flex xs:flex-col sm:flex-row" >

@@ -35,8 +35,20 @@ export const GlobalState = ({children}) => {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [currentUser, setCurrentUser] = useState({});
     const [imagePreview, setImagePreview] = useState('');
-    const [email, setEmail] = useState('');
+    const [globalEmail, setGlobalEmail] = useState('');
 
+
+                    // setUserReceived(user);
+                    // console.log("profileImg only data",response.data.user.profileImg);
+                    // let imgPreview = '';
+                    // if (user.profileImg && user.profileImg.data) {
+                    //     const base64String = btoa(
+                    //         new Uint8Array(user.profileImg.data.data)
+                    //             .reduce((data, byte) => data + String.fromCharCode(byte), '')
+                    //     );
+                    //     imgPreview = `data:${user.profileImg.contentType};base64,${base64String}`;
+                    // }
+                    // console.log("image preview inside update Profile: ", imgPreview);
     useEffect(() => {
         console.log("isAuthenticated: ", isAuthenticated);
         const userAuthentication = async () => {
@@ -45,7 +57,10 @@ export const GlobalState = ({children}) => {
                 console.log("why isValidUser.data ", isValidUser);
                 if(isValidUser.data.isAuthenticated){
                     setLoggedIn(true);
-                    setLoading(false)
+                    const response = await axios.get('http://localhost:4100/weblog/getUser', {withCredentials:true});
+                    const user =  response.data.user;
+                    console.log("user inside global Context: ", user);
+                    setLoading(false);
                 }
                 else{
                     setLoggedIn(false)
@@ -72,6 +87,10 @@ export const GlobalState = ({children}) => {
         }
     ,[])
    
+    useEffect(() => {
+      console.log("email got inside global ", globalEmail);
+    }, [globalEmail])
+
     return <AppContext.Provider value={{
         openUserAccount,
         setOpenUserAccount,
@@ -90,8 +109,8 @@ export const GlobalState = ({children}) => {
         setCurrentUser,
         imagePreview,
         setImagePreview,
-        email,
-        setEmail
+        globalEmail,
+        setGlobalEmail
 
     }}>
         {children}
