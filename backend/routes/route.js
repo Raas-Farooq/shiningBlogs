@@ -10,7 +10,7 @@ import multer from 'multer';
 const router = express.Router();
 
 
-router.get('/checkAuthen', CheckAuthen);
+router.get('/checkAuthen', authMiddleware, CheckAuthen);
 
 const registerLimiter= rateLimit({
     WindowMs:15 * 60 * 1000,

@@ -12,7 +12,7 @@ export default function BlogContent(){
     {name: 'Fatima',goal: 'Believer', image:"https://m.media-amazon.com/images/I/610+t0Qk54L._AC_UF1000,1000_QL80_.jpg"}
     ];
     const [profileImage, setProfileImage] = useState('');
-    console.log("currentUser: ", currentUser);
+    // console.log("currentUser: ", currentUser);
     // useEffect(() => {
         
     //     const gettingUserProfile =  async() => {

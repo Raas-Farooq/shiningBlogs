@@ -7,13 +7,13 @@ import axios from "axios";
 
 const Login = () => {
 
-    const {currentUser, setGlobalEmail, setCurrentUser, setLoggedIn, imagePreview, setImagePreview} = useGlobalContext();
+    const {userAuthentication, currentUser,setCurrentUser, setLoggedIn, imagePreview, setImagePreview} = useGlobalContext();
     const [email, setEmail] = useState('');
     const [message, setMessage] = useState('');
     const [password, setPassword] = useState('');
     const [errors, setErrors] =useState({});
     const navigate = useNavigate();
-
+    const [loading, setLoading] = useState(false);
 
     // useEffect(() => {
     //     if(currentUser){
@@ -50,6 +50,7 @@ const Login = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setLoading(true);
         const validationErrors = handleValidation();
 
         console.log("new Way: ", validationErrors);
@@ -71,20 +72,28 @@ const Login = () => {
                 {
                     withCredentials:true
                 });
-                
+                  if(login_response){
+                    console.log("if condition runs true");
+                    setLoading(false);
+                  }
                 console.log("login response: ", login_response);
-                // let imgPreview= '';
-                // if (user.profileImg && user.profileImg.data) {
-                //     const base64String = btoa(
-                //         new Uint8Array(user.profileImg.data.data)
-                //             .reduce((data, byte) => data + String.fromCharCode(byte), '')
-                //     );
-                //     imgPreview = `data:${user.profileImg.contentType};base64,${base64String}`;
-                // }
-                // setImagePreview(imgPreview);
+                setCurrentUser(login_response.data.user);
+                const userId = login_response.data.user._id;
+                localStorage.setItem('userId', userId);
+                const user = login_response.data.user;
+                let imgPreview= '';
+                if (user.profileImg && user.profileImg.data) {
+                    const base64String = btoa(
+                        new Uint8Array(user.profileImg.data.data)
+                            .reduce((data, byte) => data + String.fromCharCode(byte), '')
+                    );
+                    imgPreview = `data:${user.profileImg.contentType};base64,${base64String}`;
+                }
+                setImagePreview(imgPreview);
 
-                // // console.log("img Preview inside login: ", imgPreview);
-                // setCurrentUser(login_response.data.user);
+                console.log("img Preview inside login: ", imagePreview);
+                
+            
                 setEmail('');
                 setPassword('');
                 navigate('/');
@@ -104,6 +113,7 @@ const Login = () => {
                     else if(err.response.data && err.response.data.message){
                         setErrors({general:err.response.data.message})
                     }else {
+                        
                         setErrors({ general: "An error occurred. Please try again." });
                     }
                     
@@ -112,6 +122,7 @@ const Login = () => {
                     setErrors({general:"No response from the server. Try Again later!"})
                 }
                 else{
+                    console.log("err inside else: ", err);
                     setErrors({general:"An Error occurred. Try anytime Soon!"})
                 }
             }   
@@ -122,6 +133,7 @@ const Login = () => {
         // second you can also setErrors first then check from the errors lengt
     }
     
+    if(loading) return <h1> Please Wait..</h1>
     return (
 
 
