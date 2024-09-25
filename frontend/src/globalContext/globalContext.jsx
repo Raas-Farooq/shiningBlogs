@@ -17,10 +17,57 @@ export const GlobalState = ({children}) => {
     const [currentUser, setCurrentUser] = useState(null);
 
     
-      useEffect(() => {
-        console.log("current User global Context : ",currentUser);
-        console.log("is user logged in alhamdulila: ", loggedIn)
-      }, [loggedIn, currentUser])
+    const userAuthentication = async () => {
+        try {
+            const response = await axios.get('http://localhost:4100/weblog/checkAuthen', {withCredentials: true});
+            console.log("response of auth inside globaL :", response)
+            if (response.data.isAuthenticated) {
+              console.log("is validUser globaL :", response.data);
+                setLoggedIn(true);
+                const user = response.data.user;
+                setCurrentUser(user);
+                let imgLink='';
+                if(user.profileImg && user.profileImg.data){
+                    const base64String = 
+                   btoa( new Uint8Array(user.profileImg.data.data).
+                   reduce((data, byte) => data+ String.fromCharCode(byte), ''))
+
+                    imgLink = `data:${user.profileImg.contentType};base64,${base64String}`;
+                }
+                setImagePreview(imgLink)
+                
+                localStorage.setItem('userId', response.data.user._id);
+            } else {
+                setLoggedIn(false);
+                setCurrentUser(false);
+                localStorage.removeItem('userId');
+            }
+        } catch (err) {
+            console.error("Authentication error:", err);
+            setCurrentUser(null);
+            setLoggedIn(false);
+
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    useEffect(() => {
+        console.log("currentUser inside navbar: ", currentUser);
+        console.log("Navbar runs: ")
+    }, [currentUser,loggedIn]);
+
+
+    useEffect(() => {
+      const userId = localStorage.getItem('userId');
+      console.log("userId Inside Navbar: ", userId);
+      if (userId) {
+        userAuthentication(); // Fetch full user data if we have a userId
+      } else {
+          setLoading(false);
+      }
+  }, []);
+
     return (
         <AppContext.Provider value={{
             openUserAccount,

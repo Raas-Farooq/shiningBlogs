@@ -12,35 +12,7 @@ export default function BlogContent(){
     {name: 'Fatima',goal: 'Believer', image:"https://m.media-amazon.com/images/I/610+t0Qk54L._AC_UF1000,1000_QL80_.jpg"}
     ];
     const [profileImage, setProfileImage] = useState('');
-    // console.log("currentUser: ", currentUser);
-    // useEffect(() => {
-        
-    //     const gettingUserProfile =  async() => {
-    //         try{
-    //             const response = await axios.get('http://localhost:4100/weblog/getUser', {withCredentials:true});
-    //             const activeUser = response.data.user;
-    //             setCurrentUser(response.data.user);
-    //             let previewImg = '';
-    //             if(activeUser.profileImg.data && activeUser.profileImg.data){
-                    
-    //                     const string64Convert = btoa(
-    //                         new Uint8Array(activeUser.profileImg.data.data).
-    //                         reduce((data,byte) => data + String.fromCharCode(byte), '')
-    //                     )
-    //                     previewImg = `data:${activeUser.profileImg.data.contentType}; base64, ${string64Convert} `
-    //                     setProfileImage(previewImg);
-    //             }
-
-                
-                
-    //         }catch(err){
-    //             console.log("unable to get the response inside blog Contetn:",err);
-    //         }
-    //     }
-
-    //     gettingUserProfile();
-    // }, [])
-
+    
 
     useEffect(() => {
         const user= {

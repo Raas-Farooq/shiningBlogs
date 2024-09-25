@@ -10,59 +10,14 @@ import axios from 'axios';
 
 export default function Navbar(){
 
-    const {setCurrentUser, currentUser, setOpenUserAccount, openUserAccount, setShowMenu, showMenu, loggedIn, loading, setLoading, setLoggedIn} = useGlobalContext();
+    const {setCurrentUser, currentUser, setOpenUserAccount, openUserAccount, setShowMenu, showMenu, loggedIn, setLoggedIn} = useGlobalContext();
     
     // console.log("openUserAccount: ", openUserAccount);
     // console.log("showMenu: ", showMenu);
     const [searchClicked, setSearchClicked] = useState(false);
+    const [loading, setLoading] = useState(false);
     const size = WindowSize();
-    const userAuthentication = async () => {
-        try {
-            const response = await axios.get('http://localhost:4100/weblog/checkAuthen', {withCredentials: true});
-            console.log("response of auth inside globaL :", response)
-            if (response.data.isAuthenticated) {
-              console.log("is validUser globaL :", response.data);
-                setLoggedIn(true);
-                const user = response.data.user;
-                setCurrentUser(user);
-                let imgLink='';
-                if(user.profileImg && user.profileImg.data){
-                    const base64String = 
-                   btoa( new Uint8Array(user.profileImg.data.data).
-                   reduce((data, byte) => data+ String.fromCharCode(byte), ''))
-
-                    imgLink = `data:${user.profileImg.contentType};base64,${base64String}`;
-                }
-                setImagePreview(imgLink)
-                
-                localStorage.setItem('userId', response.data.user._id);
-            } else {
-                setLoggedIn(false);
-                setCurrentUser(false);
-                localStorage.removeItem('userId');
-            }
-        } catch (err) {
-            console.error("Authentication error:", err);
-            setCurrentUser(null);
-            setLoggedIn(false);
-
-        } finally {
-            setLoading(false);
-        }
-    }
-
-    useEffect(() => {
-        console.log("currentUser inside navbar: ", currentUser);
-
-    }, [currentUser,loggedIn])
-    useEffect(() => {
-      const userId = localStorage.getItem('userId');
-      if (userId) {
-        userAuthentication(); // Fetch full user data if we have a userId
-      } else {
-          setLoading(false);
-      }
-  }, []);
+    
     useEffect(() => {
         console.log("is Login: ", loggedIn);
         const thisUser = JSON.parse(localStorage.getItem('thisUser'));
