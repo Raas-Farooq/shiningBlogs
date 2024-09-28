@@ -12,7 +12,7 @@ function App() {
 
   return (
     <>
-    {loading ? <h2> ..Loading </h2> : (
+    {loading ? <h1> ..Loading </h1> : (
      <>
       <Navbar />
       <MainSection />

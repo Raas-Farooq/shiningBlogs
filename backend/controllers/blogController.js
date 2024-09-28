@@ -304,7 +304,8 @@ const addBlog = async (req,res) => {
     console.log("AddBlog Running :",)
     const {titleImage, title, content} = req.body;
     const user_id = req.user.userId;
-    console.log("user _id  :", user_id)
+    console.log("user _id  :", user_id);
+    
     try{
         const newBlog = new Blog({
             userId:user_id,
@@ -313,18 +314,18 @@ const addBlog = async (req,res) => {
             content:content
         })
 
-        const blogCreated = await newBlog.save();
-        if(!blogCreated){
-            return res.status(404).json({
-                success:false,
-                message:"Not Able to Create Blog. Try again Later",
+        // const blogCreated = await newBlog.save();
+        // if(!blogCreated){
+        //     return res.status(404).json({
+        //         success:false,
+        //         message:"Not Able to Create Blog. Try again Later",
                 
-            })
-        }
-        res.status(201).json({
-            success:true,
-            message:"BlogPost has been Created successfuly"
-        })
+        //     })
+        // }
+        // res.status(201).json({
+        //     success:true,
+        //     message:"BlogPost has been Created successfuly"
+        // })
     }
     catch(err){
         res.status(500).json({

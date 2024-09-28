@@ -12,7 +12,7 @@ const UpdateProfile = () => {
     const {isAuthenticated, setEditProfile} = useGlobalContext();
     // const [userImage, setUserImage] = useState('');
     const [userReceived, setUserReceived] = useState({});
-    const [imagePreview, setImagePreview] = useState('');
+    const [message, setMessage] = useState('');
     const [addInterest, setAddInterest] = useState('');
 
     const [formData, setFormData] = useState({
@@ -44,7 +44,7 @@ const UpdateProfile = () => {
                     );
                     imgPreview = `data:${user.profileImg.contentType};base64,${base64String}`;
                 }
-                console.log("image preview inside update Profile: ", imgPreview);
+                // console.log("image preview inside update Profile: ", imgPreview);
                 setFormData((prev) => ({
                     ...prev,
                     username:user.username || '',
@@ -137,7 +137,7 @@ const UpdateProfile = () => {
             console.log("interestes before parsing:", formData.interests);
             formInfo.append('interests', JSON.stringify(formData.interests));
         } 
-
+        setLocalLoading(true);
         console.log("before submitting: form Info", formInfo);
         try{
             const response = await axios.put(
@@ -150,7 +150,10 @@ const UpdateProfile = () => {
                 withCredentials:true
             
             })
-            console.log("successfully sent Data: ", response.data);
+            if(response.data.success){
+                setLocalLoading(false);
+                window.alert("Updated Successfully! Plz Refresh the Page")
+            }
         }catch(err){
             console.log("err: ", err);
         }
@@ -170,7 +173,6 @@ const UpdateProfile = () => {
                         />
                         {formData.imgPreview && (
                             <>
-                                {console.log("formData img: ", formData.imgPreview)}
                                 <img src={formData.imgPreview} alt="profile Image" className="w-[100px] h-[90px] p-2 m-5" />
                             </>
                             
