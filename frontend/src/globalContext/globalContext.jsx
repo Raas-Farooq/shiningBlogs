@@ -1,5 +1,6 @@
 import React, { useContext, useEffect, useState } from "react"
 import axios from 'axios';
+import UserAccount from "../Components/userAccount/userAccout";
 // import { isButtonElement } from "react-router-dom/dist/dom";
 
 const AppContext = React.createContext();
@@ -16,7 +17,10 @@ export const GlobalState = ({children}) => {
     const [globalEmail, setGlobalEmail] = useState('');
     const [currentUser, setCurrentUser] = useState(null);
 
+<<<<<<< HEAD
     
+=======
+>>>>>>> feature/loginUser
     const userAuthentication = async () => {
         try {
             const response = await axios.get('http://localhost:4100/weblog/checkAuthen', {withCredentials: true});
@@ -54,6 +58,7 @@ export const GlobalState = ({children}) => {
 
     useEffect(() => {
         console.log("currentUser inside navbar: ", currentUser);
+<<<<<<< HEAD
         console.log("Navbar runs: ")
     }, [currentUser,loggedIn]);
 
@@ -61,13 +66,26 @@ export const GlobalState = ({children}) => {
     useEffect(() => {
       const userId = localStorage.getItem('userId');
       console.log("userId Inside Navbar: ", userId);
+=======
+
+    }, [currentUser,loggedIn])
+    useEffect(() => {
+      const userId = localStorage.getItem('userId');
+>>>>>>> feature/loginUser
       if (userId) {
         userAuthentication(); // Fetch full user data if we have a userId
       } else {
           setLoading(false);
       }
   }, []);
+<<<<<<< HEAD
 
+=======
+    useEffect(() => {
+    console.log("current User global Context : ",currentUser);
+    console.log("is user logged in alhamdulila: ", loggedIn)
+    }, [loggedIn, currentUser])
+>>>>>>> feature/loginUser
     return (
         <AppContext.Provider value={{
             openUserAccount,
@@ -88,6 +106,7 @@ export const GlobalState = ({children}) => {
             setCurrentUser,
             imagePreview,
             setImagePreview,
+            userAuthentication
         }}>
             {children}
         </AppContext.Provider>

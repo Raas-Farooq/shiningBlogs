@@ -38,7 +38,6 @@ router.post('/userLogin',loginLimiter, [
     console.log("req. email: ", req.body.email)
 }
 
-
 const newBlogLimiter = rateLimit({
     windowMs:15 * 60 * 1000,
     max:10,
@@ -47,10 +46,16 @@ const newBlogLimiter = rateLimit({
 
 router.post('/addBlog', newBlogLimiter, authMiddleware, [
     body('title').isLength({min:1, max:200}).trim().escape().withMessage("title should be btween 1 and 200 characters"),
-    body('content').isArray().withMessage("content should be in Array format"),
-    body('content.*.type').isIn(['text', 'image', 'video']).withMessage("Data should be in Text, image or video format"),
-    body('content.*.value').optional().trim().escape(),
-    body('content.*.url').optional().isURL().withMessage(" Url SHuold be Valid")  
+    body('content').isJSON().withMessage("content should be in JSON format"),
+    body('content').custom(value => {
+        const content = JSON.parse(value);
+        if(!Array.isArray(content)) throw new Error("Content should be in Array form");
+        content.forEach(data => {
+            if(!['text', 'image'].includes(data.type)) throw new Error("type should be either text or image");
+            if(data.type === 'text' && typeof data !== 'string') throw new Error("text should be in String form");
+            if(data.type === 'image' && typeof data !== 'string') throw new Error("image url must be in String form")
+        })
+    })
 ], addBlog)
 
 const updateLimit = rateLimit({

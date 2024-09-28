@@ -72,11 +72,11 @@ const Login = () => {
                 {
                     withCredentials:true
                 });
+                console.log("login response: ", login_response);
                   if(login_response){
                     console.log("if condition runs true");
                     setLoading(false);
                   }
-                console.log("login response: ", login_response);
                 setCurrentUser(login_response.data.user);
                 const userId = login_response.data.user._id;
                 localStorage.setItem('userId', userId);
@@ -101,7 +101,8 @@ const Login = () => {
                
             }
             catch(err){
-                // console.log("err while Login: ", err.response.data.message);
+                console.log("err while Login: ", err.response.data.message);
+                setLoading(false);
                 if(err.response){
                     if(err.response.data && err.response.data.error){
                        const serverErr = err.response.data.errors.reduce((acc, curr) => {
