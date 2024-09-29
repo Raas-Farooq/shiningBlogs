@@ -301,19 +301,36 @@ const logging =  async(req,res) => {
 
 const addBlog = async (req,res) => {
 
-    console.log("AddBlog Running :",)
-    const {titleImage, title, content} = req.body;
-    const user_id = req.user.userId;
-    console.log("user _id  :", user_id);
-    
-    try{
-        const newBlog = new Blog({
-            userId:user_id,
-            title:title,
-            titleImage,
-            content:content
-        })
+    console.log("AddBlog Running :",req.body);
 
+    const errors = validationResult(req);
+
+    if(!errors.isEmpty()){
+        return res.status(400).json({
+            success:false,
+            message:"Got validation Errors",
+            error: errors.array()
+        })
+    }
+    const {title, content} = req.body;
+    const user_id = req.user.userId;
+    console.log(` title before: ${title}`);
+    console.log(`content before: ${content}`);
+    const titleImg = req.files['titleImage'] ? req.files['titleImage'][0].path : null;
+    const contentImages = req.files['contentImage'] ? req.files['contentImage'].map(file => file.path) : [];
+    console.log("titleImage after file management: ",titleImg);
+    const parseContent = JSON.parse(content);
+    console.log("parsed Content after :", parseContent);
+    try{
+        // const newBlog = new Blog({
+        //     userId:user_id,
+        //     title:title,
+        //     titleImage,
+        //     content:content
+        // })
+
+       
+        
         // const blogCreated = await newBlog.save();
         // if(!blogCreated){
         //     return res.status(404).json({

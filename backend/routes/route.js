@@ -44,16 +44,17 @@ const newBlogLimiter = rateLimit({
     message:"Too many blogs created plz try again after some time"
 })
 
-router.post('/addBlog', newBlogLimiter, authMiddleware, [
+const upload = multer({dest:'uploads/'})
+
+router.post('/addBlog', upload.fields([{name:'titleImage', maxCount:1}, {name:"contentImage", maxCount:10}]), newBlogLimiter, authMiddleware, [
     body('title').isLength({min:1, max:200}).trim().escape().withMessage("title should be btween 1 and 200 characters"),
     body('content').isJSON().withMessage("content should be in JSON format"),
-    body('content').custom(value => {
+    body('content').custom((value) => {
         const content = JSON.parse(value);
         if(!Array.isArray(content)) throw new Error("Content should be in Array form");
         content.forEach(data => {
             if(!['text', 'image'].includes(data.type)) throw new Error("type should be either text or image");
-            if(data.type === 'text' && typeof data !== 'string') throw new Error("text should be in String form");
-            if(data.type === 'image' && typeof data !== 'string') throw new Error("image url must be in String form")
+            if(data.type === 'text' && typeof data.value !== 'string') throw new Error("text should be in String form");
         })
     })
 ], addBlog)
@@ -62,6 +63,9 @@ const updateLimit = rateLimit({
     windowMs:15 * 60 * 1000,
     message:"Too many attempts try again later"
 })
+const storage = multer.memoryStorage();
+const uploads = multer({storage:storage});
+
 router.put('/updatedBlog/:id',updateLimit, authMiddleware,
     [
         body('title').optional().isLength({min:1, max:200}).trim().escape().withMessage("title should be btween 1 and 200 characters"),
@@ -84,8 +88,7 @@ const updateUserLimit = rateLimit({
     max: 3
 })
 
-const storage = multer.memoryStorage();
-const uploads = multer({storage:storage});
+
 
 router.put('/updateUserProfile', uploads.single('profileImg'), updateUserLimit, authMiddleware,
     // [

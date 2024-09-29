@@ -9,11 +9,12 @@ export default function Write() {
         titleImg:null,
         imgPreview:''
     })
-    const [contentText, setContentText] = useState('');
+    const [contentText, setContentText] = useState();
     const [contentImages, setContentImages] = useState([]);
 
     const handleTitles = (e) => {
 
+        
         console.log("value: ", e.target.value);
         console.log("name: ", e.target.name)
         setBlogTitle(prev => ({...prev, 
@@ -32,12 +33,13 @@ export default function Write() {
             imgPreview:URL.createObjectURL(image)
         }))
 
+        console.log(
+            "Image attached with blogImage: ", blogTitle.titleImg
+        )
     }
     const handleContent = (e) => {
         console.log(`blogContent name: ${e.target.name}, value ${e.target.value}`)
-        setContentText(
-          e.target.value
-        )
+        setContentText(e.target.value)
 
         console.log("content after setting the value: ", contentText)
     }
@@ -50,7 +52,7 @@ export default function Write() {
             ...prev,
             {
                 type:'image',
-                url:URL.createObjectURL(image)
+                imageFile:image,
             }    
         ]))
 
@@ -59,7 +61,7 @@ export default function Write() {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        console.log("your title ", blogTitle);
+        console.log("your title ", blogTitle.titleImg);
         console.log("your Content: ", contentText);
         console.log("this is the contentImages: ", contentImages);
         let contentArray = [{
@@ -68,32 +70,46 @@ export default function Write() {
         }];
 
         
-        contentImages.map(image => (
-            contentArray.push(image)
-        ))
+        // contentImages.map(image => (
+        //     contentArray.push(image)
+        // ))
 
         const blogData = new FormData();
+        blogData.append('title', blogTitle.title);
+        blogData.append('titleImage', blogTitle.titleImg);
         blogData.append('content', JSON.stringify(contentArray));
-        console.log("contentArray: ", contentArray);
-        // console.log("blog Data: ", blogData);
+
+        contentImages.forEach((image, index ) => {
+            blogData.append(`contentImage`, image.imageFile);
+        })
+        console.log("blogData: before sending",blogData);
 
         try{
+
             const response = await axios.post('http://localhost:4100/weblog/addBlog', 
-            blogData, 
-            {},
-            {withCredentials:true}
+            blogData,
+
+            {
+                withCredentials:true,
+                headers:{
+                    'Content-Type':'multipart/form-data'
+                }
+
+            }
         );
             console.log("response after sending new Blog: ", response);
         }catch(err){
             console.log("error while posting new Blog ", err)
         }
     }
+
+
     return(
         <div className="page-content">
             {console.log("content ")}
             <h1> I am Write </h1> 
             <form method="post" className="ml-5 flex flex-col">
-                <label for="title" className="text-blue-500"> Enter your title</label>
+                <label htmlFor="title" className="text-blue-500"> Enter your title</label>
                 <input type="text"
                  name="title" 
                  placeholder="enter the Title of Blog" 
