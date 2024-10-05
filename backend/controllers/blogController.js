@@ -226,6 +226,8 @@ const updateUserProfile = async (req, res) => {
 const logging =  async(req,res) => {
     //checking Result of Validation
     const {email, password}= req.body;
+    console.log("Login RUns");
+    console.log(`Received email ${email} and password ${password} backend`);
     const loginErrors = validationResult(req);
     if(!loginErrors.isEmpty()){
         return res.status(400).json({
@@ -238,7 +240,8 @@ const logging =  async(req,res) => {
     try{
 
         // accessing User
-        
+        const allUsers = await User.find({});
+        console.log("all Users inside try block: ", allUsers);
         const user = await User.findOne({email});
         console.log("user: inside login ", user);
         // if user didn't exist
@@ -316,36 +319,34 @@ const addBlog = async (req,res) => {
     const user_id = req.user.userId;
     console.log(` title before: ${title}`);
     console.log(`content before: ${content}`);
-    const titleImg = req.files['titleImage'] ? req.files['titleImage'][0].path : null;
-    const contentImages = req.files['contentImage'] ? req.files['contentImage'].map(file => file.path) : [];
-    console.log("titleImage after file management: ",titleImg);
-    const parseContent = JSON.parse(content);
-    console.log("parsed Content after :", parseContent);
-    try{
-        // const newBlog = new Blog({
-        //     userId:user_id,
-        //     title:title,
-        //     titleImage,
-        //     content:content
-        // })
-
-       
+    const titleImage = req.files['titleImage'] ? req.files['titleImage'][0].path : null;
         
-        // const blogCreated = await newBlog.save();
-        // if(!blogCreated){
-        //     return res.status(404).json({
-        //         success:false,
-        //         message:"Not Able to Create Blog. Try again Later",
+    try{
+        const contentImages = req.files['contentImage'] ? req.files['contentImage'].map(file => file.path) : [];
+        console.log("images inside try blog:", contentImages);
+        const newBlog = new Blog({
+            userId:user_id,
+            title:title,
+            titleImage,
+            content:content,
+            contentImages
+        });
+
+        const blogCreated = await newBlog.save();
+        if(!blogCreated){
+            return res.status(404).json({
+                success:false,
+                message:"Not Able to Create Blog. Try again Later",
                 
-        //     })
-        // }
-        // res.status(201).json({
-        //     success:true,
-        //     message:"BlogPost has been Created successfuly"
-        // })
+            })
+        }
+        return res.status(201).json({
+            success:true,
+            message:"BlogPost has been Created successfuly"
+        })
     }
     catch(err){
-        res.status(500).json({
+        return res.status(500).json({
             success:false,
             message:"Server responded with Errror",
             error:err.message
@@ -487,7 +488,7 @@ const allUsers = async(req,res) => {
     catch(err){
         return res.status(500).json({
             success:false,
-            message:"Server Error"
+            message:"Server Error while fetching all Users"
         })
     }
 }

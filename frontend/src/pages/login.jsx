@@ -61,6 +61,7 @@ const Login = () => {
         }
         else{
             setErrors({});
+            console.log(`before sending login data ; email: ${email}, password: ${password}`)
             const loginData = {
                 email,
                 password
@@ -101,7 +102,7 @@ const Login = () => {
                
             }
             catch(err){
-                console.log("err while Login: ", err.response.data.message);
+                // console.log("err while Login: ", err.response.data.message);
                 setLoading(false);
                 if(err.response){
                     if(err.response.data && err.response.data.error){

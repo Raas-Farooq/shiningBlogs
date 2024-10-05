@@ -55,10 +55,11 @@ const blogSchema = new mongoose.Schema({
     },
     
     content:[{
-        type:{type:String, enum:['text', 'image', 'video']},
-        value:String,
-        url:String
+        type:String
     }],
+    // contentImages:[{
+    //     type:String
+    // }],
     createdAt:{
         type:Date,
         default:Date.now

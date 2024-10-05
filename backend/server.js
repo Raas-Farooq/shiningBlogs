@@ -12,6 +12,12 @@ app.use(cors({
     credentials:true,
 }));
 app.use(cookieParser());
+
+app.use((err, req,res, next) => {
+    console.error(err.stack);
+    res.status(500).send("Something went wrong")
+})
+
 const port = process.env.PORT || 4100;
 databaseConnection()
 

@@ -50,12 +50,18 @@ router.post('/addBlog', upload.fields([{name:'titleImage', maxCount:1}, {name:"c
     body('title').isLength({min:1, max:200}).trim().escape().withMessage("title should be btween 1 and 200 characters"),
     body('content').isJSON().withMessage("content should be in JSON format"),
     body('content').custom((value) => {
-        const content = JSON.parse(value);
-        if(!Array.isArray(content)) throw new Error("Content should be in Array form");
-        content.forEach(data => {
-            if(!['text', 'image'].includes(data.type)) throw new Error("type should be either text or image");
-            if(data.type === 'text' && typeof data.value !== 'string') throw new Error("text should be in String form");
-        })
+        try{
+            const content = JSON.parse(value);
+            if(!Array.isArray(content)) throw new Error("Content should be in Array form");
+            content.forEach(data => {
+                if(!['text', 'image'].includes(data.type)) throw new Error("type should be either text or image");
+                if(data.type === 'text' && typeof data.value !== 'string') throw new Error("text should be in String form");
+        });
+        return true;
+        }catch(err){
+            throw new Error("error related to content format", err.message)
+        }
+        
     })
 ], addBlog)
 
