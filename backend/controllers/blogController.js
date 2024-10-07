@@ -324,12 +324,24 @@ const addBlog = async (req,res) => {
     try{
         const contentImages = req.files['contentImage'] ? req.files['contentImage'].map(file => file.path) : [];
         console.log("images inside try blog:", contentImages);
+        const parsed = JSON.parse(content);
+        const allContent = [parsed[0]];
+
+        contentImages.forEach(image => {
+            allContent.push({
+                type:'image',
+                value:image
+            })
+        })
+        console.log("all Content: ",allContent);
+
+
         const newBlog = new Blog({
             userId:user_id,
             title:title,
             titleImage,
-            content:content,
-            contentImages
+            content:allContent,
+            
         });
 
         const blogCreated = await newBlog.save();
@@ -503,7 +515,8 @@ const getUser = async(req,res) => {
         const user = await User.findById(userId);
 
         if(!user){
-            return res.status(401).json({
+            message:"Server Error while finding a User"
+             return res.status(401).json({
                 success:false,
                 message:'Unable to find User Id'
             })
@@ -518,12 +531,33 @@ const getUser = async(req,res) => {
     }catch(err){
         return res.status(500).json({
             success:false,
-            message:"Server Error while finding a User"
-        })
+       })
     }
 }
 
-
+const allBlogs = async(req, res) => {
+    console.log("allBlogs run");
+    try{
+        const blogs = await Blog.find({});
+        if(!blogs){
+            return res.status(401).json({
+                success:false,
+                message:"Blogs not found"
+            })
+        }
+        return res.status(200).json({
+            success:true,
+            message:"Successfully found the blogs",
+            blogs
+        })
+    }catch(err){
+        return res.status(500).json({
+            success:false,
+            message:"somewhere inside the server error is dancing",
+            err:err.message
+        })
+    }
+}
 const logout = (req,res) => {
     res.clearCookie('token');
     return res.status(200).json({
@@ -532,4 +566,4 @@ const logout = (req,res) => {
     })
 }
 
-export {current, registerUser, logging, addBlog, updateBlogPost, deleteBlog, updateUserProfile, allUsers, getUser, logout}
+export {current, registerUser, logging, allBlogs,addBlog, updateBlogPost, deleteBlog, updateUserProfile, allUsers, getUser, logout}

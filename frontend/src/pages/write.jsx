@@ -98,6 +98,16 @@ export default function Write() {
             }
         );
             console.log("response after sending new Blog: ", response);
+            if(response.data.success){
+                setBlogTitle({
+                    title:'',
+                    titleImg:null,
+                    imgPreview:''
+                });
+                setContentImages([]);
+                setContentText('');
+                alert('Blog Created Successfully');
+            }
         }catch(err){
             console.log("error while posting new Blog ", err)
         }
@@ -130,7 +140,7 @@ export default function Write() {
                     required
                     />
                     <div className="absolute bottom-24">
-                        <label htmlFor="imageUpload" className="bg-blue-500 rounded p-2 mr-4"> upload Your Image</label>
+                        <label htmlFor="imageUpload" className="text-bold p-2 mr-4"> upload Your Image</label>
                         <input type="file" 
                         name="image"
                         accept="image/*" 

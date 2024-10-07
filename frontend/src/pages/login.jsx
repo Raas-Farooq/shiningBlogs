@@ -52,10 +52,8 @@ const Login = () => {
         e.preventDefault();
         setLoading(true);
         const validationErrors = handleValidation();
-
-        console.log("new Way: ", validationErrors);
         if(Object.keys(validationErrors).length > 0){
-            console.log("you have validation errors ")
+            console.log("Got validation errors ")
             setErrors(validationErrors);
             return; 
         }
@@ -73,7 +71,7 @@ const Login = () => {
                 {
                     withCredentials:true
                 });
-                console.log("login response: ", login_response);
+
                   if(login_response){
                     console.log("if condition runs true");
                     setLoading(false);

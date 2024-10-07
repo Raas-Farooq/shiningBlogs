@@ -6,6 +6,7 @@ const usersSchema = new mongoose.Schema({
         required:true,
         unique:true
     },
+    
     email:{
         type:String,
         required:true,
@@ -38,7 +39,15 @@ const usersSchema = new mongoose.Schema({
     collection:'User'
 })
 
+usersSchema.index({username:1}, {unique:true});
+usersSchema.index({email:1}, {unique:true});
+
 const User = mongoose.model('User', usersSchema)
+
+// User.createCollection().then(function(collection) {
+//     console.log("this is the collections created: ", collection);
+// })
+
 
 const blogSchema = new mongoose.Schema({
     userId:{
@@ -55,11 +64,15 @@ const blogSchema = new mongoose.Schema({
     },
     
     content:[{
-        type:String
-    }],
-    // contentImages:[{
-    //     type:String
-    // }],
+        type:{
+            type:String, 
+            enum:['text', 'image'],
+            required:true
+        },
+        value:String
+    }
+],
+  
     createdAt:{
         type:Date,
         default:Date.now
