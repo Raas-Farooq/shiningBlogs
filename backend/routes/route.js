@@ -44,7 +44,18 @@ const newBlogLimiter = rateLimit({
     message:"Too many blogs created plz try again after some time"
 })
 
-const upload = multer({dest:'uploads/'})
+const storage = multer.diskStorage({
+    destination: function (req,file, cb){
+        cb(null, '/uploads')
+    },
+
+    filename:function (req,file, cb){
+       
+        cb(null, Date.now + '-' + file.originalname)
+    }
+})
+
+const upload = multer({storage:storage})
 
 router.post('/addBlog', upload.fields([{name:'titleImage', maxCount:1}, {name:"contentImage", maxCount:10}]), newBlogLimiter, authMiddleware, [
     body('title').isLength({min:1, max:200}).trim().escape().withMessage("title should be btween 1 and 200 characters"),
@@ -69,8 +80,6 @@ const updateLimit = rateLimit({
     windowMs:15 * 60 * 1000,
     message:"Too many attempts try again later"
 })
-const storage = multer.memoryStorage();
-const uploads = multer({storage:storage});
 
 router.put('/updatedBlog/:id',updateLimit, authMiddleware,
     [
@@ -94,9 +103,9 @@ const updateUserLimit = rateLimit({
     max: 3
 })
 
-
-
-router.put('/updateUserProfile', uploads.single('profileImg'), updateUserLimit, authMiddleware,
+// const storage = multer.memoryStorage();
+// const uploads = multer({storage:storage});
+router.put('/updateUserProfile', upload.single('profileImg'), updateUserLimit, authMiddleware,
     // [
     //     body('username').isLength({min:3}).trim().escape().withMessage("Username length should be atleast 3 characters"),
     //     body('goal').isLength({min:30}).withMessage("Your goal should consist of atleast 30 characters")

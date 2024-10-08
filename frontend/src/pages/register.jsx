@@ -77,7 +77,7 @@ const Register = () => {
                 console.log("successfully got response during registration: ", registerResponse.data);
                 setRegisterData(registerResponse.data);
                 alert("Success! You will find an Confirmation Email Soon")
-            
+                
                 setEmail('');
                 setUsername('');
                 setPassword('');

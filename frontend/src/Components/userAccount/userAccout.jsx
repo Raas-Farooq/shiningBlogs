@@ -7,7 +7,7 @@ import UpdateProfile from "../../pages/updateProfile";
 import axios from "axios";
 // eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7InVzZXJJZCI6IjY2ZGQ5YTZiMDllN2VjNzNjYjEzMThmOSIsImVtYWlsIjoiaG93bXVjaEBnbWFpbC5jb20ifSwiaWF0IjoxNzI1Nzk5MDE5LCJleHAiOjE3MjU4MDI2MTl9.30d-8wrkgIIbNR5iTJs-kpjV-6fhYYMoJtO68M_My-0
 const UserAccount = () => {
-  const { userAuthentication, openUserAccount, setOpenUserAccount, setEditProfile,currentUser,setLoggedIn, imagePreview} = useGlobalContext();
+  const { setIsAuthenticated, openUserAccount, setOpenUserAccount, setEditProfile,currentUser,setLoggedIn, imagePreview} = useGlobalContext();
   console.log("inside user Account: openUser ",openUserAccount);
 
     const [userImage, setUserImage] = useState('');
@@ -77,6 +77,7 @@ const UserAccount = () => {
         console.log("logout Response inside user Account: ", response);
         localStorage.removeItem('userId');
         setLoggedIn(false)
+        setIsAuthenticated(false)
       }catch(err){
         console.log("Error while logging out ")
       }

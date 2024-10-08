@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useGlobalContext } from "../globalContext/globalContext";
-import { Link } from "react-router-dom";
+import { Link, useNavigate, useNavigation} from "react-router-dom";
 import { FaImage } from "react-icons/fa";
 import axios from 'axios';
 
@@ -14,7 +14,7 @@ const UpdateProfile = () => {
     const [userReceived, setUserReceived] = useState({});
     const [message, setMessage] = useState('');
     const [addInterest, setAddInterest] = useState('');
-
+    const moveTo = useNavigate();
     const [formData, setFormData] = useState({
         username:'',
         goal:'',
@@ -27,9 +27,17 @@ const UpdateProfile = () => {
     
     const [localLoading, setLocalLoading] = useState(true)
 
-    
     useEffect(() => {
-        console.log("isAuthenticated inside updateProfile: ", isAuthenticated)
+        console.log("isAuthenticated: ", isAuthenticated);
+        
+        if(!isAuthenticated){
+            alert("you are Not Logged In. Sign In or Create new Account")
+            // moveTo('/');
+        }
+    }, [isAuthenticated])
+    useEffect(() => {
+        console.log("isAuthenticated inside updateProfile: ", isAuthenticated);
+        
         const get_current_user = async () => {
             try{
                 const response = await axios.get('http://localhost:4100/weblog/getUser', {withCredentials:true});
@@ -66,6 +74,9 @@ const UpdateProfile = () => {
       
     },[])
 
+    useEffect(() => {
+        console.log("userImage: inside UseEffect ",formData.userImage)
+    }, [formData])
     // useEffect(() => {
     //     console.log("UserReceived Inside Newly Created useEffect: ", userReceived)
     //     if(Object.keys(userReceived).length > 0 ){
@@ -99,7 +110,7 @@ const UpdateProfile = () => {
             userImage:imgFile,
             imgPreview:URL.createObjectURL(imgFile)
         }))
-
+        
         // const preview = URL.createObjectURL(userImage);
         // setImagePreview(preview);
         // console.log("image Preview: ", imagePreview.length)
@@ -127,6 +138,7 @@ const UpdateProfile = () => {
         if(userReceived.email) formInfo.append('email', userReceived.email);
         if(userReceived.password) formInfo.append('password', userReceived.password);
         if(formData.userImage instanceof File){
+            console.log(` formData.userImage ${formData.userImage} , name iamge ${formData.userImage.name}`)
             formInfo.append('profileImg', formData.userImage, formData.userImage.name )
         }
         // if(formData.userImage) formInfo.append('profileImg', formData.imgPreview);

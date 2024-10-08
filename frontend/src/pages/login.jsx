@@ -7,7 +7,7 @@ import axios from "axios";
 
 const Login = () => {
 
-    const {userAuthentication, currentUser,setCurrentUser, setLoggedIn, imagePreview, setImagePreview} = useGlobalContext();
+    const {setIsAuthenticated,setCurrentUser, setLoggedIn, imagePreview, setImagePreview} = useGlobalContext();
     const [email, setEmail] = useState('');
     const [message, setMessage] = useState('');
     const [password, setPassword] = useState('');
@@ -92,7 +92,7 @@ const Login = () => {
 
                 console.log("img Preview inside login: ", imagePreview);
                 
-            
+                setIsAuthenticated(true);
                 setEmail('');
                 setPassword('');
                 navigate('/');

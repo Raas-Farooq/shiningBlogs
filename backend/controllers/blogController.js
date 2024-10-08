@@ -168,25 +168,26 @@ const updateUserProfile = async (req, res) => {
         //     updatingUser.password = hashedPassword;
         // }
         if(req.file){
-            console.log("is Req.file okay ", req.file);
-            updatingUser.profileImg = {
-                data: req.file.buffer,
-                contentType: req.file.mimetype
-            }
+            console.log("req.file", req.file);
+            // const file = req.file
+            // updatingUser.profileImg = {
+            //     data: req.file.buffer,
+            //     contentType: req.file.mimetype
+            // }
         }
         if(goal) updatingUser.goal = goal;
         if(interests) updatingUser.TopicsInterested = interests;
         
-        const updated = await User.findByIdAndUpdate(userId,
-            {
-                $set:updatingUser,
-            },
-            {new:true, runValidators:true}
-        )
+        // const updated = await User.findByIdAndUpdate(userId,
+        //     {
+        //         $set:updatingUser,
+        //     },
+        //     {new:true, runValidators:true}
+        // )
         return res.status(200).json({
             success:true,
             message:" User Profile Updated",
-            new_Profile:updated
+            // new_Profile:updated
         })
  
     }
@@ -320,7 +321,7 @@ const addBlog = async (req,res) => {
     console.log(` title before: ${title}`);
     console.log(`content before: ${content}`);
     const titleImage = req.files['titleImage'] ? req.files['titleImage'][0].path : null;
-        
+    console.log("title Imaghe: ", titleImage)
     try{
         const contentImages = req.files['contentImage'] ? req.files['contentImage'].map(file => file.path) : [];
         console.log("images inside try blog:", contentImages);
@@ -344,14 +345,14 @@ const addBlog = async (req,res) => {
             
         });
 
-        const blogCreated = await newBlog.save();
-        if(!blogCreated){
-            return res.status(404).json({
-                success:false,
-                message:"Not Able to Create Blog. Try again Later",
+        // const blogCreated = await newBlog.save();
+        // if(!blogCreated){
+        //     return res.status(404).json({
+        //         success:false,
+        //         message:"Not Able to Create Blog. Try again Later",
                 
-            })
-        }
+        //     })
+        // }
         return res.status(201).json({
             success:true,
             message:"BlogPost has been Created successfuly"
