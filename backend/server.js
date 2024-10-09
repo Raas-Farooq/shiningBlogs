@@ -12,6 +12,7 @@ app.use(cors({
     credentials:true,
 }));
 app.use(cookieParser());
+app.use('/uploads', express.static('uploads'));
 
 app.use((err, req,res, next) => {
     console.error(err.stack);

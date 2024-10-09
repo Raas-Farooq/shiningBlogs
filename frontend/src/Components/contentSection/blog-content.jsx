@@ -22,7 +22,12 @@ export default function BlogContent(){
         
         localStorage.setItem('activeUser', JSON.stringify(user));
         const activeUser = JSON.parse(localStorage.getItem('activeUser'));
-        console.log("active user from localStorage: ", activeUser);
+        if(currentUser){
+            const myImage = `http://localhost:4100/${currentUser.profileImg}`;
+            setProfileImage(myImage);
+        }
+        
+        console.log("current User in Blog Content: ", currentUser);
     }, [])
 
     return (
@@ -45,7 +50,7 @@ export default function BlogContent(){
                     {currentUser ? (
                         <>
                             <h2 className="font-extrabold "> {currentUser.username && currentUser.username.length ? `About ${currentUser.username.toUpperCase()}` : 'About' }</h2>
-                            {imagePreview && (<img src={imagePreview} 
+                            {profileImage && (<img src={profileImage} 
                             alt="greenry"
                             className="w-auto md:h-h-[210px] mx-auto " />)}
                             

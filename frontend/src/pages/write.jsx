@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom"
 import axios from 'axios';
 
@@ -11,9 +11,7 @@ export default function Write() {
     })
     const [titleErr, setTitleErr] = useState('');
     const [errors, setErrors] = useState({});
-    // const [titleImgErr, setTitleImgErr] = useState('');
-    // const [contentTextErr, setContentTextErr] = useState('');
-    const [contentText, setContentText] = useState();
+    const [contentText, setContentText] = useState('');
     const [imagesShortNames, setImagesShortNames] = useState([]);
     const [contentImages, setContentImages] = useState([]);
 
@@ -32,17 +30,26 @@ export default function Write() {
 
     
 
-
+    useEffect(() => {
+        console.log("textContent: ",contentText);
+        console.log("blogTitle.title: ",blogTitle.title);
+        console.log("blogTitle.titleImg: ",blogTitle.titleImg);
+    }, [contentText, blogTitle.title, blogTitle.titleImg])
     const handleTitles = (e) => {
-
-        
-        console.log("value: ", e.target.value);
-        console.log("name: ", e.target.name)
+        // const errors = checkValidation();
         setBlogTitle(prev => ({...prev, 
             [e.target.name]: e.target.value
         }))
 
         console.log("blogTitle after adding Title:", blogTitle);
+        
+        if(errors.titleError){
+            console.log("Yes")
+            errors.titleError = "";
+            
+            setErrors(errors);
+        }
+        console.log("validation errors inside handleTitles: ", errors);
     }
 
     const handleTitleImage= (e) => {
@@ -53,7 +60,10 @@ export default function Write() {
             titleImg:image,
             imgPreview:URL.createObjectURL(image)
         }))
-
+        if(errors.titleImageError){
+            errors.titleImageError = "";
+            setErrors(errors);
+        }
         console.log(
             "Image attached with blogImage: ", blogTitle.titleImg
         )
@@ -61,7 +71,10 @@ export default function Write() {
     const handleContent = (e) => {
         console.log(`blogContent name: ${e.target.name}, value ${e.target.value}`)
         setContentText(e.target.value)
-
+        if(errors.textContentError){
+            errors.textContentError = "";
+            setErrors(errors);
+        }
         console.log("content after setting the value: ", contentText)
     }
 
@@ -134,17 +147,23 @@ export default function Write() {
                 );
                 console.log("response after sending new Blog: ", response);
                 if(response.data.success){
-                    setBlogTitle({
-                        title:'',
-                        titleImg:null,
-                        imgPreview:''
-                    });
+                    console.log("response.data.success: ", response.data.success);
+                    blogTitle.title="";
+                    blogTitle.imgPreview = '';
+                    setBlogTitle(prev => 
+                        ({
+                            ...prev,
+                            title:"",
+                            titleImg:"",
+                            imgPreview:""
+                        } )
+                    );
                     setContentImages([]);
                     setContentText('');
-                    // setTitleErr('');
-                    // setTitleImgErr('');
-                    // setContentTextErr('')
+                    setImagesShortNames([])
                     alert('Blog Created Successfully');
+                    console.log("title: ", blogTitle.title);
+                    console.log("text Content: ", contentText)
                     }
             }
             
@@ -161,7 +180,7 @@ export default function Write() {
 
     return(
         <div className="page-content">
-            {/* {console.log(`title Err ${titleErr} , image Error ${titleImgErr}`)} */}
+            {console.log(`title Dom ${blogTitle.title}`)}
             <h1> I am Write </h1> 
             <form method="post" className="ml-5 flex flex-col">
                 <label htmlFor="title" className="text-blue-500"> Enter your title</label>
@@ -170,6 +189,7 @@ export default function Write() {
                  placeholder="enter the Title of Blog" 
                  className="border border-gray-500 mt-4 w-100" 
                  onChange={handleTitles}
+                 value={blogTitle.title}
                  required/>
                 
                 {errors.titleError && <p className="text-red-600"> {errors.titleError}* </p> }
@@ -186,6 +206,7 @@ export default function Write() {
                     name="value"
                     className="border-gray-500 border w-4/5 h-[350px] mt-4"
                     onChange={handleContent}
+                    value={contentText}
                     required
                     />
                     
@@ -206,7 +227,7 @@ export default function Write() {
 
                     
                 </div>
-                {errors.textContentError && <p className="text-red-600 font-larger"> {errors.textContentError}* </p> }
+                {errors.textContentError && <p className="text-red-600 font-larger absolute top-[40%] right-48"> {errors.textContentError}* </p> }
                <button type="submit" onClick={handleSubmit} className="border border-blue-400 bg-red-500 w-fit mt-4 p-2">Create New Blog</button>
             </form>
             <button><Link to={'/'} className=''> Back To Home</Link></button>

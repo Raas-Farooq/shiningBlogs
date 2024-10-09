@@ -9,7 +9,6 @@ import { useGlobalContext } from './globalContext/globalContext.jsx';
 
 function App() {
   const {loading} = useGlobalContext();
-  console.log("loading: ", loading)
   return (
     <>
     {loading ? <h1> ..Loading </h1> : (

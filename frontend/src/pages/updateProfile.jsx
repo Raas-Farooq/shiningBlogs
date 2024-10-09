@@ -9,7 +9,7 @@ import axios from 'axios';
 // lifeLamha
 const UpdateProfile = () => {
 
-    const {isAuthenticated, setEditProfile} = useGlobalContext();
+    const {isAuthenticated, setEditProfile,setImagePreview, imagePreview} = useGlobalContext();
     // const [userImage, setUserImage] = useState('');
     const [userReceived, setUserReceived] = useState({});
     const [message, setMessage] = useState('');
@@ -43,16 +43,12 @@ const UpdateProfile = () => {
                 const response = await axios.get('http://localhost:4100/weblog/getUser', {withCredentials:true});
                 const user =  response.data.user;
                 setUserReceived(user);
-                console.log("profileImg only data",response.data.user.profileImg);
+                
+                let realImage = '';
+                console.log("response.image; ", response.data.user.profileImg);
+                realImage = `http://localhost:4100/${response.data.user.profileImg}`;
+                setImagePreview(realImage);
                 let imgPreview = '';
-                if (user.profileImg && user.profileImg.data) {
-                    const base64String = btoa(
-                        new Uint8Array(user.profileImg.data.data)
-                            .reduce((data, byte) => data + String.fromCharCode(byte), '')
-                    );
-                    imgPreview = `data:${user.profileImg.contentType};base64,${base64String}`;
-                }
-                // console.log("image preview inside update Profile: ", imgPreview);
                 setFormData((prev) => ({
                     ...prev,
                     username:user.username || '',
@@ -75,9 +71,11 @@ const UpdateProfile = () => {
     },[])
 
     useEffect(() => {
-        console.log("userImage: inside UseEffect ",formData.userImage)
-    }, [formData])
-    // useEffect(() => {
+        // console.log("formData.userImage inside update Profile",formData.imgPreview);
+        // setImagePreview(formData.imgPreview);
+        console.log("global image inside update profile: ", imagePreview)
+    }, [imagePreview])
+    // useEffect(() => {3
     //     console.log("UserReceived Inside Newly Created useEffect: ", userReceived)
     //     if(Object.keys(userReceived).length > 0 ){
             
@@ -104,7 +102,8 @@ const UpdateProfile = () => {
         e.preventDefault();
         const imgFile =  e.target.files[0];
         // setUserImage(e.target.files[0]);
-        console.log("imgFile: ",imgFile)
+        // console.log("imgFile: ",imgFile);
+        setImagePreview(URL.createObjectURL(imgFile));
         setFormData((prevState) => ({
             ...prevState,
             userImage:imgFile,
@@ -179,13 +178,16 @@ const UpdateProfile = () => {
                
                 <>
                     <h1> UPDATE Your Profile</h1>
+                    {console.log("DOM image inside update profile: ", imagePreview)}
                     <form className="flex flex-col p-5" method="post" >
                         <label className="mb-3 text-blue-600"> Select the Profile Image</label>
                         <input type="file" accept="image/*" className="w-fit" onChange={handleImageSubmit}
                         />
-                        {formData.imgPreview && (
+                        {imagePreview && (
+                            
                             <>
-                                <img src={formData.imgPreview} alt="profile Image" className="w-[100px] h-[90px] p-2 m-5" />
+                               
+                                <img src={imagePreview} alt="profile Image" className="w-[100px] h-[90px] p-2 m-5" />
                             </>
                             
         

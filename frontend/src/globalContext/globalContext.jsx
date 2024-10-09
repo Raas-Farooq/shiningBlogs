@@ -27,14 +27,14 @@ export const GlobalState = ({children}) => {
                 setLoggedIn(true);
                 const user = response.data.user;
                 setCurrentUser(user);
-                let imgLink='';
-                if(user.profileImg && user.profileImg.data){
-                    const base64String = 
-                   btoa( new Uint8Array(user.profileImg.data.data).
-                   reduce((data, byte) => data+ String.fromCharCode(byte), ''))
+                let imgLink=`http://localhost:4100/${user.profileImg}`;
+                // if(user.profileImg && user.profileImg.data){
+                //     const base64String = 
+                //    btoa( new Uint8Array(user.profileImg.data.data).
+                //    reduce((data, byte) => data+ String.fromCharCode(byte), ''))
 
-                    imgLink = `data:${user.profileImg.contentType};base64,${base64String}`;
-                }
+                //     imgLink = `data:${user.profileImg.contentType};base64,${base64String}`;
+                // }
                 setImagePreview(imgLink)
                 
                 localStorage.setItem('userId', response.data.user._id);

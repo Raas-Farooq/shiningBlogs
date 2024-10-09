@@ -25,9 +25,7 @@ const usersSchema = new mongoose.Schema({
         type:String
     },
     profileImg:{
-        data:Buffer,
-        contentType:String
-
+        type:String
     },
 
     createdAt:{

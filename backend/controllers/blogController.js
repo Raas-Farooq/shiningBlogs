@@ -147,7 +147,6 @@ const updateUserProfile = async (req, res) => {
     }
     
     const {username, email, password,goal} = req.body;
-    console.log(`goal ${goal} username ${username} email ${email}`);
     const interests = req.body.interests ? JSON.parse(req.body.interests) : undefined;
     const user = await User.findById(userId);
     if(user._id.toString() !== userId){
@@ -168,26 +167,29 @@ const updateUserProfile = async (req, res) => {
         //     updatingUser.password = hashedPassword;
         // }
         if(req.file){
-            console.log("req.file", req.file);
-            // const file = req.file
-            // updatingUser.profileImg = {
-            //     data: req.file.buffer,
-            //     contentType: req.file.mimetype
-            // }
+        
+            updatingUser.profileImg=req.file.path;
         }
         if(goal) updatingUser.goal = goal;
         if(interests) updatingUser.TopicsInterested = interests;
         
-        // const updated = await User.findByIdAndUpdate(userId,
-        //     {
-        //         $set:updatingUser,
-        //     },
-        //     {new:true, runValidators:true}
-        // )
+        const updated = await User.findByIdAndUpdate(userId,
+            {
+                $set:updatingUser,
+            },
+            {new:true, runValidators:true}
+        )
+        if(!updated){
+            return res.status(401).json({
+                success:false,
+                message:"Failed to update the Profile",
+                }
+            )
+        }
         return res.status(200).json({
             success:true,
             message:" User Profile Updated",
-            // new_Profile:updated
+            new_Profile:updated
         })
  
     }
@@ -345,14 +347,14 @@ const addBlog = async (req,res) => {
             
         });
 
-        // const blogCreated = await newBlog.save();
-        // if(!blogCreated){
-        //     return res.status(404).json({
-        //         success:false,
-        //         message:"Not Able to Create Blog. Try again Later",
+        const blogCreated = await newBlog.save();
+        if(!blogCreated){
+            return res.status(404).json({
+                success:false,
+                message:"Not Able to Create Blog. Try again Later",
                 
-        //     })
-        // }
+            })
+        }
         return res.status(201).json({
             success:true,
             message:"BlogPost has been Created successfuly"
