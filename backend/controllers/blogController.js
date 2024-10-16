@@ -449,9 +449,18 @@ const deleteBlog = async(req, res) => {
     console.log("delId: ", delId , " userId Authorization: ", userId);
 
     try{
-        
+        // console.log("All Blogs inside delete: ",your_blogs);
+        // const your_blogs = await Blog.find({});
+        // console.log("All Blogs inside delete: ",your_blogs);
         const delBlog = await Blog.findById(delId);
-
+        console.log("delBlog after using findById: ", delBlog);
+        if(delBlog.userId.toString() !== userId){
+            return res.status(403).json({
+                success:false,
+                message:"Not an Authorized User to delete a Blog"
+            })
+        }
+        console.log("delBlog after using findById: ", delBlog);
         if(!delBlog) {
             return res.status(404).json({
                 success:false,
@@ -460,18 +469,10 @@ const deleteBlog = async(req, res) => {
             })
         }
 
-        if(delBlog.userId.toString() !== userId){
-            return res.status(403).json({
-                success:false,
-                message:"Not an Authorized User to delete a Blog"
-            })
-        }
-
         await Blog.findByIdAndDelete(delBlog);
         return res.status(200).json({
             success:true,
-            message:"Successfully Deleted the Blog",
-            
+            message:"Successfully Deleted the Blog"
         })                                                                                                                                                                                                                                                                                                                                                                                                   
     }
     catch(err){

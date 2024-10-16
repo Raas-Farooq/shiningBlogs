@@ -12,6 +12,7 @@ import Register from "../pages/register"
 import Login from "../pages/login"
 import { useRef } from "react"
 import { useGlobalContext } from "../globalContext/globalContext"
+import BlogPost from "../pages/post"
 
 
 
@@ -32,6 +33,7 @@ const PageTransition = () => {
                 <Routes location={location}>
                     <Route path="/" element={<App />} />
                     <Route path="/about" element={<About />} />
+                    <Route path="/BlogPost/:id" element={<BlogPost />} />
                     <Route path="/write" element={<ProtecedRoute><Write /></ProtecedRoute>} />
                     <Route path="/content" element={<Content />} />
                     <Route path="/userAccount" element={<UserAccount />} />

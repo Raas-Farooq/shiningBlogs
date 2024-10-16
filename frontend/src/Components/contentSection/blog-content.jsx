@@ -1,6 +1,10 @@
 import { useEffect, useState } from "react";
 import { useGlobalContext } from "../../globalContext/globalContext";
 import axios from "axios";
+import PostImage from './titleImage.jsx';
+import TextContent from "./textContent.jsx";
+import { Link, useNavigate } from "react-router-dom";
+
 
 export default function BlogContent(){
 
@@ -11,17 +15,11 @@ export default function BlogContent(){
     {name: 'Bashir',goal: 'Shinning', image:"https://images.unsplash.com/photo-1700831359498-7e367ee09472?w=400&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTh8fGdyZWVuJTIwbmF0dXJlfGVufDB8fDB8fHww"},
     {name: 'Fatima',goal: 'Believer', image:"https://m.media-amazon.com/images/I/610+t0Qk54L._AC_UF1000,1000_QL80_.jpg"}
     ];
+    const [loading, setLoading] = useState(true); 
     const [profileImage, setProfileImage] = useState('');
-    
-
+    const [myBlogs, setMyBlogs] = useState([]);
+    const navigateTo = useNavigate();
     useEffect(() => {
-        const user= {
-            motto:"Believe in One and Only Allah(SWT)",
-            strength:'Be courageous'
-        }
-        
-        localStorage.setItem('activeUser', JSON.stringify(user));
-        const activeUser = JSON.parse(localStorage.getItem('activeUser'));
         if(currentUser){
             const myImage = `http://localhost:4100/${currentUser.profileImg}`;
             setProfileImage(myImage);
@@ -30,22 +28,56 @@ export default function BlogContent(){
         console.log("current User in Blog Content: ", currentUser);
     }, [])
 
+    useEffect(() => {
+        const fetchBlogs = async() => {
+
+            try{
+                const response = await axios.get('http://localhost:4100/weblog/allBlogs');
+                console.log("response of blogs : ", response.data);
+                setMyBlogs(response.data.blogs)
+                if(response.data){
+                    setLoading(false);
+                }
+            }catch(err){
+                setLoading(false);
+                console.log("got errors while fetching all blogs: ", err);
+            }
+        }
+        fetchBlogs();
+    }, []);
+
+    const handlePostClick = (post) => {
+        navigateTo(`/BlogPost/:${post._id}`, {state:{post, myBlogs:myBlogs} })
+    }
+    if(loading) return <h2 className="text-2xl font-medium"> Loading Blogs...</h2>
     return (
         <div className="flex xs:flex-col sm:flex-row" >
-            <div className="blogsContainer xs:w-[95vw] w-[70vw] ">
-                <div className="flex flex-wrap gap-5 text-center justify-center">
-                {listArr.map((item,index) => {
-                    return (
-                        <div key={index} className="flex flex-col">
-                            <h2 key={index} className="ml-3 p-4 text-xl"> {item.name} </h2>
-                            <img src={item.image} className="w-[260px] h-[210px] object-cover" alt={item.name} /> 
-                            <h2 className="ml-3 p-4 text-xl"> {item.goal} </h2>                       
-                        </div>
-                    )
-                    
-                })}
+            {console.log("Blogs inside DOM: ", myBlogs)}
+            {!myBlogs ? <h1> Please Wait..</h1> :
+            (
+                <div className="blogsContainer xs:w-[95vw] w-[70vw] text-center m-10">
+                    <div className="flex flex-wrap gap-5 text-center justify-center">
+                    {myBlogs.map((blog,index) => {
+                        return (
+                            <div key={index} 
+                            id={blog._id}
+                            className="flex flex-col shadow-lg p-4 cursor-pointer" 
+                            onClick={(e) => 
+                               
+                                handlePostClick(blog)
+                               
+                            }
+                            >
+                                <h2 key={index} className="text-center xs:text-xs sm:text-sm font-medium"> {blog.title} </h2>
+                                <PostImage postImg={blog.titleImage} title={blog.title} />
+                                <TextContent content={blog.content} />
+                            </div>
+                        )
+                        
+                    })}
+                    </div>
                 </div>
-            </div>
+            )}
             <div className={`mt-5 p-4 w-[30vw] text-center relative xs:hidden sm:block ${!loggedIn && 'xs: sm:hidden'} `}>
                     {currentUser ? (
                         <>
@@ -75,7 +107,7 @@ export default function BlogContent(){
                 
             </div>
 
-            <div className="flex justify-center">
+            <div className="flex justify-center" onClick={() => navigateTo('/userAccount')}>
                 <button className="xs:block sm:hidden border bg-green-400 text-center p-3 hover:bg-green-200">About Me</button>
             </div>
         </div>

@@ -54,7 +54,6 @@ export const GlobalState = ({children}) => {
     }
 
     useEffect(() => {
-        console.log("currentUser inside navbar: ", currentUser);
         console.log("Navbar runs: ")
     }, [currentUser,loggedIn]);
 

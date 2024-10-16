@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import axios from 'axios';
 
 export default function Write() {
@@ -8,7 +8,8 @@ export default function Write() {
         title:'',
         titleImg:null,
         imgPreview:''
-    })
+    });
+    const moveTo = useNavigate();
     const [titleErr, setTitleErr] = useState('');
     const [errors, setErrors] = useState({});
     const [contentText, setContentText] = useState('');
@@ -162,8 +163,7 @@ export default function Write() {
                     setContentText('');
                     setImagesShortNames([])
                     alert('Blog Created Successfully');
-                    console.log("title: ", blogTitle.title);
-                    console.log("text Content: ", contentText)
+                    moveTo('/');
                     }
             }
             

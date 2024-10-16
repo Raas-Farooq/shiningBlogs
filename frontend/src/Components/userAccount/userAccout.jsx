@@ -132,6 +132,16 @@ const UserAccount = () => {
         </div>
       </div>
       <div className="mt-5 xs:flex flex-col gap-5">
+      <button onClick={() => 
+        {
+          setOpenUserAccount(false)
+          navigate(-1)
+        }
+      }
+        className="p-2 border bg-green-400 mr-2 hover:bg-green-300 text-white text-bolder xs:mb-4 xs:text-sm sm:text-lg"
+        >
+      Back
+      </button>
       <button onClick={() => setOpenUserAccount(false)}>
         <Link
           className="p-2 border bg-green-400 mr-2 hover:bg-green-300 text-white text-bolder xs:mb-4 xs:text-sm sm:text-lg"

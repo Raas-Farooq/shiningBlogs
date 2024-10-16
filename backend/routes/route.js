@@ -95,7 +95,8 @@ router.put('/updatedBlog/:id',updateLimit, authMiddleware,
 const deleteLimit = rateLimit({
     windowMs:15 * 60 * 1000,
     max:5
-})
+});
+
 router.delete('/deleteBlog/:id', deleteLimit, authMiddleware, deleteBlog);
 
 const updateUserLimit = rateLimit({

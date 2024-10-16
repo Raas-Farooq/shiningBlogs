@@ -27,14 +27,14 @@ const UpdateProfile = () => {
     
     const [localLoading, setLocalLoading] = useState(true)
 
-    useEffect(() => {
-        console.log("isAuthenticated: ", isAuthenticated);
+    // useEffect(() => {
+    //     console.log("isAuthenticated: ", isAuthenticated);
         
-        if(!isAuthenticated){
-            alert("you are Not Logged In. Sign In or Create new Account")
-            // moveTo('/');
-        }
-    }, [isAuthenticated])
+    //     if(!isAuthenticated){
+    //         alert("you are Not Logged In. Sign In or Create new Account")
+    //         // moveTo('/');
+    //     }
+    // }, [isAuthenticated])
     useEffect(() => {
         console.log("isAuthenticated inside updateProfile: ", isAuthenticated);
         
