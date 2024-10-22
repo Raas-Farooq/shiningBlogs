@@ -61,14 +61,11 @@ export default function BlogContent(){
                         return (
                             <div key={index} 
                             id={blog._id}
-                            className="flex flex-col shadow-lg p-4 cursor-pointer" 
-                            onClick={(e) => 
-                               
-                                handlePostClick(blog)
-                               
-                            }
+                            className="flex flex-col shadow-lg p-4 cursor-pointer text-center" 
+                            onClick={(e) =>handlePostClick(blog)}
                             >
                                 <h2 key={index} className="text-center xs:text-xs sm:text-sm font-medium"> {blog.title} </h2>
+                                {console.log("title Image inside blog content: ", blog.titleImage)}
                                 <PostImage postImg={blog.titleImage} title={blog.title} />
                                 <TextContent content={blog.content} />
                             </div>

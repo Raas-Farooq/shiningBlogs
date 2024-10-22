@@ -1,10 +1,10 @@
 import axios from "axios";
 import { useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 
 export default function Content() {
-
+    const moveTo= useNavigate();
     useEffect(() => {
         console.log("Content useEffect ran");
         
@@ -18,7 +18,9 @@ export default function Content() {
         <div className="page-content">
             <h1> I am Content </h1> 
             <h2> Look the contents of LIfe Deliberately it is Short and Very Interactive</h2>
-
+            <div>
+                <button className="text-blue-500" onClick={() => moveTo(-1)}> Back </button>
+            </div>
             <button><Link to={'/'} className=''> Back To Home</Link></button>
         </div>
     )

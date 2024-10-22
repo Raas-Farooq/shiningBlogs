@@ -167,11 +167,10 @@ const Login = () => {
                     <button ><Link 
                     className="bg-green-400 border p-3 ml-8"
                     to="/registerUser">Register Here </Link></button>
-
-
+                    <button className="bg-green-400 border p-3 ml-8 text-blue-600" onClick={() => navigate(-1)}> Back </button>
                     <button ><Link 
                     className="bg-green-400 border p-3 ml-8"
-                    to="/">Go Back </Link></button>
+                    to="/">Back To Home</Link></button>
                 </div>
             {/* )} */}
             

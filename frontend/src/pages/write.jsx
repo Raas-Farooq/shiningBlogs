@@ -65,9 +65,7 @@ export default function Write() {
             errors.titleImageError = "";
             setErrors(errors);
         }
-        console.log(
-            "Image attached with blogImage: ", blogTitle.titleImg
-        )
+        
     }
     const handleContent = (e) => {
         console.log(`blogContent name: ${e.target.name}, value ${e.target.value}`)
@@ -196,7 +194,6 @@ export default function Write() {
                 <label htmlFor="titleImage" className="text-blue-500">Upload Your Title Image</label>
                 <input type="file" name="titleImg" accept="image/*" onChange={handleTitleImage} className="w-[88px] cursor-pointer" /> 
                 {blogTitle && blogTitle.imgPreview ? <img src={blogTitle.imgPreview} className="w-24 h-24 mt-3" /> : ''}
-
                 {errors.titleImageError && <p className="text-red-600 font-larger"> {errors.titleImageError}* </p> }
                 <label for="content" className="break-all"></label>
                 

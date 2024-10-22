@@ -5,6 +5,8 @@ import { useLocation, useNavigate } from "react-router-dom";
 import TextContent from '../Components/contentSection/textContent';
 import { FaEdit, FaTrash } from "react-icons/fa";
 import axios from "axios";
+import Navbar from '../Components/Navbar/navbar';
+
 const BlogPost = () => {
 
     const {currentUser, loggedIn} = useGlobalContext();
@@ -24,9 +26,10 @@ const BlogPost = () => {
     if(!post){
         return <div> Loading.. </div>
     }
-    const handleEdit = (e) => {
+    const handleEdit = (e,post) => {
         e.preventDefault();
-        console.log("edit has been triggered")
+        console.log("edit has been triggered ", post);
+        moveTo(`/editPost`, {state:{post}});
     }
     function handleDelete(e,id) {
         e.preventDefault();
@@ -52,6 +55,7 @@ const BlogPost = () => {
     // Always have a conscious self to recognize the small thing which made You to Procrastinate. think about the Kite flying ? how you were planned to do even the intense heat and no air but you were committed
     return (
         <>
+            <Navbar />
             <div className={`${loggedIn ? 'flex xs:flex-col sm:flex-row' : 'w-full'}`}>
               {loading && !myBlogs ? <h1> Loading the Blogs..</h1> :
               (
@@ -62,11 +66,11 @@ const BlogPost = () => {
                         >
                             
                             <h2 className="text-center w-4/5 text-2xl text-purple-600 font-medium mb-10 shadow-inner 300 p-5 shadow-2xl"> {post.title} </h2>
-                            <div className="text-right flex justify-end gap-2 mb-2 w-[80%]">
-                                <button onClick={(e) => handleEdit(e)} ><FaEdit size={20} /> </button>
+                            {loggedIn && <div className="text-right flex justify-end gap-2 mb-2 w-[80%]">
+                                <button onClick={(e) => handleEdit(e, post)} ><FaEdit size={20} /> </button>
                                 <button onClick={(e) => handleDelete(e,post._id)} ><FaTrash size={20} /> </button>
                             </div>
-                            
+                            }
                             {post.titleImage && <Image postImg={post.titleImage} title={post.title} isFullView={true} /> }
                             <TextContent content={post.content} isFullView={true} />
                         </div>
