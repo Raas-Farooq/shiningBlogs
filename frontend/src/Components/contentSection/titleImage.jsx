@@ -17,8 +17,9 @@ const Image= ({postImg, title, isFullView=false}) => {
             setImageSrc(`http://localhost:4100/${postImg}`);
             
         }else{
-            setImageSrc('../public/Venice Blue.png')
-            console.error("unable to fetch the Image")
+            // setImageSrc('../public/Venice Blue.png')
+            // console.error("unable to fetch the Image")
+            console.log("image not set for this post")
         }
     }, [postImg])
 

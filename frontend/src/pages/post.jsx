@@ -56,7 +56,7 @@ const BlogPost = () => {
     return (
         <>
             <Navbar />
-            <div className={`${loggedIn ? 'flex xs:flex-col sm:flex-row' : 'w-full'}`}>
+            <div data-component="post-container" className={`${loggedIn ? 'flex xs:flex-col sm:flex-row' : 'w-full'}`}>
               {loading && !myBlogs ? <h1> Loading the Blogs..</h1> :
               (
                 <div className="flex flex-col items-center w-full max-w-4xl mx-auto px-4 py-5">
@@ -72,7 +72,7 @@ const BlogPost = () => {
                             </div>
                             }
                             {post.titleImage && <Image postImg={post.titleImage} title={post.title} isFullView={true} /> }
-                            <TextContent content={post.content} isFullView={true} />
+                            <TextContent content={post.content} isFullView={true} fromPost={true} />
                         </div>
                     </div>
                 </div>
@@ -114,7 +114,7 @@ const BlogPost = () => {
                     </div>
                 }
             </div>
-            <div className={`text-center my-4 ${loggedIn ? 'w-full': 'w-4/5' } `}>
+            <div className={`text-center mb-4 ${loggedIn ? 'w-full': 'w-4/5' } `}>
                 <button onClick={() => moveTo('/')} className="bg-red-400 p-2"> Back To Home </button>
             </div>
         </>

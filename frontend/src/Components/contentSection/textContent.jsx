@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react"
+import Image from "./titleImage";
 
 
-export default function TextContent({content, isFullView=false}){
+export default function TextContent({content, isFullView=false, fromPost=false}){
 
     const [text, setText] = useState('');
+    const [image, setImage] = useState('');
     const makeWords = (textData) => {
         if(typeof textData !== 'string' || textData === "") return '';
         // if(!textData) return '';
@@ -17,11 +19,15 @@ export default function TextContent({content, isFullView=false}){
   
     useEffect(() => { 
         // console.log("content: inside TextContent", content);
-        console.log("is Post: ", isFullView);
+        // console.log("is Post: ", isFullView);
         content.forEach(myContent => {
             if(myContent.type==='text'){
-                console.log("text: ", myContent.value);
+                // console.log("text: ", myContent.value);
                 setText(myContent.value)
+            }
+            if(myContent.type==='image'){
+                console.log("image inside Text Content: ", myContent.value);
+                setImage(myContent.value)
             }
         })
     }, [content]);
@@ -32,6 +38,7 @@ export default function TextContent({content, isFullView=false}){
             : 
             <p> {text} </p>
             }
+            {fromPost && <Image postImg={image} />}
         </div>
     )
 }

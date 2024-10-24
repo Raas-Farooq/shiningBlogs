@@ -150,7 +150,7 @@ const EditPost = () =>  {
                         <img src={preview} alt={editPostData.title} key={ind} />
                          }
 
-<label htmlFor="imageUpload" className="text-bold p-2 mr-4"> upload Your Image</label>
+                        <label htmlFor="imageUpload" className="text-bold p-2 mr-4"> upload Your Image</label>
                         <input type="file" 
                         name="image"
                         accept="image/*" 

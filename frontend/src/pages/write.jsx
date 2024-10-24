@@ -1,6 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom"
 import axios from 'axios';
+import ContentImages from "../Components/contentSection/ContentImage";
 
 export default function Write() {
 
@@ -10,7 +11,9 @@ export default function Write() {
         imgPreview:''
     });
     const moveTo = useNavigate();
-    const [titleErr, setTitleErr] = useState('');
+    const currentTextArea = useRef(null);
+    const [cursorPosition, setCursorPosition] = useState(0);
+    // const [titleErr, setTitleErr] = useState('');
     const [errors, setErrors] = useState({});
     const [contentText, setContentText] = useState('');
     const [imagesShortNames, setImagesShortNames] = useState([]);
@@ -21,28 +24,24 @@ export default function Write() {
         const joined = text.split(' ');
         
 
-        const short = joined.slice(0,3);
-        setImagesShortNames((prev) => [
-            ...prev,
-            short
-        ]);
+        const short = joined.slice(0,3).join(' ');
+        return short
        
     }
 
     
 
     useEffect(() => {
-        console.log("textContent: ",contentText);
-        console.log("blogTitle.title: ",blogTitle.title);
-        console.log("blogTitle.titleImg: ",blogTitle.titleImg);
-    }, [contentText, blogTitle.title, blogTitle.titleImg])
+        console.log("contentImages useEffect: ",contentImages);
+        // console.log("blogTitle.title: ",blogTitle.title);
+        // console.log("blogTitle.titleImg: ",blogTitle.titleImg);
+    }, [contentImages])
     const handleTitles = (e) => {
         // const errors = checkValidation();
         setBlogTitle(prev => ({...prev, 
             [e.target.name]: e.target.value
         }))
 
-        console.log("blogTitle after adding Title:", blogTitle);
         
         if(errors.titleError){
             console.log("Yes")
@@ -50,9 +49,10 @@ export default function Write() {
             
             setErrors(errors);
         }
-        console.log("validation errors inside handleTitles: ", errors);
     }
-
+    function handleAreaSelect(){
+        setCursorPosition(currentTextArea.current.selectionStart);
+    }
     const handleTitleImage= (e) => {
         const image=e.target.files[0];
         console.log("image when submitting: files[0]", image);
@@ -68,28 +68,48 @@ export default function Write() {
         
     }
     const handleContent = (e) => {
-        console.log(`blogContent name: ${e.target.name}, value ${e.target.value}`)
+        const myText = 'the light of your heart and the love with Allah (SWT) all of the things made you more strong and enable you to achieve your goals';
+        
         setContentText(e.target.value)
         if(errors.textContentError){
             errors.textContentError = "";
             setErrors(errors);
         }
-        console.log("content after setting the value: ", contentText)
+  
     }
 
     const handleContentImage=(e) => {
 
         const image = e.target.files[0];
-        smallText(image.name);
-        setContentImages(prev => ([
-            ...prev,
-            {
-                type:'image',
-                imageFile:image,
-            }    
-        ]))
+        const shortName = smallText(image.name);
+   
+        const imageName = `[image-${contentImages.length}]`
+        const beforeImage = contentText.substring(0, cursorPosition);
+        const afterImage = contentText.substring(cursorPosition);
+        const newContent = beforeImage + imageName + afterImage;
 
-        console.log("content inside handle Image: ", contentImages);
+        setContentImages([
+            ...contentImages,
+            {
+                id:contentImages.length,
+                type:'image',
+                file:image,
+                fileName:shortName,
+                preview:URL.createObjectURL(image),
+                position:cursorPosition
+            }    
+        ])
+        setContentText(newContent);
+        // console.log("content inside handle Image: ", contentImages.length);
+    }
+
+    const removeContentImage = (id,newText) => {
+        const images = contentImages.filter(image => image.id != id);
+        setContentImages(images);
+        console.log("newText inside removeContentImage: ", newText.join(" "));
+        const newContent = newText.join(" ");
+        setContentText(newContent)
+        // console.log("Received Id inside The Write pPost ", id);
     }
 
     const checkValidation = () => {
@@ -178,7 +198,7 @@ export default function Write() {
 
     return(
         <div className="page-content">
-            {console.log(`title Dom ${blogTitle.title}`)}
+            {console.log('images inside DOM',contentImages)}
             <h1> I am Write </h1> 
             <form method="post" className="ml-5 flex flex-col">
                 <label htmlFor="title" className="text-blue-500"> Enter your title</label>
@@ -187,6 +207,7 @@ export default function Write() {
                  placeholder="enter the Title of Blog" 
                  className="border border-gray-500 mt-4 w-100" 
                  onChange={handleTitles}
+                 
                  value={blogTitle.title}
                  required/>
                 
@@ -200,15 +221,18 @@ export default function Write() {
                 <div>
                 
                     <textarea placeholder="start writing your Blog"
+                    ref={currentTextArea}
                     name="value"
-                    className="border-gray-500 border w-4/5 h-[350px] mt-4"
+                    className="border-gray-500 border w-4/5 h-[350px] mt-4 px-16"
                     onChange={handleContent}
+                    onClick={handleAreaSelect}
+                    onKeyUp={handleAreaSelect}
                     value={contentText}
                     required
                     />
-                    
-                    <div className="absolute bottom-28">
-                        <label htmlFor="imageUpload" className="text-bold p-2 mr-4"> upload Your Image</label>
+                    {contentImages.length && <ContentImages contentImages={contentImages} removeImage={removeContentImage} contentText={contentText} />}
+                    <div className="absolute top-52 right-56">
+                        <label htmlFor="imageUpload" className="text-bold p-2 mr-4"> </label>
                         <input type="file" 
                         name="image"
                         accept="image/*" 
@@ -217,9 +241,8 @@ export default function Write() {
                         id="contentImg" />
                         <div className="">
 
-                        {imagesShortNames.length > 0 && <ul className="flex gap-2"> {imagesShortNames.map((short, ind) =>  <li key={ind} className="bg-gray-300">{ind+1}-{short}</li>)} </ul>}
                         </div>
-                       
+                        
                     </div>
 
                     
@@ -227,6 +250,7 @@ export default function Write() {
                 {errors.textContentError && <p className="text-red-600 font-larger absolute top-[40%] right-48"> {errors.textContentError}* </p> }
                <button type="submit" onClick={handleSubmit} className="border border-blue-400 bg-red-500 w-fit mt-4 p-2">Create New Blog</button>
             </form>
+            
             <button><Link to={'/'} className=''> Back To Home</Link></button>
         </div>
     )
