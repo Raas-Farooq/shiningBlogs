@@ -6,6 +6,12 @@ import TextContent from "./textContent.jsx";
 import { Link, useNavigate } from "react-router-dom";
 
 
+// console.log("cancel clicked: ", `[image-${id}]`);
+//         console.log("splitting nside handleCancel ", splitting);
+//         const imageName=`[image-${id}]`;
+//         const newText = splitting.filter(text => text !== imageName);
+//         console.log("newText inside handle Cancel: ", newText);
+
 export default function BlogContent(){
 
     const {loggedIn, currentUser, setCurrentUser,imagePreview} = useGlobalContext()

@@ -63,14 +63,18 @@ const blogSchema = new mongoose.Schema({
     
     content:[{
         type:{
-            type:String, 
-            enum:['text', 'image'],
-            required:true
+            type:String,
+            enum:['text']
         },
         value:String
-    }
-],
-  
+    }]
+,
+    contentImage:[{
+        path:String,
+        position:Number,
+        fileName:String
+    }]
+,
     createdAt:{
         type:Date,
         default:Date.now

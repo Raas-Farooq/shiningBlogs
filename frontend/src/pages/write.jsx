@@ -41,8 +41,6 @@ export default function Write() {
         setBlogTitle(prev => ({...prev, 
             [e.target.name]: e.target.value
         }))
-
-        
         if(errors.titleError){
             console.log("Yes")
             errors.titleError = "";
@@ -104,12 +102,31 @@ export default function Write() {
     }
 
     const removeContentImage = (id,newText) => {
-        const images = contentImages.filter(image => image.id != id);
-        setContentImages(images);
-        console.log("newText inside removeContentImage: ", newText.join(" "));
-        const newContent = newText.join(" ");
-        setContentText(newContent)
-        // console.log("Received Id inside The Write pPost ", id);
+        const images = contentImages.filter(image => image.id !== id);
+        const updateImages = images.map((images, index) => ({
+            ...images,
+            id:index
+        }))
+        setContentImages(updateImages);
+        setContentText(newText);
+        let updatedText = newText;
+        images.forEach((img, ind) => {
+            const oldMark = `[image-${img.id}]`;
+            const newMark = `[image-${ind}]`;
+            console.log(`oldMark ${oldMark} & newMark ${newMark}`);
+            updatedText = updatedText.split(oldMark).join(newMark); 
+        });
+        
+        // setContentImages((prev, ind) => [
+        //     ...prev,
+        //     {
+        //         id:ind
+        //     }
+        // ])
+        console.log("updateImages: ", updateImages)
+        setContentText(updatedText)
+
+
     }
 
     const checkValidation = () => {
@@ -144,9 +161,15 @@ export default function Write() {
             blogData.append('title', blogTitle.title);
             blogData.append('titleImage', blogTitle.titleImg);
             blogData.append('content', JSON.stringify(contentArray));
+            
             if(contentImages){
+                const positions = contentImages.map((img, index) => ({
+                    position:img.position,
+                    fileName:img.fileName
+                }))
+                blogData.append('positions', JSON.stringify(positions))
                 contentImages.forEach((image, index ) => {
-                    blogData.append(`contentImage`, image.imageFile);
+                    blogData.append(`contentImage`, image.file);
                 })
                 console.log("blogData: before sending",blogData);
             }
@@ -167,22 +190,22 @@ export default function Write() {
                 console.log("response after sending new Blog: ", response);
                 if(response.data.success){
                     console.log("response.data.success: ", response.data.success);
-                    blogTitle.title="";
-                    blogTitle.imgPreview = '';
-                    setBlogTitle(prev => 
-                        ({
-                            ...prev,
-                            title:"",
-                            titleImg:"",
-                            imgPreview:""
-                        } )
-                    );
-                    setContentImages([]);
-                    setContentText('');
-                    setImagesShortNames([])
-                    alert('Blog Created Successfully');
-                    moveTo('/');
-                    }
+                    // blogTitle.title="";
+                    // blogTitle.imgPreview = '';
+                    // setBlogTitle(prev => 
+                    //     ({
+                    //         ...prev,
+                    //         title:"",
+                    //         titleImg:"",
+                    //         imgPreview:""
+                    //     } )
+                    // );
+                    // setContentImages([]);
+                    // setContentText('');
+                    // setImagesShortNames([])
+                    // alert('Blog Created Successfully');
+                    // moveTo('/');
+                }
             }
             
             catch(err){
@@ -218,7 +241,7 @@ export default function Write() {
                 {errors.titleImageError && <p className="text-red-600 font-larger"> {errors.titleImageError}* </p> }
                 <label for="content" className="break-all"></label>
                 
-                <div>
+                <div className="mt-5">
                 
                     <textarea placeholder="start writing your Blog"
                     ref={currentTextArea}
@@ -230,25 +253,23 @@ export default function Write() {
                     value={contentText}
                     required
                     />
-                    {contentImages.length && <ContentImages contentImages={contentImages} removeImage={removeContentImage} contentText={contentText} />}
-                    <div className="absolute top-52 right-56">
+
+                    <div className={`${blogTitle.imgPreview ? 'absolute top-[44%] right-[20%]' : 'absolute top-56 right-52' }`}>
                         <label htmlFor="imageUpload" className="text-bold p-2 mr-4"> </label>
                         <input type="file" 
                         name="image"
                         accept="image/*" 
                         onChange={handleContentImage} 
                         className="w-[88px] cursor-pointer"
-                        id="contentImg" />
-                        <div className="">
-
-                        </div>
-                        
+                        id="contentImg" />   
                     </div>
+                    {contentImages.length && <ContentImages contentImages={contentImages} removeImage={removeContentImage} contentText={contentText} />}
+                    
 
                     
                 </div>
                 {errors.textContentError && <p className="text-red-600 font-larger absolute top-[40%] right-48"> {errors.textContentError}* </p> }
-               <button type="submit" onClick={handleSubmit} className="border border-blue-400 bg-red-500 w-fit mt-4 p-2">Create New Blog</button>
+               <button type="submit" onClick={handleSubmit} className="border border-blue-400 bg-red-500 w-fit mt-4 p-2">Publish Post</button>
             </form>
             
             <button><Link to={'/'} className=''> Back To Home</Link></button>

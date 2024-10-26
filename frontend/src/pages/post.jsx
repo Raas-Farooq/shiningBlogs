@@ -60,7 +60,7 @@ const BlogPost = () => {
               {loading && !myBlogs ? <h1> Loading the Blogs..</h1> :
               (
                 <div className="flex flex-col items-center w-full max-w-4xl mx-auto px-4 py-5">
-                    <div className="w-full flex text-center justify-center">  
+                    <div className="">  
                         <div key={post._id}
                         id={post._id}
                         >
@@ -74,6 +74,9 @@ const BlogPost = () => {
                             {post.titleImage && <Image postImg={post.titleImage} title={post.title} isFullView={true} /> }
                             <TextContent content={post.content} isFullView={true} fromPost={true} />
                         </div>
+                    </div>
+                    <div className={`text-center mb-4 ${loggedIn ? 'w-full': 'w-4/5' } `}>
+                        <button onClick={() => moveTo('/')} className="bg-red-400 p-2"> Back To Home </button>
                     </div>
                 </div>
                 )}
@@ -114,9 +117,7 @@ const BlogPost = () => {
                     </div>
                 }
             </div>
-            <div className={`text-center mb-4 ${loggedIn ? 'w-full': 'w-4/5' } `}>
-                <button onClick={() => moveTo('/')} className="bg-red-400 p-2"> Back To Home </button>
-            </div>
+            
         </>
     )
 }

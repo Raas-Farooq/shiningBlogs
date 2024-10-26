@@ -65,7 +65,7 @@ router.post('/addBlog', upload.fields([{name:'titleImage', maxCount:1}, {name:"c
             const content = JSON.parse(value);
             if(!Array.isArray(content)) throw new Error("Content should be in Array form");
             content.forEach(data => {
-                if(!['text', 'image'].includes(data.type)) throw new Error("type should be either text or image");
+                if(!['text'].includes(data.type)) throw new Error("type should be either text or image");
                 if(data.type === 'text' && typeof data.value !== 'string') throw new Error("text should be in String form");
         });
         return true;

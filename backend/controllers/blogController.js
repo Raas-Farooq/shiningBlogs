@@ -307,8 +307,6 @@ const logging =  async(req,res) => {
 
 const addBlog = async (req,res) => {
 
-    console.log("AddBlog Running :",req.body);
-
     const errors = validationResult(req);
 
     if(!errors.isEmpty()){
@@ -318,35 +316,29 @@ const addBlog = async (req,res) => {
             error: errors.array()
         })
     }
-    const {title, content} = req.body;
+    const {title, content, positions} = req.body;
     const user_id = req.user.userId;
-    console.log(` title before: ${title}`);
-    console.log(`content before: ${content}`);
+    const myPositions = JSON.parse(positions) || '[]';
     const titleImage = req.files['titleImage'] ? req.files['titleImage'][0].path : null;
-    console.log("title Imaghe: ", titleImage)
+
     try{
-        const contentImages = req.files['contentImage'] ? req.files['contentImage'].map(file => file.path) : [];
-        console.log("images inside try blog:", contentImages);
-        const parsed = JSON.parse(content);
-        const allContent = [parsed[0]];
-
-        contentImages.forEach(image => {
-            allContent.push({
-                type:'image',
-                value:image
-            })
-        })
-        console.log("all Content: ",allContent);
-
-
+        const contentImages = req.files['contentImage'] ? 
+        req.files['contentImage'].map((file, ind) => 
+            ({ 
+                path:file.path,
+                ...myPositions[ind]
+            })) 
+            : 
+            [];
         const newBlog = new Blog({
             userId:user_id,
             title:title,
             titleImage,
-            content:allContent,
+            content:JSON.parse(content),
+            contentImage:contentImages
             
         });
-
+        console.log("newBlog created: ", newBlog);
         const blogCreated = await newBlog.save();
         if(!blogCreated){
             return res.status(404).json({

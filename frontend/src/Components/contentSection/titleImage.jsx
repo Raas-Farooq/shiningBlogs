@@ -23,7 +23,7 @@ const Image= ({postImg, title, isFullView=false}) => {
         }
     }, [postImg])
 
-    const imageStyles= isFullView ? 'h-2/5 w-4/5 mb-12' : 'h-52 w-56 text-center'
+    const imageStyles= isFullView ? 'h-[400px] w-4/5 mb-12' : 'h-52 w-56 text-center'
     return (
         <>   
             {/* {console.log("Image source DOM: ", imageSrc)} */}
@@ -33,3 +33,7 @@ const Image= ({postImg, title, isFullView=false}) => {
 }
 
 export default Image;
+
+
+
+
