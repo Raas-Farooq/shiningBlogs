@@ -6,7 +6,7 @@ const Image= ({postImg, title, isFullView=false}) => {
     const [imageSrc, setImageSrc] = useState('');
 
     useEffect(() => {
-        console.log("postImage inside IMAGE : ", postImg);
+        // console.log("postImage inside IMAGE : ", postImg);
         const absUrl = postImg.startsWith('http://') || postImg.startsWith('https://');
         const relUrl = postImg.startsWith('uploads/');
         

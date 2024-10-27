@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react"
 import Image from "./titleImage";
+import ContentImages from "./ContentImage";
 
 
-export default function TextContent({content, isFullView=false, fromPost=false}){
+export default function TextContent({content, isFullView=false, fromPost=false, contentImages=null}){
 
     const [text, setText] = useState('');
     const [image, setImage] = useState('');
@@ -18,15 +19,17 @@ export default function TextContent({content, isFullView=false, fromPost=false})
 
   
     useEffect(() => { 
-        // console.log("content: inside TextContent", content);
-        // console.log("is Post: ", isFullView);
+        console.log("contentImages: inside TextContent", contentImages);
         content.forEach(myContent => {
             if(myContent.type==='text'){
-                // console.log("text: ", myContent.value);
-                setText(myContent.value)
+                
+                const cleanText = myContent.value.replace(/\[image-\d\]/g, 'Good Morning');
+                
+                setText(cleanText)
             }
+            // myContent.value.replace(/\[image-\d\]/g, 'HEllo')
             if(myContent.type==='image'){
-                console.log("image inside Text Content: ", myContent.value);
+                // console.log("image inside Text Content: ", myContent.value);
                 setImage(myContent.value)
             }
         })
@@ -34,11 +37,18 @@ export default function TextContent({content, isFullView=false, fromPost=false})
 
     return (
         <div className={`${isFullView ? 'w-4/5': 'w-60'} `}>
-            {!isFullView ? <p>{makeWords(text)}..</p>
+            {!isFullView ? 
+            <p>{makeWords(text)}..</p>
+            
             : 
             <p> {text} </p>
             }
-            {fromPost && <Image postImg={image} />}
+            
+            {contentImages && contentImages.map(image => (
+                
+                <img src={`http://localhost:4100/${image.path}`} alt={image.fileName} /> 
+                
+            )) }
         </div>
     )
 }

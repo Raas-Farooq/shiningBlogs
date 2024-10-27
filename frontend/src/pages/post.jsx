@@ -72,7 +72,8 @@ const BlogPost = () => {
                             </div>
                             }
                             {post.titleImage && <Image postImg={post.titleImage} title={post.title} isFullView={true} /> }
-                            <TextContent content={post.content} isFullView={true} fromPost={true} />
+                            {console.log("post inside Post: ", post)}
+                            <TextContent content={post.content} isFullView={true} fromPost={true} contentImages={post.contentImage} />
                         </div>
                     </div>
                     <div className={`text-center mb-4 ${loggedIn ? 'w-full': 'w-4/5' } `}>

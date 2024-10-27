@@ -3,19 +3,15 @@ import { useGlobalContext } from "../../globalContext/globalContext";
 import axios from "axios";
 import PostImage from './titleImage.jsx';
 import TextContent from "./textContent.jsx";
+import Title from './Title.jsx';
 import { Link, useNavigate } from "react-router-dom";
 
-
-// console.log("cancel clicked: ", `[image-${id}]`);
-//         console.log("splitting nside handleCancel ", splitting);
-//         const imageName=`[image-${id}]`;
-//         const newText = splitting.filter(text => text !== imageName);
-//         console.log("newText inside handle Cancel: ", newText);
 
 export default function BlogContent(){
 
     const {loggedIn, currentUser, setCurrentUser,imagePreview} = useGlobalContext()
     const [loading, setLoading] = useState(true); 
+    let [slicedTitle, setSlicedTitle] = useState({});
     const [profileImage, setProfileImage] = useState('');
     const [myBlogs, setMyBlogs] = useState([]);
     const navigateTo = useNavigate();
@@ -29,6 +25,9 @@ export default function BlogContent(){
     }, [])
 
     useEffect(() => {
+        // let titleReceived = reduceTitle();
+        // console.log("slicedWord: ", titleReceived);
+        // setSlicedTitle(titleReceived);
         const fetchBlogs = async() => {
 
             try{
@@ -46,6 +45,7 @@ export default function BlogContent(){
         fetchBlogs();
     }, []);
 
+    
     const handlePostClick = (post) => {
         navigateTo(`/BlogPost/:${post._id}`, {state:{post, myBlogs:myBlogs} })
     }
@@ -54,7 +54,9 @@ export default function BlogContent(){
         <div data-component="AllBlogsParent" className=" flex xs:flex-col sm:flex-row" >
             {!myBlogs ? <h1> Please Wait..</h1> :
             (
+                
                 <div className="blogsContainer xs:w-[95vw] w-[70vw] text-center m-10">
+                    {console.log("myBlogs inside BlogContent: ", myBlogs)}
                     <div data-component="bottomBlogsContainer" className="flex flex-wrap gap-5 text-center justify-center">
                     {myBlogs.map((blog,index) => {
                         return (
@@ -63,7 +65,7 @@ export default function BlogContent(){
                             className="flex flex-col shadow-lg p-4 cursor-pointer text-center" 
                             onClick={(e) =>handlePostClick(blog)}
                             >
-                                <h2 key={index} className="text-center xs:text-xs sm:text-sm font-medium"> {blog.title} </h2>
+                                <h2 className="text-center xs:text-xs sm:text-sm font-medium"> <Title title={blog.title}  /></h2>
                                 <PostImage postImg={blog.titleImage} title={blog.title} />
                                 <TextContent content={blog.content} />
                             </div>
@@ -73,13 +75,13 @@ export default function BlogContent(){
                     </div>
                 </div>
             )}
-            <div className={`mt-5 p-4 w-[30vw] text-center relative xs:hidden sm:block ${!loggedIn && 'xs: sm:hidden'} `}>
+            <div className={`mt-10 p-4 w-[30vw] text-center relative xs:hidden sm:block ${!loggedIn && 'xs: sm:hidden'} `}>
                     {currentUser ? (
                         <>
                             <h2 className="font-extrabold "> {currentUser.username && currentUser.username.length ? `About ${currentUser.username.toUpperCase()}` : 'About' }</h2>
                             {profileImage && (<img src={profileImage} 
                             alt="greenry"
-                            className="w-auto md:h-h-[210px] mx-auto " />)}
+                            className="w-auto md:h-[210px] mx-auto " />)}
                             
                             <h2 className="font-bold mt-4"> Goal</h2>
                             {currentUser.goal && currentUser.goal.length ? (<h3> {currentUser.goal} </h3>):

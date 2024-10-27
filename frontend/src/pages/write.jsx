@@ -134,6 +134,10 @@ export default function Write() {
         if(!blogTitle.title){
             validationErrors.titleError = "Title is Missing"
         }
+        if(blogTitle.title.length > 60){
+            validationErrors.titleError = "Title length Must be under 60"
+        }
+        
         if(!blogTitle.titleImg){
             validationErrors.titleImageError = "You should Insert Title Image"
         }
@@ -190,21 +194,21 @@ export default function Write() {
                 console.log("response after sending new Blog: ", response);
                 if(response.data.success){
                     console.log("response.data.success: ", response.data.success);
-                    // blogTitle.title="";
-                    // blogTitle.imgPreview = '';
-                    // setBlogTitle(prev => 
-                    //     ({
-                    //         ...prev,
-                    //         title:"",
-                    //         titleImg:"",
-                    //         imgPreview:""
-                    //     } )
-                    // );
-                    // setContentImages([]);
-                    // setContentText('');
-                    // setImagesShortNames([])
-                    // alert('Blog Created Successfully');
-                    // moveTo('/');
+                    blogTitle.title="";
+                    blogTitle.imgPreview = '';
+                    setBlogTitle(prev => 
+                        ({
+                            ...prev,
+                            title:"",
+                            titleImg:"",
+                            imgPreview:""
+                        } )
+                    );
+                    setContentImages([]);
+                    setContentText('');
+                    setImagesShortNames([])
+                    alert('Blog Created Successfully');
+                    moveTo('/');
                 }
             }
             
@@ -227,26 +231,26 @@ export default function Write() {
                 <label htmlFor="title" className="text-blue-500"> Enter your title</label>
                 <input type="text"
                  name="title" 
-                 placeholder="enter the Title of Blog" 
-                 className="border border-gray-500 mt-4 w-100" 
+                 placeholder="enter the Title of Post " 
+                 className="border border-gray-500 w-100" 
                  onChange={handleTitles}
                  
                  value={blogTitle.title}
                  required/>
-                
+                <span className="text-xs"> *Title Length Must Not Exceed 60 characters</span>
                 {errors.titleError && <p className="text-red-600"> {errors.titleError}* </p> }
-                <label htmlFor="titleImage" className="text-blue-500">Upload Your Title Image</label>
+                <label htmlFor="titleImage" className="text-blue-500 mt-4">Upload Your Title Image</label>
                 <input type="file" name="titleImg" accept="image/*" onChange={handleTitleImage} className="w-[88px] cursor-pointer" /> 
                 {blogTitle && blogTitle.imgPreview ? <img src={blogTitle.imgPreview} className="w-24 h-24 mt-3" /> : ''}
                 {errors.titleImageError && <p className="text-red-600 font-larger"> {errors.titleImageError}* </p> }
-                <label for="content" className="break-all"></label>
-                
-                <div className="mt-5">
+
+                <label htmlFor="titleImage" className="text-blue-500 mt-5">Start Writing Your Post Content</label>
+                <div className="">
                 
                     <textarea placeholder="start writing your Blog"
                     ref={currentTextArea}
                     name="value"
-                    className="border-gray-500 border w-4/5 h-[350px] mt-4 px-16"
+                    className="border-gray-500 border w-4/5 h-[350px] mt-2 px-16"
                     onChange={handleContent}
                     onClick={handleAreaSelect}
                     onKeyUp={handleAreaSelect}
@@ -254,7 +258,7 @@ export default function Write() {
                     required
                     />
 
-                    <div className={`${blogTitle.imgPreview ? 'absolute top-[44%] right-[20%]' : 'absolute top-56 right-52' }`}>
+                    <div className={`${blogTitle.imgPreview ? 'absolute top-[45%] right-[20%]' : 'absolute top-64 right-44' }`}>
                         <label htmlFor="imageUpload" className="text-bold p-2 mr-4"> </label>
                         <input type="file" 
                         name="image"
