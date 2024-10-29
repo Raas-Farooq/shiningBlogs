@@ -30,3 +30,4 @@ const Title = ({title}) => {
 }
 
 export default Title
+
