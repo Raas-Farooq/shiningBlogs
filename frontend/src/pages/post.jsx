@@ -28,17 +28,13 @@ const BlogPost = () => {
     }
     const handleEdit = (e,post) => {
         e.preventDefault();
-        console.log("edit has been triggered ", post);
         moveTo(`/editPost`, {state:{post}});
     }
     function handleDelete(e,id) {
         e.preventDefault();
-        console.log("Deleteee has been triggered", id);
         const deletingPost = async() => {
             try{
                const response = await axios.delete(`http://localhost:4100/weblog/deleteBlog/${id}`, {withCredentials:true});
-
-               console.log("response after deleting: ",response)
                if(response.data.success){
                 alert("Successfully Remove the Post")
                 moveTo('/');
@@ -72,8 +68,7 @@ const BlogPost = () => {
                             </div>
                             }
                             {post.titleImage && <Image postImg={post.titleImage} title={post.title} isFullView={true} /> }
-                            {console.log("post inside Post: ", post)}
-                            <TextContent content={post.content} isFullView={true} fromPost={true} contentImages={post.contentImage} />
+                            <TextContent content={post.content} isFullView={true} fromPost={true} contentImages={post.contentImages} />
                         </div>
                     </div>
                     <div className={`text-center mb-4 ${loggedIn ? 'w-full': 'w-4/5' } `}>

@@ -9,7 +9,7 @@ export default function TextContent({content, isFullView=false, fromPost=false, 
     const [text, setText] = useState('');
     const [image, setImage] = useState('');
     const [transformedText, setTransformedText] = useState([]);
-    // console.log("contentImage: ", contentImages)
+  
     const makeWords = (textData) => {
         if(typeof textData !== 'string' || textData === "") return '';
         const splitted = textData.split(' ');
@@ -22,10 +22,6 @@ export default function TextContent({content, isFullView=false, fromPost=false, 
     useEffect(() => {
       const textContent = content.find(item => item.type === 'text')?.value || '';
       setText(textContent);
-      console.log("acutal text : ", textContent)
-      // for (const image of contentImages){
-      //   console.log("position :", image.position)
-      // }
       const contentAndImages = [];
       let endIndx = 0;
     
@@ -40,19 +36,18 @@ export default function TextContent({content, isFullView=false, fromPost=false, 
         sortedImages.forEach((image, index) => {
           // Add text segment before image
           const textSegment = cleanText.slice(endIndx, (image.position ));
-          // console.log("text Segment: ", textSegment);
+      
           if (textSegment) {
             // Split text segment by newlines and add each paragraph
             textSegment.split('\n').forEach((paragraph, pIndex) => {
               if (paragraph.trim()) {
-                // console.log("paragraph trim  inside first split by \n ", paragraph.trim())
                 contentAndImages.push(
                   <p key={`text-${index}-${pIndex}`} className="mb-4">
                     {paragraph.trim()}
                   </p>
                 );
               }
-              // console.log("contentAnd Images after first forEach:", contentAndImages);
+             
             });
           }
     
@@ -67,7 +62,7 @@ export default function TextContent({content, isFullView=false, fromPost=false, 
           );
     
           endIndx = image.position;
-          // console.log("endIndex: ", endIndx)
+          
         });
     
         // Add remaining text after last image
