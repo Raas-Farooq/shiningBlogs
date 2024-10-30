@@ -47,22 +47,24 @@ const EditPost = () =>  {
             // }
             post.content.forEach(cont => {
                 if(cont.type=== 'text'){
-                    console.log("TEXT: ", cont.value);
+                    
                     setEditPostData(prv => ({
                         ...prv, 
                         contentText:cont.value
                     }))
                 }
-                if(cont.type === 'image'){
-                     const image= cont.value
-                    setContentImages(prev => ({
-                        ...prev,
-                        contentPreview:[...prev.contentPreview, cont.value]
-                    }))
-                }
+                // if(cont.type === 'image'){
+                //      const image= cont.value
+                //     setContentImages(prev => ({
+                //         ...prev,
+                //         contentPreview:[...prev.contentPreview, cont.value]
+                //     }))
+                // }
             })
             
         }
+
+        
     },[post])
 
     const handleChange = (e) => {
@@ -79,7 +81,6 @@ const EditPost = () =>  {
     function handleImageChange(e){
         const image = e.target.files[0];
 
-        console.log("image inside imageChnage; ", URL.createObjectURL(image))
         setEditPostData(prev => (
            { 
             ...prev,
@@ -91,7 +92,7 @@ const EditPost = () =>  {
 
     }
    const handleContentText = (e) => {
-        console.log("text inside content change: ", e.target.value);
+        // console.log("text inside content change: ", e.target.value);
 
         setEditPostData(prev => ({
             ...prev,
@@ -100,8 +101,7 @@ const EditPost = () =>  {
    }
    const handleContentImages = (e) => {
         const newImage= e.target.files[0];
-        console.log("newImage: ", newImage);
-        console.log("new Image: ", newImage);
+        // console.log("newImage: ", newImage);
         setContentImages((prev,ind) => ({
             ...prev,
             contentImages:[newImage]
@@ -118,10 +118,10 @@ const EditPost = () =>  {
                 className="border border-gray-500 w-2/5"
                 onChange={handleChange}
                 value={editPostData.title} />
-                <label htmlFor="image">Change Title Image</label>
+                
                 <div>
-                    
-                    <input type="file" accept="image/*" name="titleImg" onChange={handleImageChange} className="w-[82px] m-3"/>
+                    <label htmlFor="image" className="block">Change Title Image</label>
+                    <input type="file" accept="image/*" name="titleImg" onChange={handleImageChange} className="w-[82px] mb-2"/>
                     {editPostData.imagePreview && !editPostData.titleImage ?  
                     
                     <Image postImg={editPostData.imagePreview} title={editPostData.title} />
@@ -132,6 +132,8 @@ const EditPost = () =>  {
                 
 
                 <div>
+
+                    {post.content && <TextContent content={post.content} isFullView={true} contentImages={post.contentImages} />}
                 <textarea placeholder="start writing your Blog"
                     name="value"
                     className="border-gray-500 border w-4/5 h-[350px] mt-4"
@@ -149,18 +151,18 @@ const EditPost = () =>  {
                         )):
                         <img src={preview} alt={editPostData.title} key={ind} />
                          }
-
-                        <label htmlFor="imageUpload" className="text-bold p-2 mr-4"> upload Your Image</label>
-                        <input type="file" 
-                        name="image"
-                        accept="image/*" 
-                        onChange={handleContentImages} 
-                        className="w-[88px] cursor-pointer"
-                        id="contentImg" />
-                        <div className="">
-                        </div>
+                        
                     </div>
-                    
+                    <div className="absolute top-[45%] right-[22%]">
+                            {/* <label htmlFor="imageUpload" className="text-bold p-2 mr-4"> upload Your Image</label> */}
+                            <input type="file" 
+                            name="image"
+                            accept="image/*" 
+                            onChange={handleContentImages} 
+                            className="w-[88px] cursor-pointer"
+                            id="contentImg" />
+                        
+                        </div>
                 </div>
             </form>
 

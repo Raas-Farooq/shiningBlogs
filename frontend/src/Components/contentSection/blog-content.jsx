@@ -21,7 +21,7 @@ export default function BlogContent(){
             setProfileImage(myImage);
         }
         
-        // console.log("current User in Blog Content: ", currentUser);
+
     }, [])
 
     useEffect(() => {
@@ -47,6 +47,7 @@ export default function BlogContent(){
 
     
     const handlePostClick = (post) => {
+       
         navigateTo(`/BlogPost/:${post._id}`, {state:{post, myBlogs:myBlogs} })
     }
     if(loading) return <h2 className="text-2xl font-medium"> Loading Blogs...</h2>
@@ -56,7 +57,6 @@ export default function BlogContent(){
             (
                 
                 <div className="blogsContainer xs:w-[95vw] w-[70vw] text-center m-10">
-                    {console.log("myBlogs inside BlogContent: ", myBlogs)}
                     <div data-component="bottomBlogsContainer" className="flex flex-wrap gap-5 text-center justify-center">
                     {myBlogs.map((blog,index) => {
                         return (

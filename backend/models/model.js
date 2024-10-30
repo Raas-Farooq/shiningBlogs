@@ -69,7 +69,7 @@ const blogSchema = new mongoose.Schema({
         value:String
     }]
 ,
-    contentImage:[{
+    contentImages:[{
         path:String,
         position:Number,
         fileName:String

@@ -322,8 +322,8 @@ const addBlog = async (req,res) => {
     const titleImage = req.files['titleImage'] ? req.files['titleImage'][0].path : null;
 
     try{
-        const contentImages = req.files['contentImage'] ? 
-        req.files['contentImage'].map((file, ind) => 
+        const contentImages = req.files['contentImages'] ? 
+        req.files['contentImages'].map((file, ind) => 
             ({ 
                 path:file.path,
                 ...myPositions[ind]
@@ -335,7 +335,7 @@ const addBlog = async (req,res) => {
             title:title,
             titleImage,
             content:JSON.parse(content),
-            contentImage:contentImages
+            contentImages:contentImages
             
         });
         console.log("newBlog created: ", newBlog);

@@ -173,7 +173,7 @@ export default function Write() {
                 }))
                 blogData.append('positions', JSON.stringify(positions))
                 contentImages.forEach((image, index ) => {
-                    blogData.append(`contentImage`, image.file);
+                    blogData.append(`contentImages`, image.file);
                 })
                 console.log("blogData: before sending",blogData);
             }

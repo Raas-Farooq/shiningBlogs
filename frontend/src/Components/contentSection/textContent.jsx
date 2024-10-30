@@ -9,7 +9,7 @@ export default function TextContent({content, isFullView=false, fromPost=false, 
     const [text, setText] = useState('');
     const [image, setImage] = useState('');
     const [transformedText, setTransformedText] = useState([]);
-    // console.log("contentImage: ", contentImages)
+  
     const makeWords = (textData) => {
         if(typeof textData !== 'string' || textData === "") return '';
         const splitted = textData.split(' ');
@@ -19,6 +19,7 @@ export default function TextContent({content, isFullView=false, fromPost=false, 
     }
 
     useEffect(() => {
+<<<<<<< HEAD
       const textContent = content.find(text => text.type === 'text').value || ''; 
         console.log("actual text of the Post ", textContent);
         if(contentImages){
@@ -64,9 +65,20 @@ export default function TextContent({content, isFullView=false, fromPost=false, 
           console.log("content&images: ", contentWithImages);
           setTransformedText(contentWithImages);
           // console.log("in paragraphs: ", paragraphs);
+=======
+      const textContent = content.find(item => item.type === 'text')?.value || '';
+      setText(textContent);
+      const contentAndImages = [];
+      let endIndx = 0;
+    
+      if (contentImages && textContent) {
+        // Sort images by position
+        const sortedImages = [...contentImages].sort((a, b) => a.position - b.position);
+>>>>>>> feature/updateBlog
         
         }
         
+<<<<<<< HEAD
     }, [content, contentImages])
   
     // useEffect(() => {
@@ -78,6 +90,26 @@ export default function TextContent({content, isFullView=false, fromPost=false, 
     //   // }
     //   const contentAndImages = [];
     //   let endIndx = 0;
+=======
+        // Process each image and text segment
+        sortedImages.forEach((image, index) => {
+          // Add text segment before image
+          const textSegment = cleanText.slice(endIndx, (image.position ));
+      
+          if (textSegment) {
+            // Split text segment by newlines and add each paragraph
+            textSegment.split('\n').forEach((paragraph, pIndex) => {
+              if (paragraph.trim()) {
+                contentAndImages.push(
+                  <p key={`text-${index}-${pIndex}`} className="mb-4">
+                    {paragraph.trim()}
+                  </p>
+                );
+              }
+             
+            });
+          }
+>>>>>>> feature/updateBlog
     
     //   if (contentImages && textContent) {
     //     // Sort images by position
@@ -117,9 +149,15 @@ export default function TextContent({content, isFullView=false, fromPost=false, 
     //         />
     //       );
     
+<<<<<<< HEAD
     //       endIndx = image.position;
     //       // console.log("endIndex: ", endIndx)
     //     });
+=======
+          endIndx = image.position;
+          
+        });
+>>>>>>> feature/updateBlog
     
     //     // Add remaining text after last image
     //     const remainingText = cleanText.slice(endIndx);

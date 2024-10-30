@@ -9,7 +9,7 @@ const ContentImages = ({contentImages, removeImage, contentText}) => {
         e.preventDefault();
         const imageMark = `[image-${id}]`
         const newText = contentText.split(imageMark).join(' ');
-        // console.log("newText inside cancel:", newText);
+    
         removeImage(id, newText);
     }
    
@@ -18,9 +18,7 @@ const ContentImages = ({contentImages, removeImage, contentText}) => {
             {contentImages && contentImages.map((image, ind) => 
                 ( 
                 <div key={ind}>
-                    {console.log("image isni")}
                     <div className="flex gap-3">
-                        
                         <span className="text-[11px]"> {"image-" + image.id }</span>
                         <button className="bg-gray-300" onClick={(e) => handleCancel(e, image.id)}> <FaTimes /> </button>
                     </div>
