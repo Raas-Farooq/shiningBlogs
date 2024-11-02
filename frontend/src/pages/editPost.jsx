@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Navigate, useLocation, useNavigate } from "react-router-dom"
 import Image from "../Components/contentSection/titleImage";
 import TextContent from "../Components/contentSection/textContent";
+import ContentImages from "../Components/contentSection/ContentImage";
 
 
 const EditPost = () =>  {
@@ -13,10 +14,7 @@ const EditPost = () =>  {
 
     });
     const [contentImages, setContentImages] = useState(
-        {
-            contentPreview:[],
-            contentImg:[]
-        }
+        []
     );
     const moveTo = useNavigate(); 
     const getState = useLocation();
@@ -53,19 +51,30 @@ const EditPost = () =>  {
                         contentText:cont.value
                     }))
                 }
-                // if(cont.type === 'image'){
-                //      const image= cont.value
-                //     setContentImages(prev => ({
-                //         ...prev,
-                //         contentPreview:[...prev.contentPreview, cont.value]
-                //     }))
-                // }
+               
             })
             
         }
-
+        if(post?.contentImages){
+            console.log("i founded the images: ", contentImages.find(image => image.preview));
+            if (post?.contentImages && contentImages.length === 0){
+                post.contentImages.forEach((image, index) => {
+                    setContentImages((prev) => ([
+                        ...prev,
+                        {
+                            fileName: image.fileName,
+                            preview: `http://localhost:4100/${image.path}`,
+                        }
+                    ]))
+                    
+                    
+                })
+            }
+            
+        }
+        // console.log("contentIMages inside the EditPost: ", contentImages)
         
-    },[post])
+    },[])
 
     const handleChange = (e) => {
         setEditPostData(prev => 
@@ -130,10 +139,9 @@ const EditPost = () =>  {
                 }
                 </div>
                 
-
                 <div>
 
-                    {post.content && <TextContent content={post.content} isFullView={true} contentImages={post.contentImages} />}
+                    {/* {post.content && <TextContent content={post.content} isFullView={true} contentImages={post.contentImages} />} */}
                 <textarea placeholder="start writing your Blog"
                     name="value"
                     className="border-gray-500 border w-4/5 h-[350px] mt-4"
@@ -141,17 +149,12 @@ const EditPost = () =>  {
                     value={editPostData.contentText}
                     required
                     />
-                    {console.log("contentImage : ", contentImages.contentPreview)}
-                    <div className="absolute bottom-32">
+                    {console.log("conentImages EDITTTT : ", contentImages)}
+                    <div className="flex">
                         
-                        {contentImages.contentPreview && !contentImages.contentImg.length ? 
-                        contentImages.contentPreview.map((preview,ind) => (
-                        <Image postImg={preview} title={editPostData.title} />
-                      
-                        )):
-                        <img src={preview} alt={editPostData.title} key={ind} />
-                         }
-                        
+                        {contentImages &&              
+                        <ContentImages contentImages={contentImages} contentText={editPostData?.contentText} />
+                        }
                     </div>
                     <div className="absolute top-[45%] right-[22%]">
                             {/* <label htmlFor="imageUpload" className="text-bold p-2 mr-4"> upload Your Image</label> */}

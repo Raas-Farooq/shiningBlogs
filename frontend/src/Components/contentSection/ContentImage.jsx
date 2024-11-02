@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import {FaTimes} from "react-icons/fa";
 
-const ContentImages = ({contentImages, removeImage, contentText}) => {
+const ContentImages = ({contentImages, removeImage=null, contentText=null}) => {
 
 
     const handleCancel = (e, id) => {
@@ -12,7 +12,12 @@ const ContentImages = ({contentImages, removeImage, contentText}) => {
     
         removeImage(id, newText);
     }
-   
+    
+   useEffect(() => {
+    console.log("contentImages inside ContentIMge Component:", contentImages);
+    console.log("post text Cotnetn :", contentText);
+   }, [contentImages,contentText]);
+
     return (
         <div className="flex flex-wrap gap-2">
             {contentImages && contentImages.map((image, ind) => 
