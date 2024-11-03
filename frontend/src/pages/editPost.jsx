@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Navigate, useLocation, useNavigate } from "react-router-dom"
 import Image from "../Components/contentSection/titleImage";
 import TextContent from "../Components/contentSection/textContent";
@@ -6,6 +6,9 @@ import ContentImages from "../Components/contentSection/ContentImage";
 
 
 const EditPost = () =>  {
+    const [updateImages,setUpdateImages] = useState([]);
+    const [cursorPosition, setCursorPosition] = useState(0);
+
     const [editPostData, setEditPostData] = useState({
         title:'',
         titleImage: null,
@@ -16,6 +19,7 @@ const EditPost = () =>  {
     const [contentImages, setContentImages] = useState(
         []
     );
+    const currentArea = useRef(null);
     const moveTo = useNavigate(); 
     const getState = useLocation();
 
@@ -25,6 +29,10 @@ const EditPost = () =>  {
         // console.log("editPost: ", editPostData);
     }, [editPostData]);
 
+    const selectCurrentSelection = () => {
+        setCursorPosition(currentArea.current.selectionStart);
+        
+    }
 
     useEffect(() => {
         console.log("useEffect Runs Post", post)
@@ -62,6 +70,7 @@ const EditPost = () =>  {
                     setContentImages((prev) => ([
                         ...prev,
                         {
+                            id:index,
                             fileName: image.fileName,
                             preview: `http://localhost:4100/${image.path}`,
                         }
@@ -75,7 +84,9 @@ const EditPost = () =>  {
         // console.log("contentIMages inside the EditPost: ", contentImages)
         
     },[])
+    function storeContentText(){
 
+    }
     const handleChange = (e) => {
         setEditPostData(prev => 
            (
@@ -101,8 +112,6 @@ const EditPost = () =>  {
 
     }
    const handleContentText = (e) => {
-        // console.log("text inside content change: ", e.target.value);
-
         setEditPostData(prev => ({
             ...prev,
             contentText:e.target.value
@@ -110,13 +119,59 @@ const EditPost = () =>  {
    }
    const handleContentImages = (e) => {
         const newImage= e.target.files[0];
-        // console.log("newImage: ", newImage);
-        setContentImages((prev,ind) => ({
+        const imageMark = `[image-${contentImages.length}]`
+        const beforeImage = editPostData.contentText.substring(0,cursorPosition);
+        const afterImage = editPostData.contentText.substring(cursorPosition);
+        const newContentText = beforeImage + imageMark + afterImage;
+        setEditPostData((prev) => ({
             ...prev,
-            contentImages:[newImage]
-        })
+            contentText:newContentText
+        }))
+        setContentImages((prev) => ([
+            ...prev,
+            {
+                id:contentImages.length,
+                fileName:newImage.name,
+                preview:URL.createObjectURL(newImage),
+            }]
+        )  
     )
+
+
    }
+   const removeImage =(id, text) => {
+    // console.log("id of removed image: ", id);
+    console.log("New TExt: ",text);
+
+    // setEditPostData(prev => (
+        
+    //     {
+    //         ...prev,
+    //         contentText:text
+    //     }
+    // ))
+    const newContentImages = contentImages.filter(image => image.id != id);
+    console.log("NewContentIMages; ", newContentImages);
+    
+    // setContentImages(newContentImages);
+    let updatedText = text;
+    for (const [index, image] of newContentImages.entries()){
+        console.log("index: ", index + " image: ", image.id);
+        updatedText = updatedText.split(`[image-${image.id}]`).join(`[image-${index}]`); 
+        console.log("updatedText")
+        setEditPostData(prev => ({
+            ...prev,
+            contentText:updatedText
+        })) 
+    }
+    const updateImages = newContentImages.map((image,index) => ({
+        id:index,
+        preview:image.preview,
+        fileName:image.fileName
+    }))
+    setContentImages(updateImages);
+    console.log("updated Text ", updatedText)
+}
 
     return (
         <>
@@ -143,17 +198,20 @@ const EditPost = () =>  {
 
                     {/* {post.content && <TextContent content={post.content} isFullView={true} contentImages={post.contentImages} />} */}
                 <textarea placeholder="start writing your Blog"
+                    ref={currentArea}
                     name="value"
                     className="border-gray-500 border w-4/5 h-[350px] mt-4"
                     onChange={handleContentText}
+                    onClick={selectCurrentSelection}
+                    onKeyUp={selectCurrentSelection}
                     value={editPostData.contentText}
                     required
                     />
-                    {console.log("conentImages EDITTTT : ", contentImages)}
+                    {console.log("contentIMages EditPost DOM : ",contentImages)}
                     <div className="flex">
                         
                         {contentImages &&              
-                        <ContentImages contentImages={contentImages} contentText={editPostData?.contentText} />
+                        <ContentImages contentImages={contentImages} removeImage={removeImage} contentText={editPostData?.contentText} />
                         }
                     </div>
                     <div className="absolute top-[45%] right-[22%]">

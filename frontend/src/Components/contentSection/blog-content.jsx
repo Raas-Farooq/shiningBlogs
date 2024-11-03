@@ -55,8 +55,8 @@ export default function BlogContent(){
         <div data-component="AllBlogsParent" className=" flex xs:flex-col sm:flex-row" >
             {!myBlogs ? <h1> Please Wait..</h1> :
             (
-                
                 <div className="blogsContainer xs:w-[95vw] w-[70vw] text-center m-10">
+                    {console.log("myBlogs: ", myBlogs)}
                     <div data-component="bottomBlogsContainer" className="flex flex-wrap gap-5 text-center justify-center">
                     {myBlogs.map((blog,index) => {
                         return (
@@ -78,7 +78,7 @@ export default function BlogContent(){
             <div className={`mt-10 p-4 w-[30vw] text-center relative xs:hidden sm:block ${!loggedIn && 'xs: sm:hidden'} `}>
                     {currentUser ? (
                         <>
-                            <h2 className="font-extrabold "> {currentUser.username && currentUser.username.length ? `About ${currentUser.username.toUpperCase()}` : 'About' }</h2>
+                            <h2 className="font-extrabold " > {currentUser.username && currentUser.username.length ? `About ${currentUser.username.toUpperCase()}` : 'About' }</h2>
                             {profileImage && (<img src={profileImage} 
                             alt="greenry"
                             className="w-auto md:h-[210px] mx-auto " />)}
@@ -91,8 +91,8 @@ export default function BlogContent(){
                             <span className="border-t border-blue-400"></span>
                            
                             {currentUser.TopicsInterested && currentUser.TopicsInterested.length ? (
-                                currentUser.TopicsInterested.map(interest => (
-                                    <h5>{interest} </h5>
+                                currentUser.TopicsInterested.map((interest, index) => (
+                                    <h5 key={index}>{interest} </h5>
                                 ))
                             ):
                             <h3> interests are not Added</h3>
