@@ -20,7 +20,7 @@ const BlogPost = () => {
     const {post, myBlogs} = location.state || {};
     useEffect(() => {
         
-        console.log("current uuser inside Post: ", currentUser);
+        // console.log("POST inside Post: ", post);
     }, [currentUser,allBlogs, post]);
 
     if(!post){

@@ -15,7 +15,7 @@ const ContentImages = ({contentImages, removeImage=null, contentText=null}) => {
     
    useEffect(() => {
     console.log("contentImages inside ContentIMge Component:", contentImages);
-    console.log("post text Cotnetn :", contentText);
+    // console.log("post text Cotnetn :", contentText);
    }, [contentImages,contentText]);
 
     return (
@@ -24,7 +24,7 @@ const ContentImages = ({contentImages, removeImage=null, contentText=null}) => {
                 ( 
                 <div key={ind}>
                     <div className="flex gap-3">
-                        <span className="text-[11px]"> {"image-" + image.id }</span>
+                        <span className="text-[11px]"> {"image-" + ind }</span>
                         <button className="bg-gray-300" onClick={(e) => handleCancel(e, image.id)}> <FaTimes /> </button>
                     </div>
 
