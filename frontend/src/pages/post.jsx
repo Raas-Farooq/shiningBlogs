@@ -91,8 +91,8 @@ const BlogPost = () => {
                             <span className="border-t bodrer-blue-400"></span>
                            
                             {currentUser.TopicsInterested && currentUser.TopicsInterested.length ? (
-                                currentUser.TopicsInterested.map(interest => (
-                                    <h5>{interest} </h5>
+                                currentUser.TopicsInterested.map((interest,index) => (
+                                    <h5 key={index}>{interest} </h5>
                                 ))
                             ):
                             <h3> interests are not Added</h3>

@@ -7,8 +7,9 @@ import ContentImages from "../Components/contentSection/ContentImage";
 
 const EditPost = () =>  {
     const [updateImages,setUpdateImages] = useState([]);
+    const [readerFile, setReaderFile] = useState('');
     const [cursorPosition, setCursorPosition] = useState(0);
-
+    const [loaded, setLoaded] = useState(false);
     const [editPostData, setEditPostData] = useState({
         title:'',
         titleImage: null,
@@ -25,9 +26,7 @@ const EditPost = () =>  {
 
     const post = getState.state?.post;
 
-    useEffect(() => {
-        // console.log("editPost: ", editPostData);
-    }, [editPostData]);
+   
 
     const selectCurrentSelection = () => {
         setCursorPosition(currentArea.current.selectionStart);
@@ -35,22 +34,52 @@ const EditPost = () =>  {
     }
 
     useEffect(() => {
-        console.log("useEffect Runs Post", post)
-        if(post?.title){
+        if(readerFile){
+            console.log("ReaderFile is Loaded")
+        }
+
+    }, [readerFile])
+
+
+    useEffect(() => {
+        console.log("useEffect Runs Post", post);
+        const titleStored = JSON.parse(localStorage.getItem('titleStorage'));
+        if(post?.title && !titleStored){
+            
             setEditPostData(prev => ({
                 ...prev,
                 title:post.title,
                 content:post.content,
-                imagePreview:post.titleImage
+                
             })
         )
-
+        localStorage.setItem('titleStorage', JSON.stringify(post.title));
         }
-        
-        if(post?.content){
-            // if(post.content[0].type === 'text'){
-            //     console.log("post.content.value: ", post.content[0].value)
-            // }
+        else
+        {
+            // alert("you already have the data")
+            setEditPostData(prev => {
+                return {
+                    ...prev,
+                    title:titleStored
+                }
+            })
+        }
+        const titleImage = localStorage.getItem('titleImagePreview');
+        if(post?.titleImage && !titleImage){
+            fetchImageAsBase64(post.titleImage)
+        }
+        else{
+            const imageName = JSON.parse(localStorage.getItem('imageName'));
+            setEditPostData(prev => (
+                {
+                    ...prev,
+                    imagePreview: titleImage
+                }
+            ))
+        }
+        const localContentText = JSON.parse(localStorage.getItem('textContent'));
+        if(post?.content && !localContentText){
             post.content.forEach(cont => {
                 if(cont.type=== 'text'){
                     
@@ -58,98 +87,174 @@ const EditPost = () =>  {
                         ...prv, 
                         contentText:cont.value
                     }))
+                    localStorage.setItem("textContent", JSON.stringify(cont.value));
                 }
                
             })
             
+        }else{
+            setEditPostData(prev => {
+                return {
+                    ...prev,
+                    contentText:localContentText
+                }
+            })
         }
+
+
         if(post?.contentImages){
-            console.log("i founded the images: ", contentImages.find(image => image.preview));
-            if (post?.contentImages && contentImages.length === 0){
+            let localContentImages = JSON.parse(localStorage.getItem('localContentImages')) || [];
+            console.log("localContentImages: before check inside useEffect",localContentImages)
+            if (post?.contentImages && localContentImages.length === 0){
                 post.contentImages.forEach((image, index) => {
-                    setContentImages((prev) => ([
-                        ...prev,
-                        {
-                            id:index,
-                            fileName: image.fileName,
-                            preview: `http://localhost:4100/${image.path}`,
-                        }
-                    ]))
                     
+                    const images = {
+                        id:index,
+                        fileName:image.fileName,
+                        preview:`http://localhost:4100/${image.path}`
+                    }
+                    localContentImages.push(images);
+                    setContentImages(localContentImages)
+                
                     
                 })
+                console.log("localContentImages: after assigning",localContentImages)
+                localStorage.setItem("localContentImages", JSON.stringify(localContentImages))
+                console.log("first time contentImages inside useEfefect:", contentImages)
+            }
+            else{
+                console.log("ALERT ContentImages stored Locally: ", localContentImages);
+                setContentImages(localContentImages);
+
             }
             
         }
+        setLoaded(true)
         // console.log("contentIMages inside the EditPost: ", contentImages)
         
     },[])
-    function storeContentText(){
 
+
+    function storeTitle(){
+        
+        // console.log("titleStorer inside storeTitle: ", titleStorer);
+        console.log("title from post inside storeTitle: ", editPostData.title)
+        // localStorage.setItem('titleStorage', JSON.stringify(e.target.value));
+        // const titleStored = JSON.parse(localStorage.getItem('titleStorage')) || '';
+        return titleStored
     }
     const handleChange = (e) => {
+        localStorage.setItem('titleStorage', JSON.stringify(e.target.value));
+        const titleStored = JSON.parse(localStorage.getItem('titleStorage')) || '';
+        console.log("titleStored: change: ", titleStored)
         setEditPostData(prev => 
            (
             {
                 ...prev, 
-                title:e.target.value
+                title:titleStored
             }
            )
         )
     }
 
+    const fetchImageAsBase64 = (image) => {
+        fetch(`http://localhost:4100/${image}`)
+        .then(response => response.blob())
+        .then(blob => {
+            const reader = new FileReader();
+
+            reader.onloadend=() => {
+                localStorage.setItem('titleImagePreview', reader.result);
+                setEditPostData(prev => {
+                    return {
+                        ...prev,
+                        imagePreview:reader.result
+                    }
+                })
+            }
+            reader.readAsDataURL(blob)
+        })
+        .catch(err => {
+            console.log("err while converting server image to buffer", err)
+        })
+    }
+    function storeAsBase64(file,fromContent=false){
+        const reader = new FileReader();
+        console.log("fromContent: ", fromContent)
+        reader.onloadend = function(){
+            localStorage.setItem('titleImagePreview', reader.result);
+            setEditPostData(prev => {
+                return {
+                    ...prev,
+                    imagePreview:reader.result
+                }
+            })
+        }
+
+        reader.readAsDataURL(file)
+    }
+
+    
+
     function handleImageChange(e){
         const image = e.target.files[0];
+        if(!image) return;
 
-        setEditPostData(prev => (
-           { 
-            ...prev,
-            titleImage: image,
-            imagePreview:URL.createObjectURL(image)
-            }
-        )
-    )
-
+        storeAsBase64(image);
+      
     }
+
    const handleContentText = (e) => {
+        localStorage.setItem('textContent', JSON.stringify(e.target.value));
+        const storedTextContent = JSON.parse(localStorage.getItem('textContent'));
         setEditPostData(prev => ({
             ...prev,
-            contentText:e.target.value
+            contentText:storedTextContent
         }))
    }
-   const handleContentImages = (e) => {
+   function saveContentImages(image, callback){
+    const reader = new FileReader();
+        let result;
+        reader.onloadend = function (){
+            // setReaderFile(reader.result);
+            callback(reader.result);
+        } 
+        reader.readAsDataURL(image);
+    }
+
+   const handleContentImages = (e) =>
+    {
         const newImage= e.target.files[0];
+        console.log("newImage: ", newImage);
+        console.log("cursor Position: ", cursorPosition);
         const imageMark = `[image-${contentImages.length}]`
         const beforeImage = editPostData.contentText.substring(0,cursorPosition);
         const afterImage = editPostData.contentText.substring(cursorPosition);
         const newContentText = beforeImage + imageMark + afterImage;
+        localStorage.setItem('textContent', JSON.stringify(newContentText));
+
         setEditPostData((prev) => ({
             ...prev,
             contentText:newContentText
         }))
-        setContentImages((prev) => ([
-            ...prev,
-            {
-                id:contentImages.length,
-                fileName:newImage.name,
-                preview:URL.createObjectURL(newImage),
-            }]
-        )  
-    )
-
-
-   }
-   const removeImage =(id, text) => {
-    // console.log("id of removed image: ", id);
-    console.log("New TExt: ",text);
-
-    // setEditPostData(prev => (
         
-    //     {
-    //         ...prev,
-    //         contentText:text
-    //     }
-    // ))
+        saveContentImages(newImage, (base64Result) => {
+            const localImage = {
+            id:contentImages.length,
+            fileName: newImage.name,
+            preview: base64Result,
+            position:cursorPosition,
+            }
+            const allImages = [...contentImages, localImage];
+            localStorage.setItem('localContentImages', JSON.stringify(allImages));
+            setContentImages(allImages)  
+        })
+        
+        
+        
+        console.log("newContentIMages after updating handle Content Images; ", contentImages)
+    }
+   const removeImage =(id, text) => {
     const newContentImages = contentImages.filter(image => image.id != id);
     console.log("NewContentIMages; ", newContentImages);
     
@@ -158,7 +263,7 @@ const EditPost = () =>  {
     for (const [index, image] of newContentImages.entries()){
         console.log("index: ", index + " image: ", image.id);
         updatedText = updatedText.split(`[image-${image.id}]`).join(`[image-${index}]`); 
-        console.log("updatedText")
+        localStorage.setItem('textContent', JSON.stringify(updatedText));
         setEditPostData(prev => ({
             ...prev,
             contentText:updatedText
@@ -186,11 +291,16 @@ const EditPost = () =>  {
                 <div>
                     <label htmlFor="image" className="block">Change Title Image</label>
                     <input type="file" accept="image/*" name="titleImg" onChange={handleImageChange} className="w-[82px] mb-2"/>
-                    {editPostData.imagePreview && !editPostData.titleImage ?  
+                    {/* {console.log("editPostData.imagPreview DOM: ", editPostData.titleImage)}
+                    {console.log("editPostData.imagPreview DOM: ", editPostData.imagePreview)} */}
+                    {editPostData.imagePreview && 
+                    // !editPostData.titleImage ?  
                     
-                    <Image postImg={editPostData.imagePreview} title={editPostData.title} />
-                    :
+                    // <Image postImg={editPostData.imagePreview} title={editPostData.title} />
+                    // :(
+                        
                     <img src={editPostData.imagePreview} alt={editPostData.title} className="h-52 w-56" /> 
+         
                 }
                 </div>
                 

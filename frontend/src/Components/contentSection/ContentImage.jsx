@@ -29,6 +29,7 @@ const ContentImages = ({contentImages, removeImage=null, contentText=null}) => {
                     </div>
 
                     <span className="text-[11px]"> {image.fileName && image.fileName.length > 22 ?  image.fileName.substring(0,22) : image.fileName } </span>
+                    {console.log("image Preview contentImage: ", image.preview)}
                     {image.preview && <img src={image.preview} alt={image.fileName} className="w-20 h-20" />}
                 </div>
                 )
