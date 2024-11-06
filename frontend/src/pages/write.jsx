@@ -66,8 +66,6 @@ export default function Write() {
         
     }
     const handleContent = (e) => {
-        const myText = 'the light of your heart and the love with Allah (SWT) all of the things made you more strong and enable you to achieve your goals';
-        
         setContentText(e.target.value)
         if(errors.textContentError){
             errors.textContentError = "";
@@ -225,8 +223,6 @@ export default function Write() {
 
     return(
         <div className="page-content">
-            {console.log('images inside DOM',contentImages)}
-            <h1> I am Write </h1> 
             <form method="post" className="ml-5 flex flex-col">
                 <label htmlFor="title" className="text-blue-500"> Enter your title</label>
                 <input type="text"
