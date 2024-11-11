@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Navigate, useLocation, useNavigate } from "react-router-dom"
+import { Navigate, useLocation, useNavigate} from "react-router-dom"
 import Image from "../Components/contentSection/titleImage";
 import TextContent from "../Components/contentSection/textContent";
 import ContentImages from "../Components/contentSection/ContentImage";
@@ -9,17 +9,23 @@ const EditPost = () =>  {
     const [cursorPosition, setCursorPosition] = useState(0);
     const [editedSomething, setEditedSomething] = useState(false);
     const [ loading, setLoading ] = useState(false);
+    const moveTo = useNavigate();
+    const isNavigatingBack= useRef(false);
+
     const [editPostData, setEditPostData] = useState({
         title:'',
         titleImage: null,
         contentText:'',
         imagePreview:''
     });
+    const isNavigatingRef = false;
+    const navigatingAttemptCount = useRef(false);
+
     const [contentImages, setContentImages] = useState(
         []
     );
     const currentArea = useRef(null);
-    const moveTo = useNavigate(); 
+    // const moveTo = useNavigate(); 
     const getState = useLocation();
 
     const post = getState.state?.post;
@@ -45,17 +51,13 @@ const EditPost = () =>  {
 
      const confirmNavigation = useCallback(async() => {
         console.log("runs confirmNavigation")
-        if(!editedSomething) return true;
+        if(!editedSomething || isNavigatingBack.current) return true;
 
         const confirmed = window.confirm("You have unsaved changes. Are you sure you want to leave?");
         if(confirmed){
+            isNavigatingBack.current = true;
             clearLocalStorage();
-            setEditPostData({
-                title: '',
-                imagePreview: '',
-                contentText: ''
-              });
-              setContentImages([]);
+            setEditedSomething(false);
         }
         console.log("confirmed value inside confirmNavigation: ", confirmNavigation)
         return confirmed;
@@ -65,45 +67,34 @@ const EditPost = () =>  {
     const handleNavigation = useCallback(async(link) => {
         console.log("runs handle Navigation")
         if(await confirmNavigation()){
-                moveTo(link)
-            }
+            moveTo(link)
+        }
 
-    }, [confirmNavigation, moveTo]);
-  
-    
-
-    useEffect(() => {
-        let isNavigating = false; // Flag to prevent multiple popstate handling
-        console.log("useEffeec of handlePop state runs")
-        const handlePopState = async (e) => {
-            e.preventDefault();
-            console.log("handlePopState is Running!");
-            // Check if there are unsaved changes
-            if (editedSomething) {
-                console.log("editedSomething is true inside handlePop state")
-                const canNavigate = await confirmNavigation();
-                if (canNavigate) {
-                    // Allow navigation and clean up if confirmed
-                    clearLocalStorage();
-                    window.history.back();
-                } else {
-                    // Cancel navigation if not confirmed
-                    window.history.pushState(null, "", window.location.pathname);
-                }
-            } else {
-                // If no changes, proceed with default navigation
-                window.history.back();
-            }
-        };
-    
-        // Add event listener for back/forward navigation detection
-        window.addEventListener('popstate', handlePopState);
-    
-        return () => {
-            window.removeEventListener('popstate', handlePopState);
-        };
     }, [editedSomething, clearLocalStorage]);
+
+   
+      const windowLoads = useCallback(async(e) => {
+        console.log("beforeUnload Running like Cheetah")
+        // console.log("edited Something", editedSomething);
+        if(editedSomething){
+            clearLocalStorage();
+            e.preventDefault();
+            e.returnValue = '';
+            return '';
+
+        }
+     },[editedSomething, clearLocalStorage])
     
+    useEffect(() => {
+         
+         window.addEventListener('beforeunload', windowLoads);
+         return () => window.removeEventListener('beforeunload', windowLoads)
+    },[windowLoads]);
+    
+
+
+   
+
     // Convert and Store image as base 64
     const fetchImageAsBase64 = useCallback(async(image) => {
         try{
@@ -186,25 +177,6 @@ const EditPost = () =>  {
         
         loadInitialData();
     },[post])
-
-    const windowLoads = useCallback(async(e) => {
-        // console.log("window Loads Running like Cheetah")
-        // console.log("edited Something", editedSomething);
-        if(editedSomething){
-            clearLocalStorage();
-            e.preventDefault();
-            e.returnValue = '';
-
-        }
-     },[ editedSomething, clearLocalStorage])
-    
-    useEffect(() => {
-         
-         window.addEventListener('beforeunload', windowLoads);
-         return () => window.removeEventListener('beforeunload', windowLoads)
-    },[windowLoads]);
-
-
     // store image as base64
     function storeAsBase64(file){
         const reader = new FileReader();
@@ -353,7 +325,7 @@ const EditPost = () =>  {
             
             <div className=""> 
                 <div>
-                <button className="border p-2 bg-red-400 mb-4" onClick={() => handleNavigation((-1))}> Back </button>
+                <button className="border p-2 bg-red-400 mb-4" onClick={() => handleNavigation(-1)}> Back </button>
                 </div>
                 
                 <button className="border p-2 bg-red-500" onClick={() => handleNavigation('/')}> Back To HOME</button>
