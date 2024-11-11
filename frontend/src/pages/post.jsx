@@ -32,13 +32,17 @@ const BlogPost = () => {
     }
     function handleDelete(e,id) {
         e.preventDefault();
+        const confirm = window.confirm("Are You sure to delete this Post. You won't be able to recover it!");
+        // if()
         const deletingPost = async() => {
             try{
-               const response = await axios.delete(`http://localhost:4100/weblog/deleteBlog/${id}`, {withCredentials:true});
-               if(response.data.success){
-                alert("Successfully Remove the Post")
-                moveTo('/');
-               }
+                if(confirm){
+                    const response = await axios.delete(`http://localhost:4100/weblog/deleteBlog/${id}`, {withCredentials:true});
+                    if(response.data.success){
+                    alert("Successfully Remove the Post")
+                    moveTo('/');
+                    }
+                }
             }
             catch(error){
                 console.log("experiencing Error while deleting ", error);

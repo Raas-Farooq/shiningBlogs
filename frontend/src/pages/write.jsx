@@ -208,10 +208,15 @@ export default function Write() {
                     alert('Blog Created Successfully');
                     moveTo('/');
                 }
+                if(!(response.success.data)){
+                    console.log("response.data.success should be false ", response.data.success)
+                    
+                }
             }
             
             catch(err){
-            console.log("error while posting new Blog ", err)
+                console.log("error while posting new Blog ", err)
+                alert("Error while Posting. Check Your Connection")
             }
         }
         
@@ -254,7 +259,7 @@ export default function Write() {
                     required
                     />
 
-                    <div className={`${blogTitle.imgPreview ? 'absolute top-[45%] right-[20%]' : 'absolute top-64 right-44' }`}>
+                    <div className={`${blogTitle.imgPreview ? 'absolute top-[45%] right-[20%]' : 'absolute top-64 xs:right-28 sm:right-48 lg:right-56' }`}>
                         <label htmlFor="imageUpload" className="text-bold p-2 mr-4"> </label>
                         <input type="file" 
                         name="image"
@@ -263,8 +268,7 @@ export default function Write() {
                         className="w-[88px] cursor-pointer"
                         id="contentImg" />   
                     </div>
-                    {contentImages.length && <ContentImages contentImages={contentImages} removeImage={removeContentImage} contentText={contentText} />}
-                    
+                    {contentImages.length > 0 && <ContentImages contentImages={contentImages} removeImage={removeContentImage} contentText={contentText} />}
 
                     
                 </div>
