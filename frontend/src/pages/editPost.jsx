@@ -3,7 +3,7 @@ import { Navigate, useLocation, useNavigate} from "react-router-dom"
 import Image from "../Components/contentSection/titleImage";
 import TextContent from "../Components/contentSection/textContent";
 import ContentImages from "../Components/contentSection/ContentImage";
-
+import ProtectedContentEditor from "./ProtectedContentEditor";
 
 const EditPost = () =>  {
     const [cursorPosition, setCursorPosition] = useState(0);
@@ -117,6 +117,7 @@ const EditPost = () =>  {
 
     useEffect(() => {
         // Assign Title
+        console.log("Post of the year ", post);
         async function loadInitialData(){
             if(!post){
                 setLoading(true);
@@ -269,8 +270,13 @@ const EditPost = () =>  {
     setContentImages(updateImages);
     localStorage.setItem('localContentImages', JSON.stringify(updateImages));
     setEditedSomething(true);
-}
+    }
 
+    const handleRepost = (e) => {
+        console.log("YOu Clicked the repost Button!");
+        console.log("EditPost: title", editPostData.title);
+        console.log("contentImages inside ", contentImages)
+    }
     return (
         <>
       
@@ -293,7 +299,13 @@ const EditPost = () =>  {
                 
                 <div>
                     {/* {console.log("editPostData: ", editPostData)} */}
-                <textarea placeholder="start writing your Blog"
+
+                    <ProtectedContentEditor
+                        value={editPostData.contentText}
+                        onChange={handleContentText}
+                        onCursorPosition={setCursorPosition}
+                    />
+                  {/* <textarea placeholder="start writing your Blog"
                     ref={currentArea}
                     name="value"
                     className="border-gray-500 border w-4/5 h-[350px] mt-4"
@@ -302,7 +314,7 @@ const EditPost = () =>  {
                     onKeyUp={selectCurrentSelection}
                     value={editPostData.contentText}
                     required
-                    />
+                    /> */}
             
                     <div className="flex">
                         
@@ -325,13 +337,38 @@ const EditPost = () =>  {
             
             <div className=""> 
                 <div>
-                <button className="border p-2 bg-red-400 mb-4" onClick={() => handleNavigation(-1)}> Back </button>
+                    <button className="border p-2 bg-red-500 mb-4" onClick={(e) => handleRepost(e)}> RePost </button>
+                </div>
+                <div>
+                <button className="border p-2 bg-blue-400 mb-4 mr-4" onClick={() => handleNavigation(-1)}> Back </button>
+                <button className="border p-2 bg-blue-400" onClick={() => handleNavigation('/')}> Back To HOME</button>
                 </div>
                 
-                <button className="border p-2 bg-red-500" onClick={() => handleNavigation('/')}> Back To HOME</button>
+                
             </div>
         </>
     )
 }
 
 export default EditPost
+
+
+// Dom of textArea 
+{/* <textarea placeholder="start writing your Blog"
+                    ref={currentArea}
+                    name="value"
+                    className="border-gray-500 border w-4/5 h-[350px] mt-4"
+                    onChange={handleContentText}
+                    onClick={selectCurrentSelection}
+                    onKeyUp={selectCurrentSelection}
+                    value={editPostData.contentText}
+                    required
+                    />
+            
+                    <div className="flex">
+                        
+                        {contentImages &&              
+                        <ContentImages contentImages={contentImages} removeImage={removeImage} contentText={editPostData?.contentText} />
+                        }
+                    </div> */}
+

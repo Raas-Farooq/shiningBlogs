@@ -46,6 +46,9 @@ const BlogPost = () => {
             }
             catch(error){
                 console.log("experiencing Error while deleting ", error);
+                if(error.response.data.error === "jwt expired"){
+                    alert("JWT Expired! Please Try again Later!")
+                }
             }
             
         }

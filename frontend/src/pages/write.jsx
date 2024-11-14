@@ -14,6 +14,7 @@ export default function Write() {
     const currentTextArea = useRef(null);
     const [cursorPosition, setCursorPosition] = useState(0);
     // const [titleErr, setTitleErr] = useState('');
+    const [loadingErr, setLoadingErr] = useState(false);
     const [errors, setErrors] = useState({});
     const [contentText, setContentText] = useState('');
     const [imagesShortNames, setImagesShortNames] = useState([]);
@@ -155,6 +156,7 @@ export default function Write() {
         }
         else{
             setErrors({});
+            setLoadingErr(true);
             let contentArray = [{
                 type:'text',
                 value:contentText
@@ -208,15 +210,17 @@ export default function Write() {
                     alert('Blog Created Successfully');
                     moveTo('/');
                 }
-                if(!(response.success.data)){
-                    console.log("response.data.success should be false ", response.data.success)
-                    
-                }
             }
             
             catch(err){
-                console.log("error while posting new Blog ", err)
-                alert("Error while Posting. Check Your Connection")
+                console.log("error while posting new Blog ", err.response.data);
+                if(err.response.data.error === 'jwt expired'){
+                    alert("token expired! Please Login Again");
+                }
+                
+            }
+            finally{
+                setLoadingErr(false)
             }
         }
         
@@ -225,6 +229,7 @@ export default function Write() {
         
     }
 
+    if(loadingErr) return (<h1> Processing </h1>)
 
     return(
         <div className="page-content">
