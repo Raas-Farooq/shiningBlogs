@@ -79,6 +79,7 @@ export default function TextContent({content, isFullView=false, fromPost=false, 
     //   const contentAndImages = [];
     //   let endIndx = 0;
     
+<<<<<<< HEAD
     //   if (contentImages && textContent) {
     //     // Sort images by position
     //     console.log("Unsorted images: ", contentImages)
@@ -106,6 +107,18 @@ export default function TextContent({content, isFullView=false, fromPost=false, 
     //           // console.log("contentAnd Images after first forEach:", contentAndImages);
     //         });
     //       }
+=======
+          // Add image
+          console.log("image . Path: ", image.path);
+          contentAndImages.push(
+            <img
+              key={`img-${index}`}
+              src={`http://localhost:4100/${image.path}`}
+              alt={image.fileName}
+              className="block w-60 h-56 rounded-md my-4 max-w-full"
+            />
+          );
+>>>>>>> feature/updateBlog
     
     //       // Add image
     //       contentAndImages.push(
