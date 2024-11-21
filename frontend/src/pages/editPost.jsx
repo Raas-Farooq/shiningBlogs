@@ -116,6 +116,7 @@ const EditPost = () =>  {
     })
 
     useEffect(() => {
+        console.log("post received at editPost: ", post);
         // Assign Title
         async function loadInitialData(){
             if(!post){
@@ -124,18 +125,18 @@ const EditPost = () =>  {
             }
             try{
                 const titleStored = JSON.parse(localStorage.getItem('titleStorage'));
-                // console.log('post: initialLoad: ', post);
+                // console.log('post title: initialLoad: ', post.title);
                 // console.log('titleStred:initialLoad ', titleStored);
                 const newTitle = post?.title && !titleStored ? post.title : titleStored; 
                 
-                // console.log('newTitle: initialLoad', newTitle);
+                // console.log('newTitle assigned: initialLoad', newTitle);
                 // Uploading Title Image
                 const titleImage = localStorage.getItem('titleImagePreview');
                 let newImagePreview = titleImage;
                 if(post?.titleImage && !titleImage){ 
                     newImagePreview = await fetchImageAsBase64(post.titleImage)
                 }
-            
+                // console.log("new title image on initial load: ", newImagePreview);
 
                 // load Save content Text (Text Data of Post)
                 const localContentText = JSON.parse(localStorage.getItem('textContent'));
@@ -152,11 +153,14 @@ const EditPost = () =>  {
               // load content Images
                if(post?.contentImages){
                     let localContentImages = JSON.parse(localStorage.getItem('localContentImages')) || [];
+                    // console.log("localContentImages on initial load: ", localContentImages, " post.contentImages: ", post.contentImages);
                     if (post?.contentImages && localContentImages.length === 0){
+                        // console.log("contentImages: if local is empty", post.contentImages);
                         const newImages = post.contentImages.map((image, index) => ({
                             id:index,
                             fileName:image.fileName,
-                            preview:`http://localhost:4100/${image.path}`
+                            preview:`http://localhost:4100/${image.path}`,
+                            position:image.position
                         }))
                         setContentImages(newImages);
                         localStorage.setItem("localContentImages", JSON.stringify(newImages))
@@ -201,6 +205,8 @@ const EditPost = () =>  {
         setEditedSomething(true);    
     }
 
+    
+    
     // Handle changes to the title Image
     function handleImageChange(e){
         const image = e.target.files[0];
@@ -211,12 +217,36 @@ const EditPost = () =>  {
     }
 
    // Managing text of the Post after Change
+
    const handleContentText = (e) => {
-        const newContentText = e.target.value;
-        localStorage.setItem('textContent', JSON.stringify(newContentText));
-        setEditPostData(prev => ({...prev,contentText:newContentText}))
-        setEditedSomething(true);
-   }
+    e.preventDefault();
+    const oldContentText = editPostData.contentText;
+    let newContentText = e.target.value;
+
+    // Check for accidental editing of placeholders
+    const oldPlaceholders = oldContentText.match(/\[image-\d+\]/g) || [];
+    const newPlaceholders = newContentText.match(/\[image-\d+\]/g) || [];
+
+    // If any placeholder is removed, prevent it
+    if (oldPlaceholders.length !== newPlaceholders.length) {
+        alert("You cannot remove image placeholders directly!");
+        setEditPostData((prev) => ({ ...prev, contentText: oldContentText }));
+        return;
+    }
+
+    // Save valid content text
+    setEditPostData((prev) => ({ ...prev, contentText: newContentText }));
+    localStorage.setItem("textContent", JSON.stringify(newContentText));
+    setEditedSomething(true);
+    };
+
+//    const handleContentText = (e) => {
+//         e.preventDefault();
+//         const newContentText = e.target.value;
+//         localStorage.setItem('textContent', JSON.stringify(newContentText));
+//         setEditPostData(prev => ({...prev,contentText:newContentText}))
+//         setEditedSomething(true);
+//    }
 
    // save content images using base64
    function saveContentImages(image, callback){
@@ -235,7 +265,7 @@ const EditPost = () =>  {
         const beforeImage = editPostData.contentText.substring(0,cursorPosition);
         const afterImage = editPostData.contentText.substring(cursorPosition);
         const newContentText = beforeImage + imageMark + afterImage;
-
+        console.log("new Image inside handle content Images: ", newImage);
         setEditPostData((prev) => ({ ...prev,contentText:newContentText}))
         localStorage.setItem('textContent', JSON.stringify(newContentText));
         saveContentImages(newImage, (base64Result) => {
@@ -264,13 +294,22 @@ const EditPost = () =>  {
     const updateImages = newContentImages.map((image,index) => ({
         id:index,
         preview:image.preview,
-        fileName:image.fileName
+        fileName:image.fileName,
+        position:image.position
     }))
     setContentImages(updateImages);
     localStorage.setItem('localContentImages', JSON.stringify(updateImages));
     setEditedSomething(true);
 }
 
+    // handle Reposting
+
+    const handleReposting = (e) => {
+        console.log("Reposting run");
+
+        console.log("editPost data DRWE REPOSTING: ", editPostData );
+        console.log("contentImages after reposting: ", contentImages);
+    }
     return (
         <>
       
@@ -324,11 +363,11 @@ const EditPost = () =>  {
 
             
             <div className=""> 
+            <button className="border p-2 bg-green-400 mb-4" onClick={(e) => handleReposting(e)}> RePost </button>
                 <div>
-                <button className="border p-2 bg-red-400 mb-4" onClick={() => handleNavigation(-1)}> Back </button>
-                </div>
-                
-                <button className="border p-2 bg-red-500" onClick={() => handleNavigation('/')}> Back To HOME</button>
+                    <button className="border p-2 bg-red-400 mb-4" onClick={() => handleNavigation(-1)}> Back </button>
+                    <button className="border p-2 bg-red-400" onClick={() => handleNavigation('/')}> Back To HOME</button>
+                </div>   
             </div>
         </>
     )

@@ -52,6 +52,7 @@ export default function TextContent({content, isFullView=false, fromPost=false, 
           }
     
           // Add image
+          console.log("image . Path: ", image.path);
           contentAndImages.push(
             <img
               key={`img-${index}`}

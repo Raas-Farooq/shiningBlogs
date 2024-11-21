@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import {useCallback, useEffect, useState } from "react";
 import { useGlobalContext } from "../../globalContext/globalContext";
 import axios from "axios";
 import PostImage from './titleImage.jsx';
@@ -23,11 +23,18 @@ export default function BlogContent(){
         
 
     }, [])
+    const clearLocalStorage = useCallback(() => {
+        localStorage.removeItem('titleStorage');
+        localStorage.removeItem('titleImagePreview');
+        localStorage.removeItem('textContent');
+        localStorage.removeItem('localContentImages');
+     }, []);
 
     useEffect(() => {
         // let titleReceived = reduceTitle();
         // console.log("slicedWord: ", titleReceived);
         // setSlicedTitle(titleReceived);
+        clearLocalStorage();
         const fetchBlogs = async() => {
 
             try{
@@ -47,8 +54,7 @@ export default function BlogContent(){
 
     
     const handlePostClick = (post) => {
-       
-        navigateTo(`/BlogPost/:${post._id}`, {state:{post, myBlogs:myBlogs} })
+       navigateTo(`/BlogPost/:${post._id}`, {state:{post, myBlogs:myBlogs} })
     }
     if(loading) return <h2 className="text-2xl font-medium"> Loading Blogs...</h2>
     return (

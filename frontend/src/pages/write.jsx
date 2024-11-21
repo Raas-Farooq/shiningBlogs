@@ -20,7 +20,6 @@ export default function Write() {
     const [contentImages, setContentImages] = useState([]);
 
     function smallText(text){
-        console.log("smallText Function Runs");
         const joined = text.split(' ');
         
 
@@ -32,7 +31,7 @@ export default function Write() {
     
 
     useEffect(() => {
-        console.log("contentImages useEffect: ",contentImages);
+        // console.log("contentImages useEffect: ",contentImages);
         // console.log("blogTitle.title: ",blogTitle.title);
         // console.log("blogTitle.titleImg: ",blogTitle.titleImg);
     }, [contentImages])
@@ -66,7 +65,12 @@ export default function Write() {
         
     }
     const handleContent = (e) => {
-        setContentText(e.target.value)
+        setContentText(e.target.value);
+        const currentContent = e.target.value;
+        console.log("contentTExt after setting: ", contentText.substring(0,30));
+        console.log("current text from target value: ", currentContent.substring(0,30));
+        const placeholders = contentText.match(/\[image-\d+\]/g);
+        console.log("placeHolders of images right Now ", placeholders);
         if(errors.textContentError){
             errors.textContentError = "";
             setErrors(errors);
@@ -111,7 +115,7 @@ export default function Write() {
         images.forEach((img, ind) => {
             const oldMark = `[image-${img.id}]`;
             const newMark = `[image-${ind}]`;
-            console.log(`oldMark ${oldMark} & newMark ${newMark}`);
+            // console.log(`oldMark ${oldMark} & newMark ${newMark}`);
             updatedText = updatedText.split(oldMark).join(newMark); 
         });
         
@@ -207,10 +211,6 @@ export default function Write() {
                     setImagesShortNames([])
                     alert('Blog Created Successfully');
                     moveTo('/');
-                }
-                if(!(response.success.data)){
-                    console.log("response.data.success should be false ", response.data.success)
-                    
                 }
             }
             
