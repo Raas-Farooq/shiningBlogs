@@ -65,17 +65,19 @@ export default function Write() {
         
     }
     const handleContent = (e) => {
-        setContentText(e.target.value);
+        const originalPlaceholders = contentText.match(/\[image-\d\]/g) || [];
         const currentContent = e.target.value;
-        console.log("contentTExt after setting: ", contentText.substring(0,30));
-        console.log("current text from target value: ", currentContent.substring(0,30));
-        const placeholders = contentText.match(/\[image-\d+\]/g);
-        console.log("placeHolders of images right Now ", placeholders);
+        const placeholders = currentContent.match(/\[image-\d+\]/g) || [];
+        if(originalPlaceholders.length !== placeholders.length){
+            alert("you can't remove the image placeholders manualy");
+            console.log("you deleted the placeholder");
+            return
+        }
         if(errors.textContentError){
             errors.textContentError = "";
             setErrors(errors);
         }
-  
+        setContentText(e.target.value);
     }
 
     const handleContentImage=(e) => {
@@ -119,12 +121,6 @@ export default function Write() {
             updatedText = updatedText.split(oldMark).join(newMark); 
         });
         
-        // setContentImages((prev, ind) => [
-        //     ...prev,
-        //     {
-        //         id:ind
-        //     }
-        // ])
         console.log("updateImages: ", updateImages)
         setContentText(updatedText)
 

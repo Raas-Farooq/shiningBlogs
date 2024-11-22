@@ -136,6 +136,8 @@ const EditPost = () =>  {
                 if(post?.titleImage && !titleImage){ 
                     newImagePreview = await fetchImageAsBase64(post.titleImage)
                 }
+
+                localStorage.setItem('titleImage', post?.titleImage);
                 // console.log("new title image on initial load: ", newImagePreview);
 
                 // load Save content Text (Text Data of Post)
@@ -146,6 +148,7 @@ const EditPost = () =>  {
                 setEditPostData((prev) => ({
                     ...prev,
                     title:newTitle || '',
+                    titleImage:post.titleImage || '',
                     imagePreview:newImagePreview || '',
                     contentText:newContentText || ''
                 }))
@@ -211,7 +214,8 @@ const EditPost = () =>  {
     function handleImageChange(e){
         const image = e.target.files[0];
         if(!image) return;
-
+        localStorage.setItem("titleImage", image);
+        setEditPostData((prev) => ({...prev,titleImage:image}))
         storeAsBase64(image);
         setEditedSomething(true);
     }
@@ -240,14 +244,6 @@ const EditPost = () =>  {
     setEditedSomething(true);
     };
 
-//    const handleContentText = (e) => {
-//         e.preventDefault();
-//         const newContentText = e.target.value;
-//         localStorage.setItem('textContent', JSON.stringify(newContentText));
-//         setEditPostData(prev => ({...prev,contentText:newContentText}))
-//         setEditedSomething(true);
-//    }
-
    // save content images using base64
    function saveContentImages(image, callback){
     const reader = new FileReader();
@@ -262,6 +258,7 @@ const EditPost = () =>  {
     {
         const newImage= e.target.files[0];
         const imageMark = `[image-${contentImages.length}]`
+        console.log("newImage: ", newImage);
         const beforeImage = editPostData.contentText.substring(0,cursorPosition);
         const afterImage = editPostData.contentText.substring(cursorPosition);
         const newContentText = beforeImage + imageMark + afterImage;
@@ -272,6 +269,7 @@ const EditPost = () =>  {
             const localImage = {
             id:contentImages.length,
             fileName: newImage.name,
+            file:newImage,
             preview: base64Result,
             position:cursorPosition,
             }
@@ -306,9 +304,23 @@ const EditPost = () =>  {
 
     const handleReposting = (e) => {
         console.log("Reposting run");
+        const formData = new FormData();
+        formData.append('title', editPostData.title);
+        formData.append('titleImage', editPostData.titleImage);
+        if(editPostData.contentText){
+            formData.append('content', JSON.stringify(editPostData.contentText));
+        }
+        if(contentImages){
+            contentImages.forEach(image => {
+                console.log("content image using forEach: ", image)
+                formData.append('contentImages', image)
+            })
+        }
+        formData.append('titleImage', editPostData.titleImage);
 
-        console.log("editPost data DRWE REPOSTING: ", editPostData );
-        console.log("contentImages after reposting: ", contentImages);
+        console.log("formData: ", formData);
+        console.log("editPost data DRWE REPOSTING: ", editPostData.titleImage );
+        // console.log("contentImages after reposting: ", contentImages);
     }
     return (
         <>
