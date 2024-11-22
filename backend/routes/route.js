@@ -58,7 +58,7 @@ const storage = multer.diskStorage({
 const upload = multer({storage:storage})
 
 router.post('/addBlog', upload.fields([{name:'titleImage', maxCount:1}, {name:"contentImages", maxCount:10}]), newBlogLimiter, authMiddleware, [
-    body('title').isLength({min:1, max:200}).trim().escape().withMessage("title should be btween 1 and 200 characters"),
+    body('title').isLength({min:1, max:60}).trim().escape().withMessage("title should be btween 1 and 200 characters"),
     body('content').isJSON().withMessage("content should be in JSON format"),
     body('content').custom((value) => {
         try{
@@ -71,7 +71,7 @@ router.post('/addBlog', upload.fields([{name:'titleImage', maxCount:1}, {name:"c
         return true;
         }catch(err){
             throw new Error("error related to content format", err.message)
-        }
+        }       
         
     })
 ], addBlog)
@@ -83,7 +83,7 @@ const updateLimit = rateLimit({
 
 router.put('/updatedBlog/:id',updateLimit, authMiddleware,
     [
-        body('title').optional().isLength({min:1, max:200}).trim().escape().withMessage("title should be btween 1 and 200 characters"),
+        body('title').optional().isLength({min:1, max:60}).trim().escape().withMessage("title should be btween 1 and 200 characters"),
         body('content').optional().isArray().withMessage("content should be in Array format"),
         body('content.*.type').optional().isIn(['text', 'image', 'video']).withMessage("Data should be in Text, image or video format"),
         body('content.*.value').optional().trim().escape(),
