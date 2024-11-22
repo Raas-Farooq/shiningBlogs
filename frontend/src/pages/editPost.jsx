@@ -259,11 +259,11 @@ const EditPost = () =>  {
     {
         const newImage= e.target.files[0];
         const imageMark = `[image-${contentImages.length}]`
-        console.log("newImage: ", newImage);
+
         const beforeImage = editPostData.contentText.substring(0,cursorPosition);
         const afterImage = editPostData.contentText.substring(cursorPosition);
         const newContentText = beforeImage + imageMark + afterImage;
-        console.log("new Image inside handle content Images: ", newImage);
+        
         setEditPostData((prev) => ({ ...prev,contentText:newContentText}))
         localStorage.setItem('textContent', JSON.stringify(newContentText));
         saveContentImages(newImage, (base64Result) => {
