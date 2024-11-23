@@ -3,12 +3,8 @@ import { Navigate, useLocation, useNavigate} from "react-router-dom"
 import Image from "../Components/contentSection/titleImage";
 import TextContent from "../Components/contentSection/textContent";
 import ContentImages from "../Components/contentSection/ContentImage";
-<<<<<<< HEAD
-import ProtectedContentEditor from "./ProtectedContentEditor";
-=======
 import axios from "axios";
 
->>>>>>> feature/updateBlog
 
 const EditPost = () =>  {
     const [cursorPosition, setCursorPosition] = useState(0);
@@ -312,16 +308,9 @@ const EditPost = () =>  {
     setEditedSomething(true);
     }
 
-<<<<<<< HEAD
-
-    // handle Reposting
-    const handleReposting = (e) => {
-        console.log("Reposting run");
-=======
     // handle Reposting
     const handleReposting = async(e) => {
         console.log("Reposting run ", post);
->>>>>>> feature/updateBlog
         const formData = new FormData();
         console.log("newTitleImage true or false ",newTitleImage);
         console.log("titleimage checking: ", editPostData.titleImage);
@@ -404,12 +393,12 @@ const EditPost = () =>  {
                 <div>
                     {/* {console.log("editPostData: ", editPostData)} */}
 
-                    <ProtectedContentEditor
+                    {/* <ProtectedContentEditor
                         value={editPostData.contentText}
                         onChange={handleContentText}
                         onCursorPosition={setCursorPosition}
-                    />
-                  {/* <textarea placeholder="start writing your Blog"
+                    /> */}
+                  <textarea placeholder="start writing your Blog"
                     ref={currentArea}
                     name="value"
                     className="border-gray-500 border w-4/5 h-[350px] mt-4"
@@ -418,7 +407,7 @@ const EditPost = () =>  {
                     onKeyUp={selectCurrentSelection}
                     value={editPostData.contentText}
                     required
-                    /> */}
+                    />
             
                     <div className="flex">
                         
