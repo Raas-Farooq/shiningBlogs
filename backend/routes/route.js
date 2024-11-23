@@ -76,18 +76,26 @@ router.post('/addBlog', upload.fields([{name:'titleImage', maxCount:1}, {name:"c
     })
 ], addBlog)
 
+const updateUploads = multer({storage:storage})
 const updateLimit = rateLimit({
     windowMs:15 * 60 * 1000,
     message:"Too many attempts try again later"
 })
 
-router.put('/updatedBlog/:id',updateLimit, authMiddleware,
+router.put('/updatedBlog/:id',
+updateUploads.fields(
+    [{name:'titleImage', max:1},
+    {name:'contentImages', max:10}]
+    )
+    ,
+    authMiddleware,
     [
         body('title').optional().isLength({min:1, max:60}).trim().escape().withMessage("title should be btween 1 and 200 characters"),
-        body('content').optional().isArray().withMessage("content should be in Array format"),
-        body('content.*.type').optional().isIn(['text', 'image', 'video']).withMessage("Data should be in Text, image or video format"),
-        body('content.*.value').optional().trim().escape(),
-        body('content.*.url').optional().isURL().withMessage(" Url SHuold be Valid")  
+        body('content').isJSON().withMessage("Content should be in JSON formate"),
+        // body('content').optional().isArray().withMessage("Content should be inside Array"),
+        // body('content.*.type').optional().isIn(['text', 'image', 'video']).withMessage("Data should be in Text, image or video format"),
+        // body('content.*.value').optional().trim().escape(),
+        // body('content.*.url').optional().isURL().withMessage(" Url SHuold be Valid")  
     ],
     updateBlogPost
 )

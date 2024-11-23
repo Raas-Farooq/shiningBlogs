@@ -392,20 +392,23 @@ const updateBlogPost = async(req,res) => {
 
     // 
     const user_id = req.user.userId;
-    console.log("req. body: ", req.body);
+    // console.log("req. body: ", req.body);
     const { title,titleImage, content} = req.body;
     const id = req.params.id; 
-    console.log(`new_ title: ${title} & content: ${content}`)
+    // console.log(`req.files['titleImage'][0].path `,req.files['titleImage'][0].path)
+    const newTitleImage = req.files['titleImage'] ? req.files['titleImage'][0].path : ''
     try{
         //updating a blog
 
         const blogPost = await Blog.findById(id);
 
         if(!blogPost){
-            res.status(404).json({
+            return res.status(404).json({
                 success:false,
                 message:"Not found the Blog Post",
             })
+        }else{
+            console.log("success BlogPost exist")
         }
 
         if(blogPost.userId.toString() !== user_id){
@@ -413,11 +416,13 @@ const updateBlogPost = async(req,res) => {
                 success:false,
                 message:"you are not authorize to Updte it"
             })
+        }else{
+            console.log("success You are authorized to edit this blog")
         }
 
         if(title) blogPost.title = title;
-        if(content) blogPost.content = content;
-        if(titleImage) blogPost.titleImage = titleImage;
+        // if(content) blogPost.content = content;
+        if(newTitleImage) blogPost.titleImage = newTitleImage;
 
         const updatedBlog = await blogPost.save();
         // successfully updated the blogPost

@@ -3,10 +3,12 @@ import { Navigate, useLocation, useNavigate} from "react-router-dom"
 import Image from "../Components/contentSection/titleImage";
 import TextContent from "../Components/contentSection/textContent";
 import ContentImages from "../Components/contentSection/ContentImage";
+import axios from "axios";
 
 
 const EditPost = () =>  {
     const [cursorPosition, setCursorPosition] = useState(0);
+    const [newTitleImage, setNewTitleImage] = useState(false);
     const [editedSomething, setEditedSomething] = useState(false);
     const [ loading, setLoading ] = useState(false);
     const moveTo = useNavigate();
@@ -28,7 +30,7 @@ const EditPost = () =>  {
     // const moveTo = useNavigate(); 
     const getState = useLocation();
 
-    const post = getState.state?.post;
+    const post= getState.state?.postId;
 
    
 
@@ -116,7 +118,10 @@ const EditPost = () =>  {
     })
 
     useEffect(() => {
-        console.log("post received at editPost: ", post);
+        console.log("post Id received at editPost: ", post);
+        // async function getPost(){
+        //     const response = await axios.get(`http://localhost:4100/weblog/`)
+        // }
         // Assign Title
         async function loadInitialData(){
             if(!post){
@@ -204,6 +209,7 @@ const EditPost = () =>  {
     const handleChange = (e) => {
         const newTitle = e.target.value;
         localStorage.setItem('titleStorage', JSON.stringify(newTitle));
+        setNewTitleImage(true);
         setEditPostData(prev => ({...prev, title:newTitle}));
         setEditedSomething(true);    
     }
@@ -214,8 +220,9 @@ const EditPost = () =>  {
     function handleImageChange(e){
         const image = e.target.files[0];
         if(!image) return;
-        localStorage.setItem("titleImage", image);
-        setEditPostData((prev) => ({...prev,titleImage:image}))
+        localStorage.setItem("titleImage", JSON.stringify(image));
+        setEditPostData((prev) => ({...prev,titleImage:image}));
+        setNewTitleImage(true);
         storeAsBase64(image);
         setEditedSomething(true);
     }
@@ -258,7 +265,7 @@ const EditPost = () =>  {
     {
         const newImage= e.target.files[0];
         const imageMark = `[image-${contentImages.length}]`
-
+        console.log("newIMage: ", newImage.path);
         const beforeImage = editPostData.contentText.substring(0,cursorPosition);
         const afterImage = editPostData.contentText.substring(cursorPosition);
         const newContentText = beforeImage + imageMark + afterImage;
@@ -298,27 +305,62 @@ const EditPost = () =>  {
     setContentImages(updateImages);
     localStorage.setItem('localContentImages', JSON.stringify(updateImages));
     setEditedSomething(true);
-}
+    }
 
     // handle Reposting
-
-    const handleReposting = (e) => {
-        console.log("Reposting run");
+    const handleReposting = async(e) => {
+        console.log("Reposting run ", post);
         const formData = new FormData();
+        console.log("newTitleImage true or false ",newTitleImage);
+        console.log("titleimage checking: ", editPostData.titleImage);
+        if(newTitleImage && editPostData.titleImage){
+            formData.append('titleImage', editPostData.titleImage);
+            
+        }
         formData.append('title', editPostData.title);
-        formData.append('titleImage', editPostData.titleImage);
         if(editPostData.contentText){
-            formData.append('content', JSON.stringify(editPostData.contentText));
+            const contentArray = [{
+                type:'text',
+                content:editPostData.contentText
+            }]
+            formData.append('content', JSON.stringify(contentArray));
         }
         if(contentImages){
+            const positions = contentImages.map(image => (image.position));
+            console.log("positions inside true: ", positions);
             contentImages.forEach(image => {
-                console.log("content image using forEach: ", image)
-                formData.append('contentImages', image)
+                if(image.file){
+                    formData.append("contentImages", image.file)
+                }else{
+                    formData.append('contentImages', image)
+                }
+                
             })
         }
         formData.append('titleImage', editPostData.titleImage);
 
         console.log("formData: ", formData);
+        try{
+            const response = await axios.put(`http://localhost:4100/weblog/updatedBlog/${post._id}`,
+            formData,
+            {
+                withCredentials:true,
+                headers:{
+                    'Content-Type': 'multipart/formD-data'
+                }
+            })
+            console.log("repsonse from put request :", response);
+            if(response?.data.success){
+                console.log("new blog data after success message", response.data.blog);
+                console.log("new Title", response.data.blog.title);
+                console.log("new titleImage ", response.data.blog.titleImage);
+                localStorage.setItem('titleImage', JSON.stringify(response.data.blog.titleImage));
+                localStorage.setItem('titleStorage', JSON.stringify(response.data.blog.title))
+            }
+            setNewTitleImage(false);
+        }catch(err){
+            console.log("You can deal with errors: ", err)
+        }
         console.log("editPost data DRWE REPOSTING: ", editPostData.titleImage );
         // console.log("contentImages after reposting: ", contentImages);
     }

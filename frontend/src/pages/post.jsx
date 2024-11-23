@@ -28,7 +28,9 @@ const BlogPost = () => {
     }
     const handleEdit = (e,post) => {
         e.preventDefault();
-        moveTo(`/editPost`, {state:{post}});
+        console.log("postId: ", post._id);
+        const postId = post._id;
+        moveTo(`/editPost`, {state:{postId}});
     }
     function handleDelete(e,id) {
         e.preventDefault();
