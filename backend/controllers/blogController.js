@@ -1,5 +1,6 @@
 import bcrypt from 'bcrypt';
 import {Blog, User} from '../models/model.js';
+import mongoose from 'mongoose';
 import rateLimit from 'express-rate-limit';
 import { body, validationResult } from 'express-validator';
 import jwt from 'jsonwebtoken';
@@ -318,7 +319,7 @@ const addBlog = async (req,res) => {
     }
     const {title, content, positions} = req.body;
     const user_id = req.user.userId;
-    const myPositions = JSON.parse(positions) || '[]';
+    const myPositions = JSON.parse(positions) || [];
     const titleImage = req.files['titleImage'] ? req.files['titleImage'][0].path : null;
 
     try{
@@ -393,13 +394,16 @@ const updateBlogPost = async(req,res) => {
     // 
     const user_id = req.user.userId;
     // console.log("req. body: ", req.body);
-    const { title,titleImage, content} = req.body;
+    const { title,titleImage, content, savedImages} = req.body;
+    const useSavedImages = JSON.parse(savedImages);
+    useSavedImages.forEach(image => {
+        console.log("useSaved Image; ", image);
+    })
     const id = req.params.id; 
-    // console.log(`req.files['titleImage'][0].path `,req.files['titleImage'][0].path)
+    console.log(`req.files['contentImages'] `,req.files['contentImages']);
     const newTitleImage = req.files['titleImage'] ? req.files['titleImage'][0].path : ''
     try{
         //updating a blog
-
         const blogPost = await Blog.findById(id);
 
         if(!blogPost){
@@ -420,11 +424,11 @@ const updateBlogPost = async(req,res) => {
             console.log("success You are authorized to edit this blog")
         }
 
-        if(title) blogPost.title = title;
-        // if(content) blogPost.content = content;
-        if(newTitleImage) blogPost.titleImage = newTitleImage;
+        // if(title) blogPost.title = title;
+        // // if(content) blogPost.content = content;
+        // if(newTitleImage) blogPost.titleImage = newTitleImage;
 
-        const updatedBlog = await blogPost.save();
+        // const updatedBlog = await blogPost.save();
         // successfully updated the blogPost
         return res.status(200).json({
             success: true,
@@ -536,6 +540,44 @@ const getUser = async(req,res) => {
     }
 }
 
+const getBlogPost = async(req,res) => {
+
+    const blogId = req.params.id;
+    console.log("getBlog post runs: ", blogId);
+    if(!mongoose.Types.ObjectId.isValid(blogId)){
+        console.log("not a valid blod Id");
+        return res.status(400).json({
+            success:false,
+            message:"Blog Id is invalid"
+        })
+    }
+    try{
+        const blog = await Blog.findById(blogId);
+        console.log("this is the Blog: ", blog.contentImages);
+        const newContentImages = blog.contentImages.filter(image => image.path !== 'uploads/1732159071743-Feeling Safe.jpg');
+        console.log("new ContentImages: ", newContentImages);        if(!blog){
+            return res.status(404).json({
+                success:false,
+                message:"Blog doesn't found"
+            })
+        }
+
+        return res.status(200).json({
+            success:true,
+            message:"Blog Found successfully",
+            blogPost:blog
+        })
+    }
+    catch(err){
+        console.error("error occured", err)
+        return res.status(500).json({
+            success:false,
+            message:"Server error while accessing blog Post"
+        })
+    }
+}
+
+
 const allBlogs = async(req, res) => {
     console.log("allBlogs run");
     try{
@@ -567,4 +609,4 @@ const logout = (req,res) => {
     })
 }
 
-export {current, registerUser, logging, allBlogs,addBlog, updateBlogPost, deleteBlog, updateUserProfile, allUsers, getUser, logout}
+export {current, registerUser, logging, allBlogs,addBlog, updateBlogPost, deleteBlog, updateUserProfile, getBlogPost, allUsers, getUser, logout}
