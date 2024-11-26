@@ -412,7 +412,7 @@ const updateBlogPost = async(req,res) => {
                 message:"Not found the Blog Post",
             })
         }else{
-            console.log("success BlogPost exist")
+            console.log("success BlogPost not found")
         }
 
         if(blogPost.userId.toString() !== user_id){

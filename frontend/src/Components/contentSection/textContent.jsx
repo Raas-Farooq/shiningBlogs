@@ -19,8 +19,9 @@ export default function TextContent({content, isFullView=false, fromPost=false, 
     }
 
     useEffect(() => {
-      const textContent = content.find(text => text.type === 'text').value || ''; 
-        console.log("actual text of the Post ", textContent);
+      const textContent = content.find(text => text.type === 'text').value || '';
+      setText(textContent); 
+        // console.log("actual text of the Post ", textContent);
         if(contentImages){
           const contentWithImages = [];
           
@@ -143,9 +144,9 @@ export default function TextContent({content, isFullView=false, fromPost=false, 
 
     return (
         <div className={`${isFullView ? 'w-4/5': 'w-60'} `}>
+          {console.log(("is Full view: ", isFullView))}
             {!isFullView ? 
             <p>{makeWords(text)}..</p>
-            
             : 
             <div>
               {transformedText}

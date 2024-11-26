@@ -138,50 +138,6 @@ const EditPost = () => {
     getPost();
   }, [postId]);
 
-  useEffect(() => {
-    console.log("post Id received at editPost: ", post);
-
-    // Assign Title
-    async function loadInitialData() {
-      if (!post) {
-        return;
-      }
-      try {
-        const titleStored = JSON.parse(localStorage.getItem("titleStorage"));
-        // console.log('post title: initialLoad: ', post.title);
-        // console.log('titleStred:initialLoad ', titleStored);
-        const newTitle = post?.title && !titleStored ? post.title : titleStored;
-
-        // console.log('newTitle assigned: initialLoad', newTitle);
-        // Uploading Title Image
-        const titleImage = localStorage.getItem("titleImagePreview");
-        let newImagePreview = titleImage;
-        if (post?.titleImage && !titleImage) {
-          newImagePreview = await fetchImageAsBase64(post.titleImage);
-        }
-
-<<<<<<< HEAD
-   
-
-    // Convert and Store image as base 64
-    const fetchImageAsBase64 = useCallback(async(image) => {
-        try{
-            const response = await fetch(`http://localhost:4100/${image}`)
-            const blob = await response.blob();
-            return new Promise((resolve) => {
-            const reader = new FileReader();
-            reader.onloadend=() => {
-                localStorage.setItem('titleImagePreview', reader.result);
-                resolve(reader.result)
-            }
-            reader.readAsDataURL(blob)
-            })
-        }
-        catch(err){
-            console.error("err while converting server image to buffer", err);
-            return null
-        }
-    })
 
     useEffect(() => {
         console.log("post Id received at editPost: ", post);
@@ -255,74 +211,7 @@ const EditPost = () => {
         } 
         
         loadInitialData();
-    },[post])
-    // store image as base64
-    function storeAsBase64(file){
-        const reader = new FileReader();
-        reader.onloadend = function(){
-            localStorage.setItem('titleImagePreview', reader.result);
-            setEditPostData(prev => {
-                return {
-                    ...prev,
-                    imagePreview:reader.result
-                }
-            })
-=======
-        localStorage.setItem("titleImage", post?.titleImage);
-        // console.log("new title image on initial load: ", newImagePreview);
-
-        // load Save content Text (Text Data of Post)
-        const localContentText = JSON.parse(
-          localStorage.getItem("textContent")
-        );
-        // console.log('localContentText:initialLoad ',localContentText);
-        const newContentText =
-          post?.content && !localContentText
-            ? post.content.find((content) => content.type === "text")?.value ||
-              ""
-            : localContentText;
-        // console.log('New Content Text initial load: ', newContentText);
-        setEditPostData((prev) => ({
-          ...prev,
-          title: newTitle || "",
-          titleImage: post.titleImage || "",
-          imagePreview: newImagePreview || "",
-          contentText: newContentText || "",
-        }));
-
-        // load content Images
-        if (post?.contentImages) {
-          let localContentImages =
-            JSON.parse(localStorage.getItem("localContentImages")) || [];
-          // console.log("localContentImages on initial load: ", localContentImages, " post.contentImages: ", post.contentImages);
-          if (post?.contentImages && localContentImages.length === 0) {
-            // console.log("contentImages: if local is empty", post.contentImages);
-            const newImages = post.contentImages.map((image, index) => ({
-              id: index,
-              fileName: image.fileName,
-              preview: `http://localhost:4100/${image.path}`,
-              position: image.position,
-            }));
-            setContentImages(newImages);
-            localStorage.setItem(
-              "localContentImages",
-              JSON.stringify(newImages)
-            );
-          } else {
-            setContentImages(localContentImages);
-          }
->>>>>>> feature/updateBlog
-        }
-      } catch (err) {
-        console.error("Error while receiving post", err);
-      } 
-      finally{
-        setLoading(false)
-      }
-    }
-
-    loadInitialData();
-  }, [post]);
+  },[post])
   // store image as base64
   function storeAsBase64(file) {
     const reader = new FileReader();
@@ -340,13 +229,14 @@ const EditPost = () => {
   }
 
   // Handle changes to the title input
-  const handleChange = debounce((e) => {
+  const handleChange = ((e) => {
     const newTitle = e.target.value;
+    console.log("new Title: ", e.target.value);
     localStorage.setItem("titleStorage", JSON.stringify(newTitle));
     setNewTitleImage(true);
     setEditPostData((prev) => ({ ...prev, title: newTitle }));
     setEditedSomething(true);
-  }, 300);
+  });
 
   // Handle changes to the title Image
   function handleImageChange(e) {
@@ -448,70 +338,6 @@ const EditPost = () => {
     if (editPostData.titleImage instanceof File) {
       formData.append("titleImage", editPostData.titleImage);
     }
-<<<<<<< HEAD
-
-    // handle Reposting
-    const handleReposting = async(e) => {
-        console.log("Reposting run ", post);
-        const formData = new FormData();
-        console.log("newTitleImage true or false ",newTitleImage);
-        console.log("titleimage checking: ", editPostData.titleImage);
-        if(newTitleImage && editPostData.titleImage){
-            formData.append('titleImage', editPostData.titleImage);
-            
-        }
-        formData.append('title', editPostData.title);
-        if(editPostData.contentText){
-            const contentArray = [{
-                type:'text',
-                content:editPostData.contentText
-            }]
-            formData.append('content', JSON.stringify(contentArray));
-        }
-        if(contentImages){
-            const positions = contentImages.map(image => (image.position));
-            console.log("positions inside true: ", positions);
-            contentImages.forEach(image => {
-                if(image.file){
-                    formData.append("contentImages", image.file)
-                }else{
-                    formData.append('contentImages', image)
-                }
-                
-            })
-        }
-        formData.append('titleImage', editPostData.titleImage);
-
-
-        console.log("editPost data DRWE REPOSTING: ", editPostData );
-        console.log("contentImages after reposting: ", contentImages);
-
-        console.log("formData: ", formData);
-        try{
-            const response = await axios.put(`http://localhost:4100/weblog/updatedBlog/${post._id}`,
-            formData,
-            {
-                withCredentials:true,
-                headers:{
-                    'Content-Type': 'multipart/formD-data'
-                }
-            })
-            console.log("repsonse from put request :", response);
-            if(response?.data.success){
-                console.log("new blog data after success message", response.data.blog);
-                console.log("new Title", response.data.blog.title);
-                console.log("new titleImage ", response.data.blog.titleImage);
-                localStorage.setItem('titleImage', JSON.stringify(response.data.blog.titleImage));
-                localStorage.setItem('titleStorage', JSON.stringify(response.data.blog.title))
-            }
-            setNewTitleImage(false);
-        }catch(err){
-            console.log("You can deal with errors: ", err)
-        }
-        console.log("editPost data DRWE REPOSTING: ", editPostData.titleImage );
-        // console.log("contentImages after reposting: ", contentImages);
-
-=======
     formData.append("title", editPostData.title);
     if (editPostData.contentText) {
       const contentArray = [
@@ -533,40 +359,39 @@ const EditPost = () => {
           formData.append("contentImages", image.file);
         } 
       });
->>>>>>> feature/updateBlog
     }
     formData.append("titleImage", editPostData.titleImage);
 
-    // console.log("formData: ", formData);
-    // try {
-    //   const response = await axios.put(
-    //     `http://localhost:4100/weblog/updatedBlog/${post._id}`,
-    //     formData,
-    //     {
-    //       withCredentials: true,
-    //       headers: {
-    //         "Content-Type": "multipart/formD-data",
-    //       },
-    //     }
-    //   );
-    //   console.log("repsonse from put request :", response);
-    //   if (response?.data.success) {
-    //     console.log("new blog data after success message", response.data.blog);
-    //     console.log("new Title", response.data.blog.title);
-    //     console.log("new titleImage ", response.data.blog.titleImage);
-    //     localStorage.setItem(
-    //       "titleImage",
-    //       JSON.stringify(response.data.blog.titleImage)
-    //     );
-    //     localStorage.setItem(
-    //       "titleStorage",
-    //       JSON.stringify(response.data.blog.title)
-    //     );
-    //   }
-    //   setNewTitleImage(false);
-    // } catch (err) {
-    //   console.log("You can deal with errors: ", err);
-    // }
+    console.log("formData: ", formData);
+    try {
+      const response = await axios.put(
+        `http://localhost:4100/weblog/updatedBlog/${post._id}`,
+        formData,
+        {
+          withCredentials: true,
+          headers: {
+            "Content-Type": "multipart/formD-data",
+          },
+        }
+      );
+      console.log("repsonse from put request :", response);
+      if (response?.data.success) {
+        console.log("new blog data after success message", response.data.blog);
+        console.log("new Title", response.data.blog.title);
+        console.log("new titleImage ", response.data.blog.titleImage);
+        localStorage.setItem(
+          "titleImage",
+          JSON.stringify(response.data.blog.titleImage)
+        );
+        localStorage.setItem(
+          "titleStorage",
+          JSON.stringify(response.data.blog.title)
+        );
+      }
+      setNewTitleImage(false);
+    } catch (err) {
+      console.log("You can deal with errors: ", err);
+    }
     console.log("editPost data DRWE REPOSTING: ", editPostData.titleImage);
     // console.log("contentImages after reposting: ", contentImages);
   };
@@ -580,9 +405,7 @@ const EditPost = () => {
   return (
     
         <>
-<<<<<<< HEAD
-      
-            <form method="post" className="flex flex-col gap-4 my-4 mx-2">
+          <form method="post" className="flex flex-col gap-4 my-4 mx-2">
                 <input type="text" 
                 name="title" 
                 placeholder="Edit the Title" 
@@ -645,108 +468,13 @@ const EditPost = () => {
                     <button className="border p-2 bg-blue-400 mb-4 mr-4" onClick={() => handleNavigation(-1)}> Back </button>
                     <button className="border p-2 bg-blue-400" onClick={() => handleNavigation('/')}> Back To HOME</button>
                 </div>
-=======
-          <form method="post" className="flex flex-col gap-4 my-4 mx-2">
-            <input
-              type="text"
-              name="title"
-              placeholder="Edit the Title"
-              className="border border-gray-500 w-2/5"
-              onChange={handleChange}
-              value={editPostData.title}
-            />
-
-            <div>
-              <label htmlFor="image" className="block">
-                Change Title Image
-              </label>
-              <input
-                type="file"
-                accept="image/*"
-                name="titleImg"
-                onChange={handleImageChange}
-                className="w-[82px] mb-2"
-              />
-              {editPostData.imagePreview && (
-                <img
-                  src={editPostData.imagePreview}
-                  alt={editPostData.title}
-                  className="h-52 w-56"
-                />
-              )}
             </div>
-
-            <div>
-              {/* {console.log("editPostData: ", editPostData)} */}
-              <textarea
-                placeholder="start writing your Blog"
-                ref={currentArea}
-                name="value"
-                className="border-gray-500 border w-4/5 h-[350px] mt-4"
-                onChange={handleContentText}
-                onClick={selectCurrentSelection}
-                onKeyUp={selectCurrentSelection}
-                value={editPostData.contentText}
-                required
-              />
-
-              <div className="flex">
-                {contentImages && (
-                  <ContentImages
-                    contentImages={contentImages}
-                    removeImage={removeImage}
-                    contentText={editPostData?.contentText}
-                  />
-                )}
-              </div>
-              <div className="absolute top-[45%] right-[22%]">
-                <input
-                  type="file"
-                  name="image"
-                  accept="image/*"
-                  onChange={handleContentImages}
-                  className="w-[88px] cursor-pointer"
-                  id="contentImg"
-                />
-              </div>
-            </div>
-          </form>
-
-          <div className="">
-            <button
-              className="border p-2 bg-green-400 mb-4"
-              onClick={(e) => handleReposting(e)}
-            >
-              {" "}
-              RePost{" "}
-            </button>
-            <div>
-              <button
-                className="border p-2 bg-red-400 mb-4"
-                onClick={() => handleNavigation(-1)}
-              >
-                {" "}
-                Back{" "}
-              </button>
-              <button
-                className="border p-2 bg-red-400"
-                onClick={() => handleNavigation("/")}
-              >
-                {" "}
-                Back To HOME
-              </button>
->>>>>>> feature/updateBlog
-            </div>
-          </div>
+          
         </>
   );
-};
+}
 
-<<<<<<< HEAD
 export default EditPost
 
 
 
-=======
-export default EditPost;
->>>>>>> feature/updateBlog
