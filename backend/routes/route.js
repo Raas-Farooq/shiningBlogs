@@ -2,7 +2,7 @@ import { ExpressValidator } from "express-validator";
 import express from 'express';
 import rateLimit from "express-rate-limit";
 import { body} from "express-validator";
-import {registerUser, logging, addBlog, updateBlogPost, deleteBlog, updateUserProfile, logout, allUsers, getUser, allBlogs} from "../controllers/blogController.js";
+import {registerUser, logging, addBlog, updateBlogPost, deleteBlog, updateUserProfile, logout, allUsers, getUser, allBlogs,getBlogPost} from "../controllers/blogController.js";
 import authMiddleware from "../middleAuthentication/authMiddleware.js";
 import CheckAuthen from "../checkUserAuthen/checkAuthen.js";
 import multer from 'multer';
@@ -135,5 +135,5 @@ router.get('/current', authMiddleware,
 router.get('/allUsers', allUsers);
 router.get('/allBlogs', allBlogs);
 router.get('/getUser', authMiddleware, getUser);
-
+router.get('/getBlogPost/:id', authMiddleware, getBlogPost);
 export default router;
