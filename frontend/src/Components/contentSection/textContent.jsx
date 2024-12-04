@@ -144,7 +144,6 @@ export default function TextContent({content, isFullView=false, fromPost=false, 
 
     return (
         <div className={`${isFullView ? 'w-4/5': 'w-60'} `}>
-          {console.log(("is Full view: ", isFullView))}
             {!isFullView ? 
             <p>{makeWords(text)}..</p>
             : 

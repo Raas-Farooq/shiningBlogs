@@ -1,0 +1,2726 @@
+server file:
+import express from 'express';
+import databaseConnection from './config/db.js';
+import router from './routes/route.js';
+import cors from 'cors';
+import cookieParser from 'cookie-parser';
+
+const app = express();
+
+app.use(express.json());
+app.use(cors({
+    origin:'http://localhost:5173',
+    credentials:true,
+}));
+app.use(cookieParser());
+app.use('/uploads', express.static('uploads'));
+
+app.use((err, req,res, next) => {
+    console.error(err.stack);
+    res.status(500).send("Something went wrong")
+})
+
+const port = process.env.PORT || 4100;
+databaseConnection()
+
+app.use('/weblog/', router)
+
+
+
+app.listen((port), () => console.log("App is running On ", port));
+
+
+
+MOdal:
+
+import mongoose from "mongoose";
+
+globlal Context:
+import React, { useContext, useEffect, useState } from "react"
+import axios from 'axios';
+import UserAccount from "../Components/userAccount/userAccout";
+// import { isButtonElement } from "react-router-dom/dist/dom";
+
+const AppContext = React.createContext();
+
+export const GlobalState = ({children}) => {
+    const [openUserAccount, setOpenUserAccount] = useState(false);
+    const [editProfile, setEditProfile] = useState(false);
+    const [showMenu, setShowMenu] = useState(false);
+    const [loggedIn, setLoggedIn] = useState(false);
+    const [loading, setLoading] = useState(true);
+    const [registerData, setRegisterData] = useState({});
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [imagePreview, setImagePreview] = useState('');
+    const [globalEmail, setGlobalEmail] = useState('');
+    const [currentUser, setCurrentUser] = useState(null);
+
+    
+    const userAuthentication = async () => {
+        try {
+            const response = await axios.get('http://localhost:4100/weblog/checkAuthen', {withCredentials: true});
+            console.log("response of auth inside globaL :", response)
+            if (response.data.isAuthenticated) {
+              console.log("is validUser globaL :", response.data);
+                setLoggedIn(true);
+                const user = response.data.user;
+                setCurrentUser(user);
+                let imgLink=`http://localhost:4100/${user.profileImg}`;
+                // if(user.profileImg && user.profileImg.data){
+                //     const base64String = 
+                //    btoa( new Uint8Array(user.profileImg.data.data).
+                //    reduce((data, byte) => data+ String.fromCharCode(byte), ''))
+
+                //     imgLink = `data:${user.profileImg.contentType};base64,${base64String}`;
+                // }
+                setImagePreview(imgLink)
+                
+                localStorage.setItem('userId', response.data.user._id);
+            } else {
+                setLoggedIn(false);
+                setCurrentUser(false);
+                localStorage.removeItem('userId');
+            }
+        } catch (err) {
+            console.error("Authentication error:", err);
+            setCurrentUser(null);
+            setLoggedIn(false);
+
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    useEffect(() => {
+        console.log("Navbar runs: ")
+    }, [currentUser,loggedIn]);
+
+    useEffect(() => {
+      const userId = localStorage.getItem('userId');
+      if (userId) {
+        userAuthentication(); // Fetch full user data if we have a userId
+      } else {
+          setLoading(false);
+      }
+  }, []);
+    return (
+        <AppContext.Provider value={{
+            openUserAccount,
+            setOpenUserAccount,
+            setShowMenu,
+            showMenu,
+            editProfile,
+            setEditProfile,
+            loggedIn,
+            setLoggedIn,
+            registerData,
+            setRegisterData,
+            loading, 
+            setLoading,
+            isAuthenticated,
+            setIsAuthenticated,
+            currentUser,
+            setCurrentUser,
+            imagePreview,
+            setImagePreview,
+            userAuthentication
+        }}>
+            {children}
+        </AppContext.Provider>
+    );
+}
+
+export const useGlobalContext = () => {
+    return useContext(AppContext);
+}const usersSchema = new mongoose.Schema({
+    username:{
+        type:String,
+        required:true,
+        unique:true
+    },
+    
+    email:{
+        type:String,
+        required:true,
+        match: [/.+\@.+\..+/, 'Please fill a valid email address'],
+        unique:true
+    },
+    password:{
+        required:true,
+        type:String
+    },
+    
+    TopicsInterested:{
+        type:[String]
+    },
+    goal:{
+        type:String
+    },
+    profileImg:{
+        type:String
+    },
+
+    createdAt:{
+        type:Date,
+        default:Date.now
+    }                                                
+},{
+    timestamps:true,
+    collection:'User'
+})
+
+usersSchema.index({username:1}, {unique:true});
+usersSchema.index({email:1}, {unique:true});
+
+const User = mongoose.model('User', usersSchema)
+
+// User.createCollection().then(function(collection) {
+//     console.log("this is the collections created: ", collection);
+// })
+
+
+const blogSchema = new mongoose.Schema({
+    userId:{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:'User'
+    },
+    title:{
+        type:String,
+        required:true
+    },
+    titleImage:{
+        type:String,
+        required:true
+    },
+    
+    content:[{
+        type:{
+            type:String,
+            enum:['text']
+        },
+        value:String
+    }]
+,
+    contentImages:[{
+        path:String,
+        position:Number,
+        fileName:String
+    }]
+,
+    createdAt:{
+        type:Date,
+        default:Date.now
+    }
+}, {
+    timestamps:true,
+    collection:'Blogs'
+})
+
+const Blog = mongoose.model('blog', blogSchema)
+export {User, Blog}
+
+
+routes of the backend:
+
+import { ExpressValidator } from "express-validator";
+
+import express from 'express';
+
+import rateLimit from "express-rate-limit";
+
+import { body} from "express-validator";
+
+import {registerUser, logging, addBlog, updateBlogPost, deleteBlog, updateUserProfile, logout, allUsers, getUser, allBlogs,getBlogPost} from "../controllers/blogController.js";
+
+import authMiddleware from "../middleAuthentication/authMiddleware.js";
+
+import CheckAuthen from "../checkUserAuthen/checkAuthen.js";
+
+import multer from 'multer';
+
+
+const router = express.Router();
+
+
+
+router.get('/checkAuthen', authMiddleware, CheckAuthen);
+
+
+const registerLimiter= rateLimit({
+
+    WindowMs:15 * 60 * 1000,
+
+    max:5,
+
+    message:"Too many attempts plz try again after 15 minutes"
+
+})
+
+
+router.post('/logout', logout);
+
+
+router.post('/registerUser', registerLimiter, [
+
+    body('username').isLength({min:3}).trim().escape().withMessage('Enter at Least 3 characters'),
+
+    body('email').isEmail().normalizeEmail().withMessage("Should be in Valid Email format"),
+
+    body('password').isLength({min:8}).withMessage("Enter atleat 8 characters")
+
+], registerUser)
+
+
+const loginLimiter = rateLimit({
+
+    windowMs:15 * 60 * 1000,
+
+    max:15
+
+})
+
+
+router.post('/userLogin',loginLimiter, [
+
+    body('email').isEmail().normalizeEmail(),
+
+    body('password').notEmpty()
+
+], logging), async(req,res) => {
+
+    console.log("req. email: ", req.body.email)
+
+}
+
+
+const newBlogLimiter = rateLimit({
+
+    windowMs:15 * 60 * 1000,
+
+    max:10,
+
+    message:"Too many blogs created plz try again after some time"
+
+})
+
+
+const storage = multer.diskStorage({
+
+    destination: function (req,file, cb){
+
+        cb(null, 'uploads/')
+
+    },
+
+
+    filename:function (req,file, cb){
+
+       
+
+        cb(null, Date.now() + '-' + file.originalname)
+
+    }
+
+})
+
+
+const upload = multer({storage:storage})
+
+
+router.post('/addBlog', upload.fields([{name:'titleImage', maxCount:1}, {name:"contentImages", maxCount:10}]), newBlogLimiter, authMiddleware, [
+
+    body('title').isLength({min:1, max:60}).trim().escape().withMessage("title should be btween 1 and 200 characters"),
+
+    body('content').isJSON().withMessage("content should be in JSON format"),
+
+    body('content').custom((value) => {
+
+        try{
+
+            const content = JSON.parse(value);
+
+            if(!Array.isArray(content)) throw new Error("Content should be in Array form");
+
+            content.forEach(data => {
+
+                if(!['text'].includes(data.type)) throw new Error("type should be either text or image");
+
+                if(data.type === 'text' && typeof data.value !== 'string') throw new Error("text should be in String form");
+
+        });
+
+        return true;
+
+        }catch(err){
+
+            throw new Error("error related to content format", err.message)
+
+        }       
+
+        
+
+    })
+
+], addBlog)
+
+
+const updateUploads = multer({storage:storage})
+
+const updateLimit = rateLimit({
+
+    windowMs:15 * 60 * 1000,
+
+    message:"Too many attempts try again later"
+
+})
+
+
+router.put('/updatedBlog/:id',
+
+updateUploads.fields(
+
+    [{name:'titleImage', max:1},
+
+    {name:'contentImages', max:10}]
+
+    )
+
+    ,
+
+    authMiddleware,
+
+    [
+
+        body('title').optional().isLength({min:1, max:60}).trim().escape().withMessage("title should be btween 1 and 200 characters"),
+
+        body('content').isJSON().withMessage("Content should be in JSON formate"),
+
+        // body('content').optional().isArray().withMessage("Content should be inside Array"),
+
+        // body('content.*.type').optional().isIn(['text', 'image', 'video']).withMessage("Data should be in Text, image or video format"),
+
+        // body('content.*.value').optional().trim().escape(),
+
+        // body('content.*.url').optional().isURL().withMessage(" Url SHuold be Valid")  
+
+    ],
+
+    updateBlogPost
+
+)
+
+
+const deleteLimit = rateLimit({
+
+    windowMs:15 * 60 * 1000,
+
+    max:15
+
+});
+
+
+router.delete('/deleteBlog/:id', deleteLimit, authMiddleware, deleteBlog);
+
+
+const updateUserLimit = rateLimit({
+
+    windowMs: 15 * 60 * 1000,
+
+    max: 3
+
+})
+
+
+// const storage = multer.memoryStorage();
+
+// const uploads = multer({storage:storage});
+
+router.put('/updateUserProfile', upload.single('profileImg'), updateUserLimit, authMiddleware,
+
+    // [
+
+    //     body('username').isLength({min:3}).trim().escape().withMessage("Username length should be atleast 3 characters"),
+
+    //     body('goal').isLength({min:30}).withMessage("Your goal should consist of atleast 30 characters")
+
+    // ],
+
+updateUserProfile
+
+)
+
+
+const getCurrentLimit = rateLimit({
+
+    WindowMs:15 * 60 * 1000,
+
+    max:10
+
+})
+
+router.get('/current', authMiddleware,
+
+    [
+
+        body('email').isEmail().normalizeEmail()
+
+    ]
+
+)
+
+
+router.get('/allUsers', allUsers);
+
+router.get('/allBlogs', allBlogs);
+
+router.get('/getUser', authMiddleware, getUser);
+
+router.get('/getBlogPost/:id', authMiddleware, getBlogPost);
+
+export default router;
+
+this is the backend controller page:
+import bcrypt from 'bcrypt';
+import {Blog, User} from '../models/model.js';
+import mongoose from 'mongoose';
+import rateLimit from 'express-rate-limit';
+import { body, validationResult } from 'express-validator';
+import jwt from 'jsonwebtoken';
+import authMiddleware from '../middleAuthentication/authMiddleware.js';
+import { RestartProcess } from 'concurrently';
+
+
+
+const registerUser = async (req,res) => {
+    
+    const errors = validationResult(req);
+    console.log("validation Result to Err: ", errors);
+    if(!errors.isEmpty()){
+        return res.status(404).json({
+            success:false,
+            message:"Validation Error",
+            error:errors.array()
+        })
+    }
+
+    try{
+            
+        const {username, email, password} = req.body;
+        const isUserExist = await User.findOne({email});
+
+        if (isUserExist){
+            return res.status(404).json({
+                success:false,
+                message:"Username or email already Taken",
+            })
+        }
+        const saltRange = 10;
+        const protectedPassword = await bcrypt.hash(password, saltRange);
+        const newUser = new User({
+            username: username,
+            email:email,
+            password:protectedPassword
+        })
+
+        
+            await newUser.save();
+
+           const newUserObject = newUser.toObject();
+           console.log("newUserObject", newUserObject);
+
+           delete newUserObject.password;
+            jwt.sign({user: {userId:newUserObject._id}}, 
+            process.env.JWT_SECRET, 
+            {expiresIn:'1h'},
+            (err,token) => {
+                if(err){
+                    return res.status(500).json({
+                        success: false,
+                        message: "Error while signing the token",
+                    });
+                }
+
+                res.cookie('token', token, {
+                    httpOnly:true,
+                    secure:process.env.NODE_ENV === 'production',
+                    maxAge:3600000,
+                    sameSite:'Strict'
+
+                })
+                res.status(201).json({
+                    success:true,
+                    message:"User Has been added",
+                    newUser:{
+                        username: newUserObject.username,
+                        email:newUserObject.email,
+                        _id: newUserObject._id,
+                    }
+                    
+                })
+            }
+        )
+    }
+    catch(err){
+            res.status(500).json({
+                success:false,
+                message:`Error Occured while server processing`,
+                err:err.message
+            })
+    }
+    
+}
+
+// Update User name
+
+/**
+ * 
+ * @param {Object} req - requests from user
+ * @param {Object} res - response to user  
+ * 
+ * @param {body} profileImage - title image of the user
+ * @param {body} username - name of the user 
+ */
+
+const current = async (req,res) => {
+    const errors = validationResult(req);
+    if(!errors.isEmpty()){
+        return res.status(401).json({
+            success:false,
+            message:"Vaidation Error Occured"
+        })
+    }
+    try{
+        const {email} = req.body;
+        
+        const user = await User.find({email});
+
+        if(!user){
+            return res.status(401).json({
+                success:false,
+                message:"Unable to find the requested user. Try Again"
+            })
+        }
+        return res.status(200).json({
+            success:true,
+            message:"Successfully access the User"
+        })
+    }
+
+    catch(err){
+        res.status(500).json({
+            success:false,
+            message:"Got server error while getting the user"
+        })
+    }
+}
+
+
+const updateUserProfile = async (req, res) => {
+
+    const errors = validationResult(req);
+    const userId = req.user.userId;
+  
+    // console.log("req.file inside UpdateUsr ", req.file);
+    console.log("req.body", req.body);
+    if(!errors.isEmpty()){
+        return res.status(400).json({
+            success:false,
+            message:"Not a valid data"
+        })
+    }
+    
+    const {username, email, password,goal} = req.body;
+    const interests = req.body.interests ? JSON.parse(req.body.interests) : undefined;
+    const user = await User.findById(userId);
+    if(user._id.toString() !== userId){
+        return res.status(403).json(
+            {
+                success:false,
+                message:"You are not authorized to Edit this Profile"
+            })
+    }
+
+    
+    try{
+        let updatingUser = {};
+        if(username) updatingUser.username = username;
+        if(email) updatingUser.email = email;
+        // if(password){
+        //     const hashedPassword = await bcrypt.hash(password, 10);
+        //     updatingUser.password = hashedPassword;
+        // }
+        if(req.file){
+        
+            updatingUser.profileImg=req.file.path;
+        }
+        if(goal) updatingUser.goal = goal;
+        if(interests) updatingUser.TopicsInterested = interests;
+        
+        const updated = await User.findByIdAndUpdate(userId,
+            {
+                $set:updatingUser,
+            },
+            {new:true, runValidators:true}
+        )
+        if(!updated){
+            return res.status(401).json({
+                success:false,
+                message:"Failed to update the Profile",
+                }
+            )
+        }
+        return res.status(200).json({
+            success:true,
+            message:" User Profile Updated",
+            new_Profile:updated
+        })
+ 
+    }
+    catch(err){
+        return res.status(500).json({
+            success:false,
+            message:"Unable to Update the User",
+            err:err.message
+        })
+    }
+
+}
+
+// user Login Function
+
+/**Handles user login by validating input, checking credentials, and generating a JWT token.
+ * 
+ * @param {Object} req - request Object : it have the user requests/data   
+ * @param {Object} res - response Object:  it is used to send the responses back to user
+ * @returns {Object} it shows the result of user responses after login attempt
+ * 
+ * @param {String} req.body.username - username of the user
+ * @param {String} req.body.email - user email address
+ * @param {String} req.body.password - user's password
+ * 
+ * @returns {Object} - JSON response with a status and message indicating the result of the login attempt.
+ * @returns {Object} res.success - Indicates whether the login was successful.
+ * @returns {string} res.message - Provides additional information on the result (e.g., errors or success messages).
+ * 
+ * @description This function This function uses bcrypt for password comparison and jwt for token generation.
+ *              Also checks whether the user is valid who is trying to login and
+ *              and it returns different responses like 200 for (Ok), 400 for (bad request), 
+ *              404 for (Not Found) and 500 for (Server Error) 
+ */
+
+
+const logging =  async(req,res) => {
+    //checking Result of Validation
+    const {email, password}= req.body;
+    console.log("Login RUns");
+    console.log(`Received email ${email} and password ${password} backend`);
+    const loginErrors = validationResult(req);
+    if(!loginErrors.isEmpty()){
+        return res.status(400).json({
+            success:false,
+            message:"email or password not Valid",
+            errors:loginErrors.array()
+        })
+    }
+    
+    try{
+
+        // accessing User
+        const allUsers = await User.find({});
+        console.log("all Users inside try block: ", allUsers);
+        const user = await User.findOne({email});
+        console.log("user: inside login ", user);
+        // if user didn't exist
+        if(!user) {
+            return res.status(404).json({
+                success:false,
+                message:"user didn't exist"
+            })
+        }
+        // Match the provided password with the stored password
+        const isPasswordMatched = await bcrypt.compare(password, user.password);
+        if(!isPasswordMatched){
+            return res.status(404).json(
+                {
+                    success:false,
+                    message:"password didn't Match. Try again please",
+                    
+                }
+            )
+        }
+        // Create a JWT token for the user
+        console.log("user._id: ", user._id);
+        jwt.sign(
+            ({user:{userId:user._id}}), 
+            process.env.JWT_SECRET,
+             {expiresIn: '1h'}
+             , (err, token) => {
+                if(err){
+                    return res.status(500).json({
+                        success:false,
+                        message:"Got Error, Didn't able to sign the token!"
+                    })
+                }
+                res.cookie('token', token, {
+                    httpOnly:true,
+                    secure:process.env.NODE_ENV="production",
+                    maxAsge:3600000,
+                    sameSite:'Strict'
+                })
+
+                return res.status(201).json({
+                    success:true, 
+                    message:"logged in and Successfully created the token",
+                    user
+                })
+
+             }
+            )
+    }
+    // Handle server errors
+    catch(err){
+        res.status(500).json({
+            success:false,
+            message:`server Error Occured while logging`,
+            err:err.message
+        })
+    }
+}
+
+
+const addBlog = async (req,res) => {
+
+    const errors = validationResult(req);
+
+    if(!errors.isEmpty()){
+        return res.status(400).json({
+            success:false,
+            message:"Got validation Errors",
+            error: errors.array()
+        })
+    }
+    const {title, content, positions} = req.body;
+    const user_id = req.user.userId;
+    const myPositions = JSON.parse(positions) || [];
+    const titleImage = req.files['titleImage'] ? req.files['titleImage'][0].path : null;
+
+    try{
+        const contentImages = req.files['contentImages'] ? 
+        req.files['contentImages'].map((file, ind) => 
+            ({ 
+                path:file.path,
+                ...myPositions[ind]
+            })) 
+            : 
+            [];
+        const newBlog = new Blog({
+            userId:user_id,
+            title:title,
+            titleImage,
+            content:JSON.parse(content),
+            contentImages:contentImages
+            
+        });
+        console.log("newBlog created: ", newBlog);
+        const blogCreated = await newBlog.save();
+        if(!blogCreated){
+            return res.status(404).json({
+                success:false,
+                message:"Not Able to Create Blog. Try again Later",
+                
+            })
+        }
+        return res.status(201).json({
+            success:true,
+            message:"BlogPost has been Created successfuly"
+        })
+    }
+    catch(err){
+        return res.status(500).json({
+            success:false,
+            message:"Server responded with Errror",
+            error:err.message
+        })
+    }
+
+}
+
+/**
+ * the Purpose of this function is to update the blog post by authenticating the valid user
+ * and updating the content (textContent, images or videos) and title of the Blog Post 
+ * @param {Object} req - user's request 
+ * @param {Object} res - responses send back to the user 
+ * @param {return} return the success/fail result of update
+ * 
+ * @param {body} req.content - user new content 
+ * @param {body} req.title - updated title
+ * @param {req} req.user.id - id of the user, got by authMiddleWare  
+ *  
+ * @returns {Object} res.success - Indicates whether the login was successful.
+ * @returns {string} res.message - Provides additional information on the result (e.g., errors or success messages).
+ */
+const updateBlogPost = async(req,res) => {
+
+    console.log("Update Blog Post on its waysxz")
+    // checking the validation Result
+    const errs = validationResult(req);
+
+    if(!errs.isEmpty()){
+        return res.status(400).json({
+            success:false,
+            message:"Validation Error",
+            error:errs.array()
+        })
+    }
+
+    const user_id = req.user.userId;
+    // console.log("req. body: ", req.body);
+    const {title, content, positions, savedImages} = req.body;
+    const useSavedImages = JSON.parse(savedImages);
+    const newPositions = JSON.parse(positions)
+    useSavedImages.forEach(image => {
+        console.log("useSaved Image; ", image);
+    })
+    const id = req.params.id; 
+    newPositions.forEach(position => {
+        console.log("position: ", position)
+    })
+    // console.log("positions inside backend: ", positions)
+    req.files['contentImages'].forEach((image,ind) => {
+        useSavedImages.push({
+            path:image.path,
+            position:positions[ind].position,
+            fileName:positions[ind].fileName
+        })
+    });
+    console.log("useSavedImages ", useSavedImages);
+    const newTitleImage = req.files['titleImage'] ? req.files['titleImage'][0].path : ''
+    try{
+        //updating a blog
+        const blogPost = await Blog.findById(id);
+
+        if(!blogPost){
+            return res.status(404).json({
+                success:false,
+                message:"Not found the Blog",
+            })
+        }else{
+            console.log("success BlogPost exist")
+        }
+
+        if(blogPost.userId.toString() !== user_id){
+            return res.status(403).json({
+                success:false,
+                message:"you are not authorize to Updte it"
+            })
+        }else{
+            console.log("success You are authorized to edit this blog")
+        }
+        // if(title) blogPost.title = title;
+        // // if(content) blogPost.content = content;
+        // if(newTitleImage) blogPost.titleImage = newTitleImage;
+
+        // const updatedBlog = await blogPost.save();
+        // successfully updated the blogPost
+        // return res.status(200).json({
+        //     success: true,
+        //     message: "Blog updated successfully",
+        //     blog: updatedBlog
+        //   });
+    }
+    catch(error){
+        res.status(500).json({
+            success:true,
+            message:"Server responded with error while updating the Blog"
+        })
+    }
+}
+
+const deleteBlog = async(req, res) => {
+    const delId = req.params.id;
+    const userId = req.user.userId;
+    console.log("delId: ", delId , " userId Authorization: ", userId);
+
+    try{
+        // console.log("All Blogs inside delete: ",your_blogs);
+        // const your_blogs = await Blog.find({});
+        // console.log("All Blogs inside delete: ",your_blogs);
+        const delBlog = await Blog.findById(delId);
+        console.log("delBlog after using findById: ", delBlog);
+        if(delBlog.userId.toString() !== userId){
+            return res.status(403).json({
+                success:false,
+                message:"Not an Authorized User to delete a Blog"
+            })
+        }
+        console.log("delBlog after using findById: ", delBlog);
+        if(!delBlog) {
+            return res.status(404).json({
+                success:false,
+                message:"coudn't find the Blog",
+
+            })
+        }
+
+        await Blog.findByIdAndDelete(delBlog);
+        return res.status(200).json({
+            success:true,
+            message:"Successfully Deleted the Blog"
+        })                                                                                                                                                                                                                                                                                                                                                                                                   
+    }
+    catch(err){
+        return res.status(500).json({
+            success:false,
+            message:"Server error occured during deleting Process"
+        })
+    }
+}
+
+const allUsers = async(req,res) => {
+    console.log("Alhamdulila, backend is running");
+    const users = await User.find({});
+    // console.log("myBlogs: ", myBlogs);
+    try{
+        if(!users.length){
+            return res.status(400).json({
+                success:false,
+                message:"no blog found"
+            })
+        }
+
+        return res.status(200).json({
+            success:true,
+            message:"Successfully accessed Blogs",
+            users
+        })
+    }
+    catch(err){
+        return res.status(500).json({
+            success:false,
+            message:"Server Error while fetching all Users"
+        })
+    }
+}
+
+const getUser = async(req,res) => {
+    const userId = req.user.userId;
+    console.log("getUser Runs")
+    console.log("userId : ", userId);
+
+
+    try{
+        const user = await User.findById(userId);
+
+        if(!user){
+            message:"Server Error while finding a User"
+             return res.status(401).json({
+                success:false,
+                message:'Unable to find User Id'
+            })
+
+        }
+
+        return res.status(200).json({
+            success:true,
+            message:"The User has been Found Successfully",
+            user
+        })
+    }catch(err){
+        return res.status(500).json({
+            success:false,
+       })
+    }
+}
+
+const getBlogPost = async(req,res) => {
+
+    const blogId = req.params.id;
+    console.log("getBlog post runs: ", blogId);
+    if(!mongoose.Types.ObjectId.isValid(blogId)){
+        console.log("not a valid blod Id");
+        return res.status(400).json({
+            success:false,
+            message:"Blog Id is invalid"
+        })
+    }
+    try{
+        const blog = await Blog.findById(blogId);
+        console.log("this is the Blog: ", blog.contentImages);
+        const newContentImages = blog.contentImages.filter(image => image.path !== 'uploads/1732159071743-Feeling Safe.jpg');
+        console.log("new ContentImages: ", newContentImages);        if(!blog){
+            return res.status(404).json({
+                success:false,
+                message:"Blog doesn't found"
+            })
+        }
+
+        return res.status(200).json({
+            success:true,
+            message:"Blog Found successfully",
+            blogPost:blog
+        })
+    }
+    catch(err){
+        console.error("error occured", err)
+        return res.status(500).json({
+            success:false,
+            message:"Server error while accessing blog Post"
+        })
+    }
+}
+
+
+const allBlogs = async(req, res) => {
+    console.log("allBlogs run");
+    try{
+        const blogs = await Blog.find({});
+        if(!blogs){
+            return res.status(401).json({
+                success:false,
+                message:"Blogs not found"
+            })
+        }
+        return res.status(200).json({
+            success:true,
+            message:"Successfully found the blogs",
+            blogs
+        })
+    }catch(err){
+        return res.status(500).json({
+            success:false,
+            message:"somewhere inside the server error is dancing",
+            err:err.message
+        })
+    }
+}
+const logout = (req,res) => {
+    res.clearCookie('token');
+    return res.status(200).json({
+        success:true,
+        message:"Logout Successfully"
+    })
+}
+
+export {current, registerUser, logging, allBlogs,addBlog, updateBlogPost, deleteBlog, updateUserProfile, getBlogPost, allUsers, getUser, logout}this is the editPost frontEnd:
+import { useCallback, useEffect, useRef, useState } from "react";
+import { Navigate, useLocation, useNavigate } from "react-router-dom";
+import Image from "../Components/contentSection/titleImage";
+import TextContent from "../Components/contentSection/textContent";
+import ContentImages from "../Components/contentSection/ContentImage";
+import axios from "axios";
+import { debounce } from "lodash";
+
+const EditPost = () => {
+  const [cursorPosition, setCursorPosition] = useState(0);
+  const [newTitleImage, setNewTitleImage] = useState(false);
+  const [removedImages, setRemovedImages] = useState([]);
+  const [errors, setErrors] = useState({})
+  const [editedSomething, setEditedSomething] = useState(false);
+  const [fetchedPost, setFetchedPost] = useState({});
+  const [loading, setLoading] = useState(true);
+  const [post, setPost] = useState(null);
+  const moveTo = useNavigate();
+  const isNavigatingBack = useRef(false);
+
+  const [editPostData, setEditPostData] = useState({
+    title: "",
+    titleImage: null,
+    contentText: "",
+    imagePreview: "",
+  });
+  const isNavigatingRef = false;
+  const navigatingAttemptCount = useRef(false);
+
+  const [contentImages, setContentImages] = useState([]);
+  const currentArea = useRef(null);
+  // const moveTo = useNavigate();
+  const getState = useLocation();
+
+  const postId = getState.state?.postId;
+
+  const selectCurrentSelection = () => {
+    setCursorPosition(currentArea.current.selectionStart);
+  };
+
+  const clearLocalStorage = useCallback(() => {
+    localStorage.removeItem("titleStorage");
+    localStorage.removeItem("titleImagePreview");
+    localStorage.removeItem("textContent");
+    localStorage.removeItem("localContentImages");
+  }, []);
+
+  const confirmNavigation = useCallback(async () => {
+    console.log("runs confirmNavigation");
+    if (!editedSomething || isNavigatingBack.current) return true;
+
+    const confirmed = window.confirm(
+      "You have unsaved changes. Are you sure you want to leave?"
+    );
+    if (confirmed) {
+      isNavigatingBack.current = true;
+      clearLocalStorage();
+      setEditedSomething(false);
+    }
+    console.log(
+      "confirmed value inside confirmNavigation: ",
+      confirmNavigation
+    );
+    return confirmed;
+  }, [editedSomething, clearLocalStorage]);
+
+  const handleNavigation = useCallback(
+    async (link) => {
+      console.log("runs handle Navigation");
+      if (await confirmNavigation()) {
+        moveTo(link);
+      }
+    },
+    [editedSomething, clearLocalStorage]
+  );
+
+  const windowLoads = useCallback(
+    async (e) => {
+      console.log("beforeUnload Running like Cheetah");
+      // console.log("edited Something", editedSomething);
+      if (editedSomething) {
+        clearLocalStorage();
+        e.preventDefault();
+        e.returnValue = "";
+        return "";
+      }
+    },
+    [editedSomething, clearLocalStorage]
+  );
+
+  useEffect(() => {
+    window.addEventListener("beforeunload", windowLoads);
+    return () => window.removeEventListener("beforeunload", windowLoads);
+  }, [windowLoads]);
+
+  // Convert and Store image as base 64
+  const fetchImageAsBase64 = useCallback(async (image) => {
+    try {
+      const response = await fetch(`http://localhost:4100/${image}`);
+      const blob = await response.blob();
+      return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          localStorage.setItem("titleImagePreview", reader.result);
+          resolve(reader.result);
+        };
+        reader.readAsDataURL(blob);
+      });
+    } catch (err) {
+      console.error("err while converting server image to buffer", err);
+      return null;
+    }
+  });
+
+  useEffect(() => {
+    async function getPost() {
+     if(!postId){
+        setLoading(false);
+        return;
+     }
+      setLoading(true);
+      try {
+        const response = await axios.get(
+          `http://localhost:4100/weblog/getBlogPost/${postId}`,
+          { withCredentials: true }
+        );
+
+        console.log("Response: while getting Post", response);
+        setPost(response.data.blogPost);
+      } catch (err) {
+        console.error("error while getting the post ", err);
+        setErrors({
+            message:"Post is not Loading, check your connection and Try Again!!"
+        })
+        setLoading(false);
+      } 
+    }
+    getPost();
+  }, [postId]);
+
+
+    useEffect(() => {
+        console.log("post Id received at editPost: ", post);
+        // async function getPost(){
+        //     const response = await axios.get(`http://localhost:4100/weblog/`)
+        // }
+        // Assign Title
+        console.log("Post of the year ", post);
+        async function loadInitialData(){
+            if(!post){
+                setLoading(true);
+                return
+            }
+            try{
+                const titleStored = JSON.parse(localStorage.getItem('titleStorage'));
+                // console.log('post title: initialLoad: ', post.title);
+                // console.log('titleStred:initialLoad ', titleStored);
+                const newTitle = post?.title && !titleStored ? post.title : titleStored; 
+                
+                // console.log('newTitle assigned: initialLoad', newTitle);
+                // Uploading Title Image
+                const titleImage = localStorage.getItem('titleImagePreview');
+                let newImagePreview = titleImage;
+                if(post?.titleImage && !titleImage){ 
+                    newImagePreview = await fetchImageAsBase64(post.titleImage)
+                }
+
+                localStorage.setItem('titleImage', post?.titleImage);
+                // console.log("new title image on initial load: ", newImagePreview);
+
+                // load Save content Text (Text Data of Post)
+                const localContentText = JSON.parse(localStorage.getItem('textContent'));
+                // console.log('localContentText:initialLoad ',localContentText);
+                const newContentText = post?.content && !localContentText ? post.content.find((content) => content.type === 'text')?.value || '' : localContentText;
+                // console.log('New Content Text initial load: ', newContentText);
+                setEditPostData((prev) => ({
+                    ...prev,
+                    title:newTitle || '',
+                    titleImage:post.titleImage || '',
+                    imagePreview:newImagePreview || '',
+                    contentText:newContentText || ''
+                }))
+
+              // load content Images
+               if(post?.contentImages){
+                    let localContentImages = JSON.parse(localStorage.getItem('localContentImages')) || [];
+                    // console.log("localContentImages on initial load: ", localContentImages, " post.contentImages: ", post.contentImages);
+                    if (post?.contentImages && localContentImages.length === 0){
+                        // console.log("contentImages: if local is empty", post.contentImages);
+                        const newImages = post.contentImages.map((image, index) => ({
+                            id:index,
+                            fileName:image.fileName,
+                            preview:`http://localhost:4100/${image.path}`,
+                            position:image.position
+                        }))
+                        setContentImages(newImages);
+                        localStorage.setItem("localContentImages", JSON.stringify(newImages))
+                    }
+                    else{
+                        setContentImages(localContentImages);
+                    }
+                    
+                }
+            }
+            catch(err){
+                console.error("Error while receiving post", err)
+            }
+            finally{
+                setLoading(false)
+            }
+        } 
+        
+        loadInitialData();
+  },[post])
+  // store image as base64
+  function storeAsBase64(file) {
+    const reader = new FileReader();
+    reader.onloadend = function () {
+      localStorage.setItem("titleImagePreview", reader.result);
+      setEditPostData((prev) => {
+        return {
+          ...prev,
+          imagePreview: reader.result,
+        };
+      });
+    };
+
+    reader.readAsDataURL(file);
+  }
+
+  // Handle changes to the title input
+  const handleChange = ((e) => {
+    const newTitle = e.target.value;
+    console.log("new Title: ", e.target.value);
+    localStorage.setItem("titleStorage", JSON.stringify(newTitle));
+    setNewTitleImage(true);
+    setEditPostData((prev) => ({ ...prev, title: newTitle }));
+    setEditedSomething(true);
+  });
+
+  // Handle changes to the title Image
+  function handleImageChange(e) {
+    const image = e.target.files[0];
+    if (!image) return;
+    localStorage.setItem("titleImage", JSON.stringify(image));
+    setEditPostData((prev) => ({ ...prev, titleImage: image }));
+    setNewTitleImage(true);
+    storeAsBase64(image);
+    setEditedSomething(true);
+  }
+
+  // Managing text of the Post after Change
+
+  const handleContentText = (e) => {
+    e.preventDefault();
+    const oldContentText = editPostData.contentText;
+    let newContentText = e.target.value;
+
+    // Check for accidental editing of placeholders
+    const oldPlaceholders = oldContentText.match(/\[image-\d+\]/g) || [];
+    const newPlaceholders = newContentText.match(/\[image-\d+\]/g) || [];
+
+    // If any placeholder is removed, prevent it
+    if (oldPlaceholders.length !== newPlaceholders.length) {
+      alert("You cannot remove image placeholders directly!");
+      setEditPostData((prev) => ({ ...prev, contentText: oldContentText }));
+      return;
+    }
+
+    // Save valid content text
+    setEditPostData((prev) => ({ ...prev, contentText: newContentText }));
+    localStorage.setItem("textContent", JSON.stringify(newContentText));
+    setEditedSomething(true);
+  };
+
+  // save content images using base64
+  function saveContentImages(image, callback) {
+    const reader = new FileReader();
+    reader.onloadend = function () {
+      callback(reader.result);
+    };
+    reader.readAsDataURL(image);
+  }
+
+  // handle changes to the content images
+  const handleContentImages = (e) => {
+    const newImage = e.target.files[0];
+    const imageMark = `[image-${contentImages.length}]`;
+    console.log("newIMage: ", newImage.path);
+    const beforeImage = editPostData.contentText.substring(0, cursorPosition);
+    const afterImage = editPostData.contentText.substring(cursorPosition);
+    const newContentText = beforeImage + imageMark + afterImage;
+
+    setEditPostData((prev) => ({ ...prev, contentText: newContentText }));
+    localStorage.setItem("textContent", JSON.stringify(newContentText));
+    saveContentImages(newImage, (base64Result) => {
+      const localImage = {
+        id: contentImages.length,
+        fileName: newImage.name,
+        file: newImage,
+        preview: base64Result,
+        position: cursorPosition,
+      };
+      const allImages = [...contentImages, localImage];
+      localStorage.setItem("localContentImages", JSON.stringify(allImages));
+      setContentImages(allImages);
+      setEditedSomething(true);
+    });
+  };
+  // removing the content Image
+  const removeImage = (id, text) => {
+    const newContentImages = contentImages.filter((image) => image.id != id);
+    let updatedText = text;
+    for (const [index, image] of newContentImages.entries()) {
+      updatedText = updatedText
+        .split(`[image-${image.id}]`)
+        .join(`[image-${index}]`);
+      localStorage.setItem("textContent", JSON.stringify(updatedText));
+      setEditPostData((prev) => ({ ...prev, contentText: updatedText }));
+    }
+    const updateImages = newContentImages.map((image, index) => ({
+      id: index,
+      preview: image.preview,
+      fileName: image.fileName,
+      position: image.position,
+    }));
+    setContentImages(updateImages);
+    localStorage.setItem("localContentImages", JSON.stringify(updateImages));
+    setEditedSomething(true);
+  };
+
+  // handle Reposting
+  const handleReposting = async (e) => {
+    console.log("Reposting run ", post);
+    const formData = new FormData();
+    console.log("newTitleImage true or false ", newTitleImage);
+    console.log("titleimage checking: ", editPostData.titleImage);
+    if (editPostData.titleImage instanceof File) {
+      formData.append("titleImage", editPostData.titleImage);
+    }
+    formData.append("title", editPostData.title);
+    if (editPostData.contentText) {
+      const contentArray = [
+        {
+          type: "text",
+          content: editPostData.contentText,
+        },
+      ];
+      formData.append("content", JSON.stringify(contentArray));
+    }
+    let positions = [];
+    if (contentImages) {
+      const savedPics = contentImages.filter(image => !image.file);
+      formData.append("savedImages", JSON.stringify(savedPics))
+      contentImages.forEach((image) => {
+        
+        
+        // console.log("positions inside true: ", positions);
+        if (image.file) {
+          positions.push({
+            position: image.position,
+            fileName: image.fileName,
+          });
+          formData.append("contentImages", image.file);
+        } 
+      });
+    }
+    console.log(" combined positions: ", positions);
+    formData.append("positions", JSON.stringify(positions));
+    formData.append("titleImage", editPostData.titleImage);
+
+    // console.log("formData: ", formData);
+    try {
+      const response = await axios.put(
+        `http://localhost:4100/weblog/updatedBlog/${post._id}`,
+        formData,
+        {
+          withCredentials: true,
+          headers: {
+            "Content-Type": "multipart/formD-data",
+          },
+        }
+      );
+      console.log("repsonse from put request :", response);
+      if (response?.data.success) {
+        console.log("new blog data after success message", response.data.blog);
+        console.log("new Title", response.data.blog.title);
+        console.log("new titleImage ", response.data.blog.titleImage);
+        localStorage.setItem(
+          "titleImage",
+          JSON.stringify(response.data.blog.titleImage)
+        );
+        localStorage.setItem(
+          "titleStorage",
+          JSON.stringify(response.data.blog.title)
+        );
+      }
+      setNewTitleImage(false);
+    } catch (err) {
+      console.log("You can deal with errors: ", err);
+    }
+    console.log("editPost data DRWE REPOSTING: ", editPostData.titleImage);
+    // console.log("contentImages after reposting: ", contentImages);
+  };
+
+  if(loading) {
+    return (<h1>Loading the Post..</h1>)
+  } 
+  if(errors.message){
+    return <h2>{errors.message}</h2>
+  }
+  return (
+    
+        <>
+          <form method="post" className="flex flex-col gap-4 my-4 mx-2">
+                <input type="text" 
+                name="title" 
+                placeholder="Edit the Title" 
+                className="border border-gray-500 w-2/5"
+                onChange={handleChange}
+                value={editPostData.title} />
+                
+                <div>
+                    <label htmlFor="image" className="block">Change Title Image</label>
+                    <input type="file" accept="image/*" name="titleImg" onChange={handleImageChange} className="w-[82px] mb-2"/>
+                    {editPostData.imagePreview && 
+                    <img src={editPostData.imagePreview} alt={editPostData.title} className="h-52 w-56" /> 
+        
+                }
+                </div>
+                
+                <div>
+                    {/* {console.log("editPostData: ", editPostData)} */}
+
+                    {/* <ProtectedContentEditor
+                        value={editPostData.contentText}
+                        onChange={handleContentText}
+                        onCursorPosition={setCursorPosition}
+                    /> */}
+                  <textarea placeholder="start writing your Blog"
+                    ref={currentArea}
+                    name="value"
+                    className="border-gray-500 border w-4/5 h-[350px] mt-4"
+                    onChange={handleContentText}
+                    onClick={selectCurrentSelection}
+                    onKeyUp={selectCurrentSelection}
+                    value={editPostData.contentText}
+                    required
+                    />
+            
+                    <div className="flex">
+                        
+                        {contentImages &&              
+                        <ContentImages contentImages={contentImages} removeImage={removeImage} contentText={editPostData?.contentText} />
+                        }
+                    </div>
+                        
+                    <div className="absolute top-[45%] right-[22%]">
+                            <input type="file" 
+                            name="image"
+                            accept="image/*" 
+                            onChange={handleContentImages} 
+                            className="w-[88px] cursor-pointer"
+                            id="contentImg" />
+                        
+                    </div>
+                </div>
+            </form>
+
+            
+            <div className=""> 
+                <button className="border p-2 bg-green-400 mb-4" onClick={(e) => handleReposting(e)}> RePost </button>
+
+                <div>
+                    <button className="border p-2 bg-blue-400 mb-4 mr-4" onClick={() => handleNavigation(-1)}> Back </button>
+                    <button className="border p-2 bg-blue-400" onClick={() => handleNavigation('/')}> Back To HOME</button>
+                </div>
+            </div>
+          
+        </>
+  );
+}
+
+export default EditPost
+
+this is the write a blog Post FrontEnd:
+import { useEffect, useRef, useState } from "react";
+import { Link, useNavigate } from "react-router-dom"
+import axios from 'axios';
+import ContentImages from "../Components/contentSection/ContentImage";
+
+export default function Write() {
+
+    const [blogTitle, setBlogTitle] = useState({
+        title:'',
+        titleImg:null,
+        imgPreview:''
+    });
+    const moveTo = useNavigate();
+    const currentTextArea = useRef(null);
+    const [cursorPosition, setCursorPosition] = useState(0);
+    // const [titleErr, setTitleErr] = useState('');
+    const [loadingErr, setLoadingErr] = useState(false);
+    const [errors, setErrors] = useState({});
+    const [contentText, setContentText] = useState('');
+    const [imagesShortNames, setImagesShortNames] = useState([]);
+    const [contentImages, setContentImages] = useState([]);
+
+    function smallText(text){
+        const joined = text.split(' ');
+        
+
+        const short = joined.slice(0,3).join(' ');
+        return short
+       
+    }
+
+    
+
+    useEffect(() => {
+        // console.log("contentImages useEffect: ",contentImages);
+        // console.log("blogTitle.title: ",blogTitle.title);
+        // console.log("blogTitle.titleImg: ",blogTitle.titleImg);
+    }, [contentImages])
+    const handleTitles = (e) => {
+        // const errors = checkValidation();
+        setBlogTitle(prev => ({...prev, 
+            [e.target.name]: e.target.value
+        }))
+        if(errors.titleError){
+            console.log("Yes")
+            errors.titleError = "";
+            
+            setErrors(errors);
+        }
+    }
+    function handleAreaSelect(){
+        setCursorPosition(currentTextArea.current.selectionStart);
+    }
+    const handleTitleImage= (e) => {
+        const image=e.target.files[0];
+        console.log("image when submitting: files[0]", image);
+        setBlogTitle(prev => ({
+            ...prev,
+            titleImg:image,
+            imgPreview:URL.createObjectURL(image)
+        }))
+        if(errors.titleImageError){
+            errors.titleImageError = "";
+            setErrors(errors);
+        }
+        
+    }
+    const handleContent = (e) => {
+        const originalPlaceholders = contentText.match(/\[image-\d\]/g) || [];
+        const currentContent = e.target.value;
+        const placeholders = currentContent.match(/\[image-\d+\]/g) || [];
+        if(originalPlaceholders.length !== placeholders.length){
+            alert("you can't remove the image placeholders manualy");
+            console.log("you deleted the placeholder");
+            return
+        }
+        if(errors.textContentError){
+            errors.textContentError = "";
+            setErrors(errors);
+        }
+        setContentText(e.target.value);
+    }
+
+    const handleContentImage=(e) => {
+
+        const image = e.target.files[0];
+        const shortName = smallText(image.name);
+   
+        const imageName = `[image-${contentImages.length}]`
+        const beforeImage = contentText.substring(0, cursorPosition);
+        const afterImage = contentText.substring(cursorPosition);
+        const newContent = beforeImage + imageName + afterImage;
+
+        setContentImages([
+            ...contentImages,
+            {
+                id:contentImages.length,
+                type:'image',
+                file:image,
+                fileName:shortName,
+                preview:URL.createObjectURL(image),
+                position:cursorPosition
+            }    
+        ])
+        setContentText(newContent);
+        // console.log("content inside handle Image: ", contentImages.length);
+    }
+
+    const removeContentImage = (id,newText) => {
+        const images = contentImages.filter(image => image.id !== id);
+        const updateImages = images.map((images, index) => ({
+            ...images,
+            id:index
+        }))
+        setContentImages(updateImages);
+        setContentText(newText);
+        let updatedText = newText;
+        images.forEach((img, ind) => {
+            const oldMark = `[image-${img.id}]`;
+            const newMark = `[image-${ind}]`;
+            // console.log(`oldMark ${oldMark} & newMark ${newMark}`);
+            updatedText = updatedText.split(oldMark).join(newMark); 
+        });
+        
+        console.log("updateImages: ", updateImages)
+        setContentText(updatedText)
+
+
+    }
+
+    const checkValidation = () => {
+        const validationErrors = {};
+        if(!blogTitle.title){
+            validationErrors.titleError = "Title is Missing"
+        }
+        if(blogTitle.title.length > 60){
+            validationErrors.titleError = "Title length Must be under 60"
+        }
+        
+        if(!blogTitle.titleImg){
+            validationErrors.titleImageError = "You should Insert Title Image"
+        }
+
+        if(!contentText){
+            validationErrors.textContentError = "Blog Must have some Text Content"
+        }
+        return validationErrors;
+    }
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        const seeErrors = checkValidation();
+        if(Object.keys(seeErrors).length > 0){
+            setErrors(seeErrors);
+            alert("Some Necessary Data is Missing")
+            return;
+        }
+        else{
+            setErrors({});
+            setLoadingErr(true);
+            let contentArray = [{
+                type:'text',
+                value:contentText
+            }];
+            const blogData = new FormData();
+            blogData.append('title', blogTitle.title);
+            blogData.append('titleImage', blogTitle.titleImg);
+            blogData.append('content', JSON.stringify(contentArray));
+            
+            if(contentImages){
+                const positions = contentImages.map((img, index) => ({
+                    position:img.position,
+                    fileName:img.fileName
+                }))
+                blogData.append('positions', JSON.stringify(positions))
+                contentImages.forEach((image, index ) => {
+                    blogData.append(`contentImages`, image.file);
+                })
+                console.log("blogData: before sending",blogData);
+            }
+
+            try{
+
+                const response = await axios.post('http://localhost:4100/weblog/addBlog', 
+                blogData,
+    
+                    {
+                        withCredentials:true,
+                        headers:{
+                            'Content-Type':'multipart/form-data'
+                        }
+    
+                    }
+                );
+                console.log("response after sending new Blog: ", response);
+                if(response.data.success){
+                    console.log("response.data.success: ", response.data.success);
+                    blogTitle.title="";
+                    blogTitle.imgPreview = '';
+                    setBlogTitle(prev => 
+                        ({
+                            ...prev,
+                            title:"",
+                            titleImg:"",
+                            imgPreview:""
+                        } )
+                    );
+                    setContentImages([]);
+                    setContentText('');
+                    setImagesShortNames([])
+                    alert('Blog Created Successfully');
+                    moveTo('/');
+                }
+            }
+            
+            catch(err){
+                console.log("error while posting new Blog ", err.response.data);
+                if(err.response.data.error === 'jwt expired'){
+                    alert("token expired! Please Login Again");
+                }
+                
+            }
+            finally{
+                setLoadingErr(false)
+            }
+        }
+        
+            
+            
+        
+    }
+
+    if(loadingErr) return (<h1> Processing </h1>)
+
+    return(
+        <div className="page-content">
+            <form method="post" className="ml-5 flex flex-col">
+                <label htmlFor="title" className="text-blue-500"> Enter your title</label>
+                <input type="text"
+                 name="title" 
+                 placeholder="enter the Title of Post " 
+                 className="border border-gray-500 w-100" 
+                 onChange={handleTitles}
+                 
+                 value={blogTitle.title}
+                 required/>
+                <span className="text-xs"> *Title Length Must Not Exceed 60 characters</span>
+                {errors.titleError && <p className="text-red-600"> {errors.titleError}* </p> }
+                <label htmlFor="titleImage" className="text-blue-500 mt-4">Upload Your Title Image</label>
+                <input type="file" name="titleImg" accept="image/*" onChange={handleTitleImage} className="w-[88px] cursor-pointer" /> 
+                {blogTitle && blogTitle.imgPreview ? <img src={blogTitle.imgPreview} className="w-24 h-24 mt-3" /> : ''}
+                {errors.titleImageError && <p className="text-red-600 font-larger"> {errors.titleImageError}* </p> }
+
+                <label htmlFor="titleImage" className="text-blue-500 mt-5">Start Writing Your Post Content</label>
+                <div className="">
+                
+                    <textarea placeholder="start writing your Blog"
+                    ref={currentTextArea}
+                    name="value"
+                    className="border-gray-500 border w-4/5 h-[350px] mt-2 px-16"
+                    onChange={handleContent}
+                    onClick={handleAreaSelect}
+                    onKeyUp={handleAreaSelect}
+                    value={contentText}
+                    required
+                    />
+
+                    <div className={`${blogTitle.imgPreview ? 'absolute top-[45%] right-[20%]' : 'absolute top-64 xs:right-28 sm:right-48 lg:right-56' }`}>
+                        <label htmlFor="imageUpload" className="text-bold p-2 mr-4"> </label>
+                        <input type="file" 
+                        name="image"
+                        accept="image/*" 
+                        onChange={handleContentImage} 
+                        className="w-[88px] cursor-pointer"
+                        id="contentImg" />   
+                    </div>
+                    {contentImages.length > 0 && <ContentImages contentImages={contentImages} removeImage={removeContentImage} contentText={contentText} />}
+
+                    
+                </div>
+                {errors.textContentError && <p className="text-red-600 font-larger absolute top-[40%] right-48"> {errors.textContentError}* </p> }
+               <button type="submit" onClick={handleSubmit} className="border border-blue-400 bg-red-500 w-fit mt-4 p-2">Publish Post</button>
+            </form>
+            
+            <button><Link to={'/'} className=''> Back To Home</Link></button>
+        </div>
+    )
+} 
+
+
+singlePost:
+import { useEffect, useState } from "react";
+import { useGlobalContext } from "../globalContext/globalContext"
+import Image from "../Components/contentSection/titleImage";
+import { useLocation, useNavigate } from "react-router-dom";
+import TextContent from '../Components/contentSection/textContent';
+import { FaEdit, FaTrash } from "react-icons/fa";
+import axios from "axios";
+import Navbar from '../Components/Navbar/navbar';
+
+const BlogPost = () => {
+
+    const {currentUser, loggedIn} = useGlobalContext();
+    const [currentBlog, setCurrentBlog] = useState([]);
+    const [allBlogs, setAllBlogs] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const location = useLocation();
+
+    const moveTo = useNavigate();
+
+    const {post, myBlogs} = location.state || {};
+    useEffect(() => {
+        
+        console.log("POST inside Post: ", post);
+    }, [currentUser,allBlogs, post]);
+
+    if(!post){
+        return <div> Loading.. </div>
+    }
+    const handleEdit = (e,post) => {
+        e.preventDefault();
+        console.log("postId: ", post._id);
+        const postId = post._id;
+        moveTo(`/editPost`, {state:{postId}});
+    }
+    function handleDelete(e,id) {
+        e.preventDefault();
+        const confirm = window.confirm("Are You sure to delete this Post. You won't be able to recover it!");
+        // if()
+        const deletingPost = async() => {
+            try{
+                if(confirm){
+                    const response = await axios.delete(`http://localhost:4100/weblog/deleteBlog/${id}`, {withCredentials:true});
+                    if(response.data.success){
+                    alert("Successfully Remove the Post")
+                    moveTo('/');
+                    }
+                }
+            }
+            catch(error){
+                console.log("experiencing Error while deleting ", error);
+                if(error.response.data.error === "jwt expired"){
+                    alert("JWT Expired! Please Try again Later!")
+                }
+            }
+            
+        }
+
+        deletingPost();
+    }
+    // Always have a conscious self to recognize the small thing which made You to Procrastinate. think about the Kite flying ? how you were planned to do even the intense heat and no air but you were committed
+    return (
+        <>
+            <Navbar />
+            <div data-component="post-container" className={`${loggedIn ? 'flex xs:flex-col sm:flex-row' : 'w-full'}`}>
+              {loading && !myBlogs ? <h1> Loading the Blogs..</h1> :
+              (
+                <div className="flex flex-col items-center w-full max-w-4xl mx-auto px-4 py-5">
+                    <div className="">  
+                        <div key={post._id}
+                        id={post._id}
+                        >
+                            
+                            <h2 className="text-center w-4/5 text-2xl text-purple-600 font-medium mb-10 shadow-inner 300 p-5 shadow-2xl"> {post.title} </h2>
+                            {loggedIn && <div className="text-right flex justify-end gap-2 mb-2 w-[80%]">
+                                <button onClick={(e) => handleEdit(e, post)} ><FaEdit size={20} /> </button>
+                                <button onClick={(e) => handleDelete(e,post._id)} ><FaTrash size={20} /> </button>
+                            </div>
+                            }
+                            {post.titleImage && <Image postImg={post.titleImage} title={post.title} isFullView={true} /> }
+                            <TextContent content={post.content} isFullView={true} fromPost={true} contentImages={post.contentImages} />
+                        </div>
+                    </div>
+                    <div className={`text-center mb-4 ${loggedIn ? 'w-full': 'w-4/5' } `}>
+                        <button onClick={() => moveTo('/')} className="bg-red-400 p-2"> Back To Home </button>
+                    </div>
+                </div>
+                )}
+                <div className={`mt-5 p-4 ${loggedIn ? 'w-[30vw]' : 'w-0'} text-center relative xs:hidden sm:block ${!loggedIn && 'xs: sm:hidden'} `}>
+                    {currentUser ? (
+                        <>
+                            <h2 className="font-extrabold "> {currentUser.username && currentUser.username.length ? `About ${currentUser.username.toUpperCase()}` : 'About' }</h2>
+                            {currentUser.profileImg && (<Image postImg={currentUser.profileImg} 
+                             title={currentUser.username} />)}
+                            
+                            <h2 className="font-bold mt-4"> Goal</h2>
+                            {currentUser.goal && currentUser.goal.length ? (<h3> {currentUser.goal} </h3>):
+                            <h3>Goal is Empty</h3>}
+                            
+                            <h3 className="text-bold text-lg font-bold mt-4 text-center border-t border-blue-400"> Interest </h3>
+                            <span className="border-t bodrer-blue-400"></span>
+                           
+                            {currentUser.TopicsInterested && currentUser.TopicsInterested.length ? (
+                                currentUser.TopicsInterested.map((interest,index) => (
+                                    <h5 key={index}>{interest} </h5>
+                                ))
+                            ):
+                            <h3> interests are not Added</h3>
+                            }
+                        </>
+                    ):
+                    <h2> Loading..</h2>
+                    }
+                
+                </div>
+
+                {currentUser && 
+                    <div className="flex justify-center">
+                        <button 
+                        onClick={() => moveTo('/userAccount')}
+                        className="xs:block sm:hidden border bg-green-400 text-center p-3 hover:bg-green-200">
+                            About Me</button>
+                    </div>
+                }
+            </div>
+            
+        </>
+    )
+}
+
+export default BlogPost
+
+App Routes:
+// import BrowserRouter, {routes, Route} from 'react-router-dom';
+
+import { BrowserRouter, Navigate, Route,Routes, useLocation } from "react-router-dom"
+import App from "../App"
+import About from "../pages/About"
+import Write from "../pages/write"
+import Content from "../pages/content"
+import { CSSTransition, Transition, TransitionGroup } from "react-transition-group"
+import UserAccount from "../Components/userAccount/userAccout"
+import UpdateProfile from "../pages/updateProfile"
+import Register from "../pages/register"
+import Login from "../pages/login"
+import { useRef } from "react"
+import { useGlobalContext } from "../globalContext/globalContext"
+import BlogPost from "../pages/post"
+import EditPost from '../pages/editPost'
+
+
+const PageTransition = () => {
+    const location = useLocation();
+    const nodeRef = useRef(null);
+
+    return (
+
+        <TransitionGroup className="page-container">
+            <CSSTransition 
+            nodeRef={nodeRef}
+            // key={location.key}
+            classNames="slide"
+            timeout={500}
+            >
+            <div className="page-wrapper" ref={nodeRef}>
+                <Routes location={location}>
+                    <Route path="/" element={<App />} />
+                    <Route path="/about" element={<About />} />
+                    <Route path="/write" element={<ProtecedRoute><Write /></ProtecedRoute>} />
+                    <Route path="/content" element={<Content />} />
+                    <Route path="/userAccount" element={<UserAccount />} />
+                    <Route path="/updateProfile" element={<UpdateProfile />} /> 
+                    <Route path="/registerUser" element ={<Register />} />   
+                    <Route path="/login" element ={<Login />} /> 
+                    <Route path="/BlogPost/:id" element={<BlogPost />} />
+                    <Route path="/editPost" element={<EditPost />} />
+                    
+                </Routes>
+            </div>
+            </CSSTransition>
+        </TransitionGroup>
+            
+        
+    )
+}
+
+const ProtecedRoute = ({children}) => {
+    const {loggedIn, loading, setLoggedIn} = useGlobalContext();
+
+    if(loading){
+        return <h1> Loading.. </h1>
+    }
+
+    if(!loggedIn){
+        alert("You Should Login in order to Create Blog")
+        return <Navigate to="/login" />
+    }
+
+    return children
+}
+const AppRoutes = () => {
+
+    return (
+        <BrowserRouter>
+            <PageTransition />
+        </BrowserRouter>
+    )
+}
+
+export default AppRoutes
+
+register user frontEdn:
+import { useEffect, useState } from "react";
+import { useGlobalContext } from "../globalContext/globalContext";
+import { Link, Navigate, useNavigate } from "react-router-dom";
+import { FaImage } from "react-icons/fa";
+import axios from "axios";
+
+const Register = () => {
+    const {setLoggedIn, setRegisterData, loggedIn} = useGlobalContext();
+
+    const [username, setUsername] = useState('');
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [errors, setErrors] = useState({});
+    const [confirmMessage, setConfirmMessage] = useState('');
+
+    const navigateTo = useNavigate();
+    
+    const validEmail = (email_text) => {
+        const emailTest = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+        return emailTest.test(email_text);
+    } 
+
+    useEffect(() => {
+        if(loggedIn){
+            navigateTo("/")
+        };
+        // if(errors){
+        //     console.log("server Errors: ", errors);
+        // }
+        
+    }, [loggedIn])
+    const validateRegistration = () => {
+        let errors = {};
+        if(!username){
+            errors.username = "Username is required"
+        }
+        else if (username.length < 3){
+            errors.username = "username length should be atleast 3 digits"
+        }
+        if(!isNaN(username[0])){
+            errors.username = "username first character must not be Number";
+        }
+
+        if(!email){
+            errors.email=" Email is required";
+        }
+        else if(!validEmail(email)){
+            errors.email = "Invalid Email"
+        }
+
+        if(password.length === 0){
+            errors.password = "Password is Empty!";
+        }
+        else if(password.length < 8){
+            errors.password = "Enter strong password Length must be atleast 8 characters"
+        }
+
+        return errors;
+    }
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        const validationResult = validateRegistration();
+        console.log(Object.keys(validationResult).length === 0);
+
+        if(Object.keys(validationResult).length === 0){
+            setErrors({});
+            const registrationData = {
+                username,
+                email,
+                password
+            }
+            try{
+                const registerResponse = await axios.post(`http://localhost:4100/weblog/registerUser`, 
+                registrationData
+                )
+                console.log("successfully got response during registration: ", registerResponse.data);
+                setRegisterData(registerResponse.data);
+                alert("Success! You will find an Confirmation Email Soon")
+                
+                setEmail('');
+                setUsername('');
+                setPassword('');
+                
+                setConfirmMessage("Your Information Submitted Successfully");
+    
+                setTimeout(() => {
+                    setConfirmMessage("");
+                }, 3000)
+                
+                
+                
+                
+            }catch (err) {
+                // console.log("err.: ", err.response.data.message);
+                if (err.response) {
+                    // The request was made and the server responded with a status code
+                    // that falls out of the range of 2xx
+                    if (err.response.data && err.response.data.error) {
+                        // If the server sent validation errors
+                        const serverErrors = err.response.data.error.reduce((acc, curr) => {
+                            acc[curr.param] = curr.msg;
+                            return acc;
+                        }, {});
+                        setErrors(serverErrors);
+                    } else if (err.response.data && err.response.data.message) {
+                        // If the server sent a general error message
+                        setErrors({ general: err.response.data.message });
+                    } else {
+                        setErrors({ general: "An error occurred. Please try again." });
+                    }
+                } else if (err.request) {
+                    // The request was made but no response was received
+                    setErrors({ general: "No response from server. Please try again." });
+                } else {
+                    // Something happened in setting up the request that triggered an Error
+                    setErrors({ general: "An error occurred. Please try again." });
+                }
+            }
+            
+        }else
+        {
+            setErrors(validationResult);
+            console.log("actual Errors: ", errors)
+        }
+
+        
+    }
+    
+    return (
+        <div className="mt-16 flex justify-center">
+            {console.log("server Errors inside return: ", errors)}
+                <div>
+                    <h1> Create New Account</h1>
+                    <form className="flex flex-col p-5" method="post" >
+                        
+                        <input type="input" 
+                        name="input" 
+                        className={`border border-gray-300 w-[25vw] p-2 m-5 ${errors.username && 'border border-red-400'}`} 
+                        placeholder="Enter New Username" 
+                        onChange={(e) => setUsername(e.target.value)}
+                        value={username}
+                        />
+                        
+                        {errors.username && <p className="ml-5 text-red-500"> {errors.username}!</p>}
+
+                        <input type="email" id="email" placeholder="Enter Your Email"
+                        className={`border border-gray-300 w-[25vw] p-2 m-5 ${errors.email && 'border border-red-400'}`}
+                        onChange={(e) => setEmail(e.target.value)}
+                        value={email}
+                        />
+                        {errors.email && <p className="ml-5 text-red-500"> {errors.email}!</p>}
+                        {errors.general && <p className="ml-5 text-red-500"> {errors.general}!</p> }
+
+                        <input type="password" 
+                        name="password" 
+                        className={`border border-gray-300 w-[25vw] p-2 m-5 ${errors.password && 'border border-red-400'}`}
+                        placeholder="Enter New Password" 
+                        onChange={(e) => setPassword(e.target.value)}
+                        value={password}
+                        />
+                        {errors.password && errors  ? <p className="ml-5 text-red-500"> {errors.password}!</p> : ''}
+                      
+                        <button type="submit" onClick={handleSubmit} className="border border-gray-300 w-[15vw] p-2 m-5 bg-red-400 hover:bg-red-300 ">Create Account</button>
+                        {confirmMessage && <p className="text-green-600 text-lg"> {confirmMessage}</p>}
+                    </form>
+
+                    <button><Link 
+                    className="bg-green-400 border p-3 ml-8 hover:bg-green-300"
+                    to="/">Go Back </Link></button>
+                </div>
+            {/* )} */}
+            
+        </div>
+    )
+}
+
+export default Register
+
+login User frontEnd:
+import { useEffect, useState } from "react";
+import { useGlobalContext } from "../globalContext/globalContext";
+import { Link, useNavigate } from "react-router-dom";
+import { FaImage } from "react-icons/fa";
+import { set } from "mongoose";
+import axios from "axios";
+
+const Login = () => {
+
+    const {setIsAuthenticated,setCurrentUser, setLoggedIn, imagePreview, setImagePreview} = useGlobalContext();
+    const [email, setEmail] = useState('');
+    const [message, setMessage] = useState('');
+    const [password, setPassword] = useState('');
+    const [errors, setErrors] =useState({});
+    const navigate = useNavigate();
+    const [loading, setLoading] = useState(false);
+
+    // useEffect(() => {
+    //     if(currentUser){
+    //         const user =  login_response.data.user;
+    //             localStorage.setItem('thisUser', JSON.stringify(user));
+    //             const thisUser = JSON.parse(localStorage.getItem('thisUser'));
+    //             console.log("this user inside login: ", thisUser);
+    //     }
+    // }, [currentUser])
+    
+    const emailValid = (email_text) => {
+        const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+        return regex.test(email_text);
+    }
+
+    // console.log("handle Validation outside; ", handleValidation());
+    function handleValidation(){
+        let newErrors = {};
+        if(!email){
+            newErrors.email="Email field is empty!"
+        }
+        
+        else if(!emailValid(email)){
+            newErrors.email = "Email Should be Valid like example@gmail.com"
+        }
+        if(password.length === 0){
+            newErrors.password = "Enter Your Password! ";
+        }
+        else if(password.length < 8){
+            newErrors.password = "Password must contains minimum 8 characters"
+        }
+        return newErrors
+    }
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+        const validationErrors = handleValidation();
+        if(Object.keys(validationErrors).length > 0){
+            console.log("Got validation errors ")
+            setErrors(validationErrors);
+            return; 
+        }
+        else{
+            setErrors({});
+            console.log(`before sending login data ; email: ${email}, password: ${password}`)
+            const loginData = {
+                email,
+                password
+            }
+            
+            try{
+                const login_response = await axios.post(`http://localhost:4100/weblog/userLogin`,
+                loginData,
+                {
+                    withCredentials:true
+                });
+
+                  if(login_response){
+                    console.log("if condition runs true");
+                    setLoading(false);
+                  }
+                setCurrentUser(login_response.data.user);
+                const userId = login_response.data.user._id;
+                localStorage.setItem('userId', userId);
+                const user = login_response.data.user;
+                let imgPreview= '';
+                if (user.profileImg && user.profileImg.data) {
+                    const base64String = btoa(
+                        new Uint8Array(user.profileImg.data.data)
+                            .reduce((data, byte) => data + String.fromCharCode(byte), '')
+                    );
+                    imgPreview = `data:${user.profileImg.contentType};base64,${base64String}`;
+                }
+                setImagePreview(imgPreview);
+
+                console.log("img Preview inside login: ", imagePreview);
+                
+                setIsAuthenticated(true);
+                setEmail('');
+                setPassword('');
+                navigate('/');
+                setLoggedIn(true);
+               
+            }
+            catch(err){
+                // console.log("err while Login: ", err.response.data.message);
+                setLoading(false);
+                if(err.response){
+                    if(err.response.data && err.response.data.error){
+                       const serverErr = err.response.data.errors.reduce((acc, curr) => {
+                            acc[curr.param ] = curr.msg;
+                            return acc;
+                        }, {});
+                        setErrors(serverErr)
+                    }
+                    else if(err.response.data && err.response.data.message){
+                        setErrors({general:err.response.data.message})
+                    }else {
+                        
+                        setErrors({ general: "An error occurred. Please try again." });
+                    }
+                    
+                }
+                else if(err.request){
+                    setErrors({general:"No response from the server. Try Again later!"})
+                }
+                else{
+                    console.log("err inside else: ", err);
+                    setErrors({general:"An Error occurred. Try anytime Soon!"})
+                }
+            }   
+            
+        }
+ 
+        // one how to check the object is it empty or contains
+        // second you can also setErrors first then check from the errors lengt
+    }
+    
+    if(loading) return <h1> Please Wait..</h1>
+    return (
+
+
+        <div className="mt-16 flex justify-center">
+           
+                <div>
+                    <h1> Login Here</h1>
+                    <form className="flex flex-col p-5" method="post" >
+                        
+                        <input type="email" id="email" placeholder="Enter Your Email"
+                        className="border border-gray-300 w-[25vw] p-2 m-5"
+                        onChange={(e) => setEmail(e.target.value)}
+                        value={email}
+
+                        />
+                        {errors.email && <p className="ml-5 text-red-500"> {errors.email}!</p>}
+                        <input type="password" 
+                        name="password" 
+                        className="border border-gray-300 w-[25vw] p-2 m-5" 
+                        placeholder="Enter New Password" 
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        />
+                            {errors.password && <p className="ml-5 text-red-500"> {errors.password}!</p>}
+                            {errors.general && <p className="ml-5 text-red-500"> {errors.general}!</p>}
+                        <button type="submit" onClick={handleSubmit} className="border border-gray-300 w-[15vw] p-2 m-5 bg-red-400 hover:bg-red-300 ">Login</button>
+                        {message && <p> {message} </p>}
+                        
+                    </form>
+                    <h3 className="mb-5"> Do not have Account ?</h3>
+                    <button ><Link 
+                    className="bg-green-400 border p-3 ml-8"
+                    to="/registerUser">Register Here </Link></button>
+                    <button className="bg-green-400 border p-3 ml-8 text-blue-600" onClick={() => navigate(-1)}> Back </button>
+                    <button ><Link 
+                    className="bg-green-400 border p-3 ml-8"
+                    to="/">Back To Home</Link></button>
+                </div>
+            {/* )} */}
+            
+        </div>
+    )
+}
+
+export default Login
+
+Update Profile FrontEnd:
+import { useEffect, useState } from "react";
+import { useGlobalContext } from "../globalContext/globalContext";
+import { Link, useNavigate, useNavigation} from "react-router-dom";
+import { FaImage } from "react-icons/fa";
+import axios from 'axios';
+
+// dua 
+// dua@gmail.com
+// lifeLamha
+const UpdateProfile = () => {
+
+    const {isAuthenticated, setEditProfile,setImagePreview, imagePreview} = useGlobalContext();
+    // const [userImage, setUserImage] = useState('');
+    const [userReceived, setUserReceived] = useState({});
+    const [message, setMessage] = useState('');
+    const [addInterest, setAddInterest] = useState('');
+    const moveTo = useNavigate();
+    const [formData, setFormData] = useState({
+        username:'',
+        goal:'',
+        interests:[],
+        userImage:null,
+        imgPreview:''
+        
+    }) 
+    // const [password, setPassword] = useState('');
+    
+    const [localLoading, setLocalLoading] = useState(true)
+
+    // useEffect(() => {
+    //     console.log("isAuthenticated: ", isAuthenticated);
+        
+    //     if(!isAuthenticated){
+    //         alert("you are Not Logged In. Sign In or Create new Account")
+    //         // moveTo('/');
+    //     }
+    // }, [isAuthenticated])
+    useEffect(() => {
+        console.log("isAuthenticated inside updateProfile: ", isAuthenticated);
+        
+        const get_current_user = async () => {
+            try{
+                const response = await axios.get('http://localhost:4100/weblog/getUser', {withCredentials:true});
+                const user =  response.data.user;
+                setUserReceived(user);
+                
+                let realImage = '';
+                console.log("response.image; ", response.data.user.profileImg);
+                realImage = `http://localhost:4100/${response.data.user.profileImg}`;
+                setImagePreview(realImage);
+                let imgPreview = '';
+                setFormData((prev) => ({
+                    ...prev,
+                    username:user.username || '',
+                    goal:user.goal || '',
+                    interests:user.TopicsInterested || [],
+                    userImage:user.profileImg,
+                    imgPreview:imgPreview
+                   }))
+                   setAddInterest(user.TopicsInterested ? user.TopicsInterested.join('\n'): '');
+                //    console.log("formData inside axios: ", formData)
+                setLocalLoading(false)
+            }catch(err){
+                console.log("got this error while working with getUser: ", err);
+                setLocalLoading(false)
+            }
+        }
+
+        get_current_user();
+      
+    },[])
+
+    useEffect(() => {
+        // console.log("formData.userImage inside update Profile",formData.imgPreview);
+        // setImagePreview(formData.imgPreview);
+        console.log("global image inside update profile: ", imagePreview)
+    }, [imagePreview])
+    // useEffect(() => {3
+    //     console.log("UserReceived Inside Newly Created useEffect: ", userReceived)
+    //     if(Object.keys(userReceived).length > 0 ){
+            
+
+               
+    //             console.log("username UseEffect: ", formData.username);
+    //         }
+        
+    
+    // }, [userReceived])
+
+    const handleChange = (e) => {
+        const {name, value} = e.target;
+
+        setFormData(prev => ({
+            ...prev,
+            [name]:value
+        }))
+        console.log('e.target: ', formData);
+        
+    }
+
+    const handleImageSubmit = (e) => {
+        e.preventDefault();
+        const imgFile =  e.target.files[0];
+        // setUserImage(e.target.files[0]);
+        // console.log("imgFile: ",imgFile);
+        setImagePreview(URL.createObjectURL(imgFile));
+        setFormData((prevState) => ({
+            ...prevState,
+            userImage:imgFile,
+            imgPreview:URL.createObjectURL(imgFile)
+        }))
+        
+        // const preview = URL.createObjectURL(userImage);
+        // setImagePreview(preview);
+        // console.log("image Preview: ", imagePreview.length)
+    }
+    const handleInterests = (e) => {
+        setAddInterest(e.target.value);
+        let newInterest = e.target.value
+        .split(/[\n,]+/)
+        .map(interest => interest.trim())
+        .filter(interest => interest.length > 0);
+
+        console.log("newInterests: ", newInterest);
+        console.log("formData: ", formData);
+        setFormData((prev) => ({
+            ...prev,
+            interests:newInterest
+        }))
+    }
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        console.log("handle Submit is running: ", formData);
+
+        const formInfo = new FormData();
+        if(formData.username) formInfo.append('username', formData.username);
+        if(userReceived.email) formInfo.append('email', userReceived.email);
+        if(userReceived.password) formInfo.append('password', userReceived.password);
+        if(formData.userImage instanceof File){
+            console.log(` formData.userImage ${formData.userImage} , name iamge ${formData.userImage.name}`)
+            formInfo.append('profileImg', formData.userImage, formData.userImage.name )
+        }
+        // if(formData.userImage) formInfo.append('profileImg', formData.imgPreview);
+        // if(password) formInfo.append('password',password)
+        if(formData.goal) formInfo.append('goal', formData.goal);
+        
+        if(formData.interests && formData.interests.length > 0){
+            console.log("interestes before parsing:", formData.interests);
+            formInfo.append('interests', JSON.stringify(formData.interests));
+        } 
+        setLocalLoading(true);
+        console.log("before submitting: form Info", formInfo);
+        try{
+            const response = await axios.put(
+                `http://localhost:4100/weblog/updateUserProfile`,
+                 formInfo,
+                {
+                headers:{
+                    "Content-Type":"multipart/form-data"
+                },
+                withCredentials:true
+            
+            })
+            if(response.data.success){
+                setLocalLoading(false);
+                window.alert("Updated Successfully! Plz Refresh the Page")
+            }
+        }catch(err){
+            console.log("err: ", err);
+        }
+        
+    }
+    // {localLoading && userReceived ? <h1> Loading..</h1>:
+
+    if(localLoading) return <h1> Loading...</h1>
+    return (
+        <div className="">
+               
+                <>
+                    <h1> UPDATE Your Profile</h1>
+                    {console.log("DOM image inside update profile: ", imagePreview)}
+                    <form className="flex flex-col p-5" method="post" >
+                        <label className="mb-3 text-blue-600"> Select the Profile Image</label>
+                        <input type="file" accept="image/*" className="w-fit" onChange={handleImageSubmit}
+                        />
+                        {imagePreview && (
+                            
+                            <>
+                               
+                                <img src={imagePreview} alt="profile Image" className="w-[100px] h-[90px] p-2 m-5" />
+                            </>
+                            
+        
+                        )
+                        // : 
+                        // (   <div  className="p-2 m-5">
+                        //         <label> Upload Profile Picture</label>
+                        //         <div><FaImage /></div>
+                        //     </div>
+                        
+                        //     )
+                        }
+
+                        <input type="input" 
+                        name="username" 
+                        className="border border-gray-300 w-[25vw] p-2 m-5" 
+                        placeholder="Enter New Username" 
+                        onChange={handleChange}
+                        value={formData.username}
+                        />
+
+            
+                        {/* <input type="password" 
+                        name="password" 
+                        className="border border-gray-300 w-[25vw] p-2 m-5" 
+                        placeholder="Enter New Password" 
+                        onChange={(e) => setPassword(e.target.value)}
+                        /> */}
+
+                        <label className="text-blue-600" > What is Your Goal </label>
+                        <textarea id="goal"
+                            name="goal"
+                            placeholder="Write Your Objective here.."
+                            onChange={handleChange}
+                            className="border border-gray-400 p-12 h-44 w-72"
+                            value={formData.goal}
+                        />
+
+                        <label className=" mt-5 text-blue-600"> Which topics are you Interested</label>
+                        <textarea 
+                        placeholder="Enter Your Interests (Separated by commas or new line)"
+                        className="border w-60 h-32 mt-2 border-gray-500"
+                        value={addInterest}
+                        onChange={handleInterests}
+                        />
+                    
+                        <button type="submit" onClick={handleSubmit} className="border border-gray-300 w-[15vw] p-2 m-5 bg-red-400 hover:bg-red-300 ">Update Account</button>
+
+                    </form>
+
+                    <button onClick={()=> setEditProfile(false)} ><Link 
+                    className="bg-green-400 border p-3 ml-8"
+                    to="/userAccount">Go Back </Link></button>
+                </>
+        </div>
+    )
+}
+
+export default UpdateProfile
+
+package json:
+{
+  "name": "specialweblog",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "frontend": "cd frontend && npm run dev",
+    "backend": "cd backend && npm run dev",
+    "dev": "concurrently \" npm run frontend \" \" npm run backend \" "
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "concurrently": "^8.2.2",
+    "lodash": "^4.17.21",
+    "node-fetch": "^3.3.2"
+  }
+}
+Technologies.. Tailwind, JS, React, node, mongodb 
+it is the project of creating posts. YOu can delete, edit the post. further user needs to register in order to create the posts. these are some of the files of project. now this is the best project which i have made so far. 
+today is 27 novmber now, tell me thoroughly how can i land a job in market with this level of skill before new Year. i want you to remind that i didn't do any interview prepation and i dont know what kind of question they ask? since i was completely focusing on my learning journey thus tell me the way so that i must get the jop?

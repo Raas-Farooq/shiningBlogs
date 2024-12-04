@@ -379,7 +379,7 @@ const addBlog = async (req,res) => {
  */
 const updateBlogPost = async(req,res) => {
 
-    console.log("Shocked to See the Update Blog")
+    console.log("Update Blog Post on its waysxz")
     // checking the validation Result
     const errs = validationResult(req);
 
@@ -391,28 +391,39 @@ const updateBlogPost = async(req,res) => {
         })
     }
 
-    // 
     const user_id = req.user.userId;
     // console.log("req. body: ", req.body);
-    const { title,titleImage, content, savedImages} = req.body;
+    const {title, content, positions, savedImages} = req.body;
     const useSavedImages = JSON.parse(savedImages);
+    const newPositions = JSON.parse(positions);
     useSavedImages.forEach(image => {
         console.log("useSaved Image; ", image);
     })
     const id = req.params.id; 
-    console.log(`req.files['contentImages'] `,req.files['contentImages']);
+    // newPositions.forEach(position => {
+    //     console.log("position: ", position)
+    // })
+    console.log("nwe Content: ",content);
+    console.log("title changes: ", title);
+    req.files['contentImages']?.forEach((image,ind) => {
+        useSavedImages.push({
+            path:image.path,
+            position:newPositions[ind].position,
+            fileName:newPositions[ind].fileName
+        })
+    });
+    console.log("useSavedImages ", useSavedImages);
     const newTitleImage = req.files['titleImage'] ? req.files['titleImage'][0].path : ''
+    console.log("newTitleImage ", newTitleImage);
     try{
         //updating a blog
         const blogPost = await Blog.findById(id);
-
+        // console.log("blogPost inside backen: ", blogPost);
         if(!blogPost){
             return res.status(404).json({
                 success:false,
-                message:"Not found the Blog Post",
+                message:"Not found the Blog",
             })
-        }else{
-            console.log("success BlogPost not found")
         }
 
         if(blogPost.userId.toString() !== user_id){
@@ -423,13 +434,20 @@ const updateBlogPost = async(req,res) => {
         }else{
             console.log("success You are authorized to edit this blog")
         }
-
-        // if(title) blogPost.title = title;
-        // // if(content) blogPost.content = content;
-        // if(newTitleImage) blogPost.titleImage = newTitleImage;
-
-        // const updatedBlog = await blogPost.save();
+        if(title) blogPost.title = title;
+        if(content) blogPost.content = content;
+        if(newTitleImage) blogPost.titleImage = newTitleImage;
+        if(useSavedImages) blogPost.contentImages = useSavedImages;
+        console.log("blogPost before saving: ", blogPost);
+        const updatedBlog = await blogPost.save();
+        console.log("updatedBlog after saving: ", updatedBlog);
         // successfully updated the blogPost
+        if(!updatedBlog){
+            return res.status(402).json({
+                success:true,
+                message:"Failed to update the Blog"
+            })
+        }
         return res.status(200).json({
             success: true,
             message: "Blog updated successfully",

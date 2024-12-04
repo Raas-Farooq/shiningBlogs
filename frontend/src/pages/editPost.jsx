@@ -309,9 +309,21 @@ const EditPost = () => {
   };
   // removing the content Image
   const removeImage = (id, text) => {
+    console.log("id received inside removeImage: ",id);
     const newContentImages = contentImages.filter((image) => image.id != id);
+    console.log("newContentImages after filter inside removeImage: ", newContentImages);
+    console.log("newContentImages enteries: ", newContentImages.entries());
     let updatedText = text;
+    if(!newContentImages.length){
+      updatedText = updatedText.split('[image-0]').join('');
+      console.log("updated Text if no contentImages: ", updatedText);
+      localStorage.setItem("textContent", JSON.stringify(updatedText));
+      setEditPostData((prev) => ({ ...prev, contentText: updatedText }));
+    }
     for (const [index, image] of newContentImages.entries()) {
+      console.log("did i run: ")
+      console.log("entery index: ", index);
+      console.log("entry image: ", image);
       updatedText = updatedText
         .split(`[image-${image.id}]`)
         .join(`[image-${index}]`);
@@ -343,26 +355,34 @@ const EditPost = () => {
       const contentArray = [
         {
           type: "text",
-          content: editPostData.contentText,
+          value: editPostData.contentText,
         },
       ];
       formData.append("content", JSON.stringify(contentArray));
     }
+    let positions = [];
     if (contentImages) {
       const savedPics = contentImages.filter(image => !image.file);
+      console.log("savedPics AwareNess: ", savedPics);
       formData.append("savedImages", JSON.stringify(savedPics))
       contentImages.forEach((image) => {
-        const positions = contentImages.map((image) => image.position);
+        
+        
         // console.log("positions inside true: ", positions);
         if (image.file) {
-          console.log("image.file before appending: ", image);
+          positions.push({
+            position: image.position,
+            fileName: image.fileName,
+          });
           formData.append("contentImages", image.file);
         } 
       });
     }
+    console.log(" combined positions: ", positions);
+    formData.append("positions", JSON.stringify(positions));
     formData.append("titleImage", editPostData.titleImage);
 
-    console.log("formData: ", formData);
+    // console.log("formData: ", formData);
     try {
       const response = await axios.put(
         `http://localhost:4100/weblog/updatedBlog/${post._id}`,
