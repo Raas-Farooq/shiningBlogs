@@ -22,12 +22,7 @@ export default function TextContent({content, isFullView=false, fromPost=false, 
       const textContent = content?.find(text => text.type === 'text').value || '';
       setText(textContent); 
         // console.log("actual text of the Post ", textContent);
-<<<<<<< HEAD
-        if(contentImages){
-          console.log("content IMages inside TextContent: ", contentImages);
-=======
         if(textContent){
->>>>>>> feature/handleEditPost
           const contentWithImages = [];
           
           let endIndex = 0;
@@ -67,21 +62,6 @@ export default function TextContent({content, isFullView=false, fromPost=false, 
                 })
               }
               
-<<<<<<< HEAD
-            }
-
-            contentWithImages.push(
-              <img key={`img-${index}`}
-              src={image.path.startsWith('http://') ? image.path : `http://localhost:4100/${image.path}`}
-              alt={image.fileName}
-              className="block w-56 h-52 rounded-md max-w-full my-4"></img>
-            )
-            let remainingText;
-            if(index === sortedImages.length-1){
-              remainingText = cleanText.slice(image.position);
-              const remaining = remainingText.split(`\n`);
-              remaining.forEach(remain => {
-=======
               endIndex = image.position;
             })
           }
@@ -93,7 +73,6 @@ export default function TextContent({content, isFullView=false, fromPost=false, 
             paragraphs.forEach((para,ind) => {
               myBlogText.push(<div key={ind} style={{whiteSpace:"pre-wrap"}}>{para}</div>)
             })
->>>>>>> feature/handleEditPost
 
             setTransformedText(myBlogText)
           }
