@@ -393,18 +393,18 @@ const updateBlogPost = async(req,res) => {
 
     const user_id = req.user.userId;
     // console.log("req. body: ", req.body);
-    const {title, content, positions, savedImages} = req.body;
-    const useSavedImages = JSON.parse(savedImages);
-    const newPositions = JSON.parse(positions);
+    const {title, newContent, positions, savedImages} = req.body;
+    const useSavedImages = JSON.parse(savedImages) || [];
+    const newPositions = JSON.parse(positions) || [];
     useSavedImages.forEach(image => {
-        console.log("useSaved Image; ", image);
+        console.log("useSaved Image before combining; ", image);
     })
     const id = req.params.id; 
     // newPositions.forEach(position => {
     //     console.log("position: ", position)
     // })
-    console.log("nwe Content: ",content);
-    console.log("title changes: ", title);
+    const parsedContent = JSON.parse(newContent);
+    // console.log("parsedContent: ", parsedContent);
     req.files['contentImages']?.forEach((image,ind) => {
         useSavedImages.push({
             path:image.path,
@@ -412,7 +412,7 @@ const updateBlogPost = async(req,res) => {
             fileName:newPositions[ind].fileName
         })
     });
-    console.log("useSavedImages ", useSavedImages);
+    console.log("useSavedImages after combining", useSavedImages);
     const newTitleImage = req.files['titleImage'] ? req.files['titleImage'][0].path : ''
     console.log("newTitleImage ", newTitleImage);
     try{
@@ -435,7 +435,7 @@ const updateBlogPost = async(req,res) => {
             console.log("success You are authorized to edit this blog")
         }
         if(title) blogPost.title = title;
-        if(content) blogPost.content = content;
+        if(newContent) blogPost.content = parsedContent;
         if(newTitleImage) blogPost.titleImage = newTitleImage;
         if(useSavedImages) blogPost.contentImages = useSavedImages;
         console.log("blogPost before saving: ", blogPost);

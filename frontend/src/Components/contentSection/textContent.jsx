@@ -23,6 +23,7 @@ export default function TextContent({content, isFullView=false, fromPost=false, 
       setText(textContent); 
         // console.log("actual text of the Post ", textContent);
         if(contentImages){
+          console.log("content IMages inside TextContent: ", contentImages);
           const contentWithImages = [];
           
           let endIndex = 0;
@@ -45,7 +46,7 @@ export default function TextContent({content, isFullView=false, fromPost=false, 
 
             contentWithImages.push(
               <img key={`img-${index}`}
-              src={`http://localhost:4100/${image.path}`}
+              src={image.path.startsWith('http://') ? image.path : `http://localhost:4100/${image.path}`}
               alt={image.fileName}
               className="block w-56 h-52 rounded-md max-w-full my-4"></img>
             )

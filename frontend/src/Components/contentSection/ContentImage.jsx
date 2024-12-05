@@ -15,7 +15,7 @@ const ContentImages = ({contentImages, removeImage=null, contentText=null}) => {
 
     return (
         <div className="flex flex-wrap gap-2">
-            {/* {console.log("contentImages ", contentImages)} */}
+            {console.log("contentImages inside the contentImage", contentImages)}
             {contentImages && contentImages.map((image, ind) => 
                 ( 
                 <div key={ind}>
