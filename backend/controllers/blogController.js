@@ -394,17 +394,29 @@ const updateBlogPost = async(req,res) => {
     const user_id = req.user.userId;
     // console.log("req. body: ", req.body);
     const {title, newContent, positions, savedImages} = req.body;
+<<<<<<< HEAD
     const useSavedImages = JSON.parse(savedImages) || [];
     const newPositions = JSON.parse(positions) || [];
     useSavedImages.forEach(image => {
         console.log("useSaved Image before combining; ", image);
     })
+=======
+    const useSavedImages = JSON.parse(savedImages);
+    const newPositions = JSON.parse(positions);
+
+>>>>>>> feature/handleEditPost
     const id = req.params.id; 
     // newPositions.forEach(position => {
     //     console.log("position: ", position)
     // })
+<<<<<<< HEAD
     const parsedContent = JSON.parse(newContent);
     // console.log("parsedContent: ", parsedContent);
+=======
+ 
+    const parsedContent = JSON.parse(newContent);
+   
+>>>>>>> feature/handleEditPost
     req.files['contentImages']?.forEach((image,ind) => {
         useSavedImages.push({
             path:image.path,
@@ -412,7 +424,11 @@ const updateBlogPost = async(req,res) => {
             fileName:newPositions[ind].fileName
         })
     });
+<<<<<<< HEAD
     console.log("useSavedImages after combining", useSavedImages);
+=======
+    
+>>>>>>> feature/handleEditPost
     const newTitleImage = req.files['titleImage'] ? req.files['titleImage'][0].path : ''
     console.log("newTitleImage ", newTitleImage);
     try{
@@ -434,13 +450,21 @@ const updateBlogPost = async(req,res) => {
         }else{
             console.log("success You are authorized to edit this blog")
         }
+      
         if(title) blogPost.title = title;
+<<<<<<< HEAD
         if(newContent) blogPost.content = parsedContent;
+=======
+    
+        if(parsedContent) blogPost.content = parsedContent;
+       
+>>>>>>> feature/handleEditPost
         if(newTitleImage) blogPost.titleImage = newTitleImage;
+      
         if(useSavedImages) blogPost.contentImages = useSavedImages;
-        console.log("blogPost before saving: ", blogPost);
+       
         const updatedBlog = await blogPost.save();
-        console.log("updatedBlog after saving: ", updatedBlog);
+       
         // successfully updated the blogPost
         if(!updatedBlog){
             return res.status(402).json({
@@ -560,10 +584,11 @@ const getUser = async(req,res) => {
 
 const getBlogPost = async(req,res) => {
 
-    const blogId = req.params.id;
+    let blogId = req.params.id;
     console.log("getBlog post runs: ", blogId);
+    blogId = blogId.startsWith(':') ? blogId.slice(1): blogId;
     if(!mongoose.Types.ObjectId.isValid(blogId)){
-        console.log("not a valid blod Id");
+        console.log("not a valid blog Id");
         return res.status(400).json({
             success:false,
             message:"Blog Id is invalid"
@@ -572,8 +597,9 @@ const getBlogPost = async(req,res) => {
     try{
         const blog = await Blog.findById(blogId);
         console.log("this is the Blog: ", blog.contentImages);
-        const newContentImages = blog.contentImages.filter(image => image.path !== 'uploads/1732159071743-Feeling Safe.jpg');
-        console.log("new ContentImages: ", newContentImages);        if(!blog){
+        // const newContentImages = blog.contentImages.filter(image => image.path !== 'uploads/1732159071743-Feeling Safe.jpg');
+        // console.log("new ContentImages: ", newContentImages);       
+        if(!blog){
             return res.status(404).json({
                 success:false,
                 message:"Blog doesn't found"

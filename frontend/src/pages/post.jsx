@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useGlobalContext } from "../globalContext/globalContext"
 import Image from "../Components/contentSection/titleImage";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import TextContent from '../Components/contentSection/textContent';
 import { FaEdit, FaTrash } from "react-icons/fa";
 import axios from "axios";
@@ -11,19 +11,37 @@ const BlogPost = () => {
 
     const {currentUser, loggedIn} = useGlobalContext();
     const [currentBlog, setCurrentBlog] = useState([]);
+    const [post, setPost] = useState([]);
     const [allBlogs, setAllBlogs] = useState([]);
     const [loading, setLoading] = useState(true);
     const location = useLocation();
-
+    const {id} = useParams();
+    console.log("myIDDD ", id);
     const moveTo = useNavigate();
 
-    const {post, myBlogs} = location.state || {};
+    // const {post, myBlogs} = location.state || {};
     useEffect(() => {
-        
-        console.log("POST inside Post: ", post);
-    }, [currentUser,allBlogs, post]);
+        const getPost = async() => {
+
+            try{
+                if(id){
+                    const response = await axios.get(`http://localhost:4100/weblog/getBlogPost/${id}`,
+                    { withCredentials:true}
+                );
+                    setPost(response.data.blogPost);
+                    console.log("response: ", response);
+                }
+            }
+            catch(err){
+                console.log("I'm here Err : while getting the Post ", err)
+            }
+        }
+        getPost();
+        // console.log("POST inside Post: ", post);
+    }, [id]);
 
     if(!post){
+
         return <div> Loading.. </div>
     }
     const handleEdit = (e,post) => {
@@ -62,7 +80,7 @@ const BlogPost = () => {
         <>
             <Navbar />
             <div data-component="post-container" className={`${loggedIn ? 'flex xs:flex-col sm:flex-row' : 'w-full'}`}>
-              {loading && !myBlogs ? <h1> Loading the Blogs..</h1> :
+              {!post ? <h1> Loading the Blog..</h1> :
               (
                 <div className="flex flex-col items-center w-full max-w-4xl mx-auto px-4 py-5">
                     <div className="">  
