@@ -22,7 +22,7 @@ const CheckAuthen = async(req, res) => {
             const user = await User.findById(req.user.userId).select('-password');
 
             console.log('user inside the authentication: ', user)
-            res.status(200).json({isAuthenticated:true, user});
+            res.status(200).json({isAuthenticated:true, user,token});
         }
     )
 }
