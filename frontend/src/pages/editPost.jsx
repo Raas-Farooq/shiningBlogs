@@ -121,8 +121,7 @@ const EditPost = () => {
       setLoading(true);
       try {
         const response = await axios.get(
-          `http://localhost:4100/weblog/getBlogPost/${postId}`,
-          { withCredentials: true }
+          `http://localhost:4100/weblog/getBlogPost/${postId}`
         );
 
         console.log("Response: while getting Post", response);

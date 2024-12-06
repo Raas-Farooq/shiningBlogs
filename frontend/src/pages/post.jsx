@@ -10,19 +10,26 @@ import Navbar from '../Components/Navbar/navbar';
 const BlogPost = () => {
 
     const {currentUser, loggedIn} = useGlobalContext();
+    console.log("loggeIn after useGlobal: ", loggedIn)
     const [currentBlog, setCurrentBlog] = useState([]);
-    const [post, setPost] = useState([]);
+    const [post, setPost] = useState({});
     const [allBlogs, setAllBlogs] = useState([]);
     const [loading, setLoading] = useState(true);
     const location = useLocation();
-    const {id} = useParams();
-    console.log("myIDDD ", id);
+    let {id} = useParams();
+    id = id.startsWith(':') ? id.slice(1) : id;
     const moveTo = useNavigate();
-
+    useEffect(() => {
+        console.log("loggedn insisde use:Effect", loggedIn
+        )
+    },[loggedIn])
     // const {post, myBlogs} = location.state || {};
     useEffect(() => {
+        const userId = localStorage.getItem('userId');
+        console.log("userId: ", userId);
         const getPost = async() => {
-
+            console.log("Post id: ", id);
+            
             try{
                 if(id){
                     const response = await axios.get(`http://localhost:4100/weblog/getBlogPost/${id}`,
@@ -37,12 +44,30 @@ const BlogPost = () => {
             }
         }
         getPost();
+
+        async function userPrivileges(){
+            
+            try{
+                if(id){
+                    const response = await axios.get(`http://localhost:4100/weblog/canEditBlog/${id}`
+                        ,{withCredentials:true}
+                    );
+                    console.log("response: ", response);
+                }   
+               
+            }
+            catch(err){
+                console.log("error while ensuring the privileges of user: ", err);
+            }
+        }
+
+        userPrivileges();
         // console.log("POST inside Post: ", post);
     }, [id]);
 
-    if(!post){
+    if(!Object.keys(post).length){
 
-        return <div> Loading.. </div>
+        return <h1> Loading.. </h1>
     }
     const handleEdit = (e,post) => {
         e.preventDefault();
@@ -80,7 +105,8 @@ const BlogPost = () => {
         <>
             <Navbar />
             <div data-component="post-container" className={`${loggedIn ? 'flex xs:flex-col sm:flex-row' : 'w-full'}`}>
-              {!post ? <h1> Loading the Blog..</h1> :
+                {console.log("posst: ", Object.keys(post).length)}
+              {!Object.keys(post).length ? <h1> Loading the Blog..</h1> :
               (
                 <div className="flex flex-col items-center w-full max-w-4xl mx-auto px-4 py-5">
                     <div className="">  
@@ -89,6 +115,7 @@ const BlogPost = () => {
                         >
                             
                             <h2 className="text-center w-4/5 text-2xl text-purple-600 font-medium mb-10 shadow-inner 300 p-5 shadow-2xl"> {post.title} </h2>
+                            {console.log("logged In: ", loggedIn)}
                             {loggedIn && <div className="text-right flex justify-end gap-2 mb-2 w-[80%]">
                                 <button onClick={(e) => handleEdit(e, post)} ><FaEdit size={20} /> </button>
                                 <button onClick={(e) => handleDelete(e,post._id)} ><FaTrash size={20} /> </button>

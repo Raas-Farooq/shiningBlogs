@@ -27,7 +27,6 @@ export default function TextContent({content, isFullView=false, fromPost=false, 
           
           let endIndex = 0;
           const sortedImages = contentImages?.sort((a,b) => a.position - b.position);
-          console.log(`sorted Images: ${sortedImages} contentImages ${contentImages}`)
           const cleanText = textContent.replace(/\[image-\d+\]/g, '         ');
           // console.log("sortedImages 0: ", sortedImages[2].position);
           // const paragraphs = cleanText.split('\n');
@@ -39,7 +38,7 @@ export default function TextContent({content, isFullView=false, fromPost=false, 
                 const paragraphs = partOfText.split(`\n`);
   
                 paragraphs.forEach((para, ind) => {
-                  contentWithImages.push(<p key={ind}> {para.trim()}</p>)
+                  contentWithImages.push(<p key={`para-${index}-${ind}`}> {para.trim()}</p>)
                 })
                 // console.log("withuot any modification: paragraph :", paragraphs.join(' ').trim(' '));
                 
@@ -55,9 +54,9 @@ export default function TextContent({content, isFullView=false, fromPost=false, 
               if(index === sortedImages.length-1){
                 remainingText = cleanText.slice(image.position);
                 const remaining = remainingText.split(`\n`);
-                remaining.forEach(remain => {
+                remaining.forEach((remain,ind) => {
   
-                  contentWithImages.push(<p>{remain}</p>)
+                  contentWithImages.push(<p key={`remain${ind}`}>{remain}</p>)
                   // console.log("remain.trim: ", )
                 })
               }
@@ -69,19 +68,16 @@ export default function TextContent({content, isFullView=false, fromPost=false, 
           if(!contentWithImages.length){
             let myBlogText = [];
             const paragraphs = textContent.split('\n');
-            console.log("paragraphs: ", paragraphs);
             paragraphs.forEach((para,ind) => {
               myBlogText.push(<div key={ind} style={{whiteSpace:"pre-wrap"}}>{para}</div>)
             })
 
             setTransformedText(myBlogText)
           }
-          console.log("content&images: ", contentWithImages);
-          
-          // console.log("in paragraphs: ", paragraphs);
         
         }
         
+
     }, [content, contentImages])
   
     return (

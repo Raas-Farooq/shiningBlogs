@@ -574,10 +574,7 @@ const getBlogPost = async(req,res) => {
         })
     }
     try{
-        const blog = await Blog.findById(blogId);
-        console.log("this is the Blog: ", blog.contentImages);
-        // const newContentImages = blog.contentImages.filter(image => image.path !== 'uploads/1732159071743-Feeling Safe.jpg');
-        // console.log("new ContentImages: ", newContentImages);       
+        const blog = await Blog.findById(blogId);     
         if(!blog){
             return res.status(404).json({
                 success:false,
@@ -624,6 +621,46 @@ const allBlogs = async(req, res) => {
         })
     }
 }
+
+const canEditBlog = async(req,res) => {
+    console.log("canEditBlog running ");
+    console.log("userId: ", req.user.userId);
+    const userIdReceived = req.user.userId.toString();
+    console.log("BlogId received from frontEnd", req.params.id);
+    const blogId = req.params.id;
+    try{
+        const blog = await Blog.findById(blogId);
+        if(!blog){
+            res.status(404).json({
+                success:false,
+                message:"Blog not fuond"
+            })
+        }
+        console.log("creator ID: ", blog.userId.toString());
+        if(blog.userId.toString() === userIdReceived){
+            return res.status(200).json({
+                success:true,
+                message:"Yes! you are authorize to Edit It"
+            })
+        }
+        else{
+            return res.status(403).json({
+                success:false,
+                message:"You are not the authorized user"
+            })
+        }
+        
+    }catch(err){
+        res.status(500).json(
+            {
+                success:false,
+                message:"Server error while checking the privilege of user",
+                error: err.message
+            }
+        )
+    }
+
+}
 const logout = (req,res) => {
     res.clearCookie('token');
     return res.status(200).json({
@@ -632,4 +669,6 @@ const logout = (req,res) => {
     })
 }
 
-export {current, registerUser, logging, allBlogs,addBlog, updateBlogPost, deleteBlog, updateUserProfile, getBlogPost, allUsers, getUser, logout}
+export {current, registerUser, logging, allBlogs,addBlog, updateBlogPost, deleteBlog, updateUserProfile, getBlogPost, allUsers, getUser, logout, canEditBlog}
+
+// privilege few are made
