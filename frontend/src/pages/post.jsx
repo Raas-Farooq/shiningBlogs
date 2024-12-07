@@ -9,11 +9,10 @@ import Navbar from '../Components/Navbar/navbar';
 
 const BlogPost = () => {
 
-    const {currentUser, loggedIn} = useGlobalContext();
+    const {currentUser, loggedIn,setLoggedIn} = useGlobalContext();
     console.log("loggeIn after useGlobal: ", loggedIn)
-    const [currentBlog, setCurrentBlog] = useState([]);
+    const [blogOwner, setBlogOwner] = useState(false);
     const [post, setPost] = useState({});
-    const [allBlogs, setAllBlogs] = useState([]);
     const [loading, setLoading] = useState(true);
     const location = useLocation();
     let {id} = useParams();
@@ -53,11 +52,22 @@ const BlogPost = () => {
                         ,{withCredentials:true}
                     );
                     console.log("response: ", response);
+                    if(response.data.success){
+                        setBlogOwner(true);
+                    }
                 }   
                
             }
             catch(err){
                 console.log("error while ensuring the privileges of user: ", err);
+                if(err.response.data.error === 'jwt expired'){
+                    console.log("Token Expired");
+                    alert("Your session has expired, You are logged Out");
+                    setLoggedIn(false);
+                }
+                if(err.response.data.error === 'Not-Authorized'){
+                    setBlogOwner(false);
+                }
             }
         }
 
@@ -116,10 +126,12 @@ const BlogPost = () => {
                             
                             <h2 className="text-center w-4/5 text-2xl text-purple-600 font-medium mb-10 shadow-inner 300 p-5 shadow-2xl"> {post.title} </h2>
                             {console.log("logged In: ", loggedIn)}
-                            {loggedIn && <div className="text-right flex justify-end gap-2 mb-2 w-[80%]">
+                            {loggedIn && blogOwner ? <div className="text-right flex justify-end gap-2 mb-2 w-[80%]">
                                 <button onClick={(e) => handleEdit(e, post)} ><FaEdit size={20} /> </button>
                                 <button onClick={(e) => handleDelete(e,post._id)} ><FaTrash size={20} /> </button>
                             </div>
+                            :
+                            null
                             }
                             {post.titleImage && <Image postImg={post.titleImage} title={post.title} isFullView={true} /> }
                             <TextContent content={post.content} isFullView={true} fromPost={true} contentImages={post.contentImages} />

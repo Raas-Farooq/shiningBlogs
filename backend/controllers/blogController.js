@@ -49,7 +49,7 @@ const registerUser = async (req,res) => {
            delete newUserObject.password;
             jwt.sign({user: {userId:newUserObject._id}}, 
             process.env.JWT_SECRET, 
-            {expiresIn:'1h'},
+            {expiresIn:'5m'},
             (err,token) => {
                 if(err){
                     return res.status(500).json({
@@ -271,7 +271,7 @@ const logging =  async(req,res) => {
         jwt.sign(
             ({user:{userId:user._id}}), 
             process.env.JWT_SECRET,
-             {expiresIn: '1h'}
+             {expiresIn: '1m'}
              , (err, token) => {
                 if(err){
                     return res.status(500).json({
@@ -667,7 +667,8 @@ const canEditBlog = async(req,res) => {
         else{
             return res.status(403).json({
                 success:false,
-                message:"You are not the authorized user"
+                message:"You are not the authorized user",
+                error:'Not-Authorized'
             })
         }
         

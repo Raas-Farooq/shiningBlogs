@@ -4,7 +4,7 @@ import { useGlobalContext } from '../../globalContext/globalContext';
 import { FaTwitch } from 'react-icons/fa';
 import {CiSearch} from 'react-icons/ci';
 import WindowSize from '../../windowSize';
-import { Link } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import '../../App.css';
 import axios from 'axios';
 
@@ -17,12 +17,14 @@ export default function Navbar(){
     const [searchClicked, setSearchClicked] = useState(false);
     const [loading, setLoading] = useState(false);
     const size = WindowSize();
-    
+    const moveTo = useNavigate();
+
     useEffect(() => {
-        console.log("is Login: ", loggedIn);
-        const thisUser = JSON.parse(localStorage.getItem('thisUser'));
-        // console.log("this User inside navbar: ", thisUser);
-    }, [])
+        
+        console.log("loggedIn: ", loggedIn);
+    }, [loggedIn]);
+
+    
     useEffect(() => {
         if(size.width > 768){
             console.log("logeed In inside navbar: ", loggedIn);
@@ -77,6 +79,7 @@ export default function Navbar(){
                     <input type="search" 
                     id="search" 
                     placeholder='Search Blog' 
+                    // onChange={handleSearchChange}
                     className='text-black w-28 pb-1 bg-white border border-green-300 rounded'/>
                 </div>
                 <button 
