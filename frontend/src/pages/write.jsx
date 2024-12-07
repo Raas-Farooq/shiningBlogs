@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom"
 import axios from 'axios';
 import ContentImages from "../Components/contentSection/ContentImage";
+import { useGlobalContext } from "../globalContext/globalContext";
 
 export default function Write() {
 
@@ -12,6 +13,7 @@ export default function Write() {
     });
     const moveTo = useNavigate();
     const currentTextArea = useRef(null);
+    const {loggedIn} = useGlobalContext();
     const [cursorPosition, setCursorPosition] = useState(0);
     // const [titleErr, setTitleErr] = useState('');
     const [loadingErr, setLoadingErr] = useState(false);
@@ -32,10 +34,16 @@ export default function Write() {
     
 
     useEffect(() => {
-        // console.log("contentImages useEffect: ",contentImages);
-        // console.log("blogTitle.title: ",blogTitle.title);
-        // console.log("blogTitle.titleImg: ",blogTitle.titleImg);
-    }, [contentImages])
+        if(!loggedIn){
+            const moveToLoginPage = window.confirm("you are logged out. please Login Again and Write Your Post");
+
+            if(moveToLoginPage){
+                moveTo('/login')
+            }
+        }
+    }, [loggedIn,moveTo])
+
+
     const handleTitles = (e) => {
         // const errors = checkValidation();
         setBlogTitle(prev => ({...prev, 
@@ -215,7 +223,13 @@ export default function Write() {
             catch(err){
                 console.log("error while posting new Blog ", err.response.data);
                 if(err.response.data.error === 'jwt expired'){
-                    alert("token expired! Please Login Again");
+                    // alert("You are logged Out! Please Login In First");
+                    const confirmMovingLogin = window.confirm("you Are Logged Out! please login and Come Again.");
+
+                    console.log("confirmMOving : ", confirmMovingLogin);
+                    if(confirmMovingLogin){
+                        moveTo("/login")
+                    }
                 }
                 
             }

@@ -5,8 +5,10 @@ import TextContent from "../Components/contentSection/textContent";
 import ContentImages from "../Components/contentSection/ContentImage";
 import axios from "axios";
 import { debounce } from "lodash";
+import { useGlobalContext } from "../globalContext/globalContext";
 
 const EditPost = () => {
+  const {loggedIn,setLoggedIn} = useGlobalContext();
   const [cursorPosition, setCursorPosition] = useState(0);
   const [newTitleImage, setNewTitleImage] = useState(false);
   const [removedImages, setRemovedImages] = useState([]);
@@ -18,6 +20,14 @@ const EditPost = () => {
   const moveTo = useNavigate();
   const isNavigatingBack = useRef(false);
 
+  useEffect(() => {
+    if(!loggedIn){
+     const moveToLogin = window.confirm('token expired! please Login Again. Do you want to Login');
+      if(moveToLogin){
+        moveTo('/login')
+      }
+    }
+  },[loggedIn])
   const [editPostData, setEditPostData] = useState({
     title: "",
     titleImage: null,
@@ -129,7 +139,7 @@ const EditPost = () => {
       } catch (err) {
         console.error("error while getting the post ", err);
         setErrors({
-            message:"Post is not Loading, check your connection and Try Again!!"
+            message:"Post is not Loading, you are either logged out or internet connection err. Plz check & Try Again!!"
         })
         setLoading(false);
       } 
@@ -418,6 +428,9 @@ const EditPost = () => {
       setNewTitleImage(false);
     } catch (err) {
       console.log("You can deal with errors: ", err);
+      if(err.response.data.error === 'jwt expired'){
+        alert("Your session has Expired! You are Logged Out")
+      }
     }
     console.log("editPost data DRWE REPOSTING: ", editPostData.titleImage);
     // console.log("contentImages after reposting: ", contentImages);

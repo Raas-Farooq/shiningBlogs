@@ -29,9 +29,10 @@ export const GlobalState = ({children}) => {
     const isTokenExpired = (token) => {
         const decoded = decodeToken(token);
 
-        if(!decoded || !decoded.exp){
-            return Date.now() > decoded.exp * 1000
-        }
+        if(!decoded || !decoded.exp) return true
+
+        return Date.now() > decoded.exp * 1000
+        
     }
     const userAuthentication = async () => {
         try {

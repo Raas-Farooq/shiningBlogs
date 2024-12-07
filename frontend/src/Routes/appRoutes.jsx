@@ -33,7 +33,7 @@ const PageTransition = () => {
                 <Routes location={location}>
                     <Route path="/" element={<App />} />
                     <Route path="/about" element={<About />} />
-                    <Route path="/write" element={<ProtecedRoute><Write /></ProtecedRoute>} />
+                    <Route path="/write" element={<ProtecedRoute stayOnPage={true}><Write /></ProtecedRoute>} />
                     <Route path="/content" element={<Content />} />
                     <Route path="/userAccount" element={<UserAccount />} />
                     <Route path="/updateProfile" element={<UpdateProfile />} /> 
@@ -51,14 +51,14 @@ const PageTransition = () => {
     )
 }
 
-const ProtecedRoute = ({children}) => {
+const ProtecedRoute = ({children, stayOnPage=false }) => {
     const {loggedIn, loading, setLoggedIn} = useGlobalContext();
 
     if(loading){
         return <h1> Loading.. </h1>
     }
 
-    if(!loggedIn){
+    if(!loggedIn && !stayOnPage){
         alert("You Should Login in order to Create Blog")
         return <Navigate to="/login" />
     }

@@ -15,9 +15,12 @@ export default function BlogContent(){
     const [profileImage, setProfileImage] = useState('');
     const [myBlogs, setMyBlogs] = useState([]);
     const navigateTo = useNavigate();
+    
     useEffect(() => {
-        if(currentUser){
+        if(currentUser?.profileImg){
+            console.log("What exactly the current User: ", currentUser);
             const myImage = `http://localhost:4100/${currentUser.profileImg}`;
+            console.log("myImage received in blogContent: ", myImage);
             setProfileImage(myImage);
         }
         
