@@ -9,13 +9,13 @@ import { Link, useNavigate } from "react-router-dom";
 
 export default function BlogContent(){
 
-    const {loggedIn, currentUser, setCurrentUser,imagePreview} = useGlobalContext()
+    const {setSearchValue,filteredBlogs,searching, setSearching,loggedIn, currentUser,allBlogsGlobally,setAllBlogsGlobally, setCurrentUser,imagePreview} = useGlobalContext()
     const [loading, setLoading] = useState(true); 
-    let [slicedTitle, setSlicedTitle] = useState({});
+    let   [slicedTitle, setSlicedTitle] = useState({});
     const [profileImage, setProfileImage] = useState('');
     const [myBlogs, setMyBlogs] = useState([]);
     const navigateTo = useNavigate();
-    
+    let showBlogsResult;
     useEffect(() => {
         if(currentUser?.profileImg){
             console.log("What exactly the current User: ", currentUser);
@@ -26,6 +26,7 @@ export default function BlogContent(){
         
 
     }, [])
+    
     const clearLocalStorage = useCallback(() => {
         localStorage.removeItem('titleStorage');
         localStorage.removeItem('titleImagePreview');
@@ -35,7 +36,7 @@ export default function BlogContent(){
 
     useEffect(() => {
         // let titleReceived = reduceTitle();
-        // console.log("slicedWord: ", titleReceived);
+        console.log("searching blogContent: ",searching );
         // setSlicedTitle(titleReceived);
         clearLocalStorage();
         const fetchBlogs = async() => {
@@ -43,7 +44,7 @@ export default function BlogContent(){
             try{
                 const response = await axios.get('http://localhost:4100/weblog/allBlogs');
            
-                setMyBlogs(response.data.blogs)
+                setAllBlogsGlobally(response.data.blogs)
                 if(response.data){
                     setLoading(false);
                 }
@@ -55,32 +56,55 @@ export default function BlogContent(){
         fetchBlogs();
     }, []);
 
-    
+
+
+    function handleRefresh(e){
+        e.preventDefault();
+        setSearching(false);
+        setSearchValue('');
+    }
     const handlePostClick = (post) => {
        navigateTo(`/BlogPost/:${post._id}`, {state:{post, myBlogs:myBlogs} })
     }
     if(loading) return <h2 className="text-2xl font-medium"> Loading Blogs...</h2>
     return (
         <div data-component="AllBlogsParent" className=" flex xs:flex-col sm:flex-row" >
-            {!myBlogs ? <h1> Please Wait..</h1> :
+            {!allBlogsGlobally ? <h1> Please Wait..</h1> :
             (
                 <div className="blogsContainer xs:w-[95vw] w-[70vw] text-center m-10">
-                    {console.log("myBlogs: ", myBlogs)}
+                    <button onClick={handleRefresh} className="text-green-600 text-lg shadow-xl p-2">Load All</button>
                     <div data-component="bottomBlogsContainer" className="flex flex-wrap gap-5 text-center justify-center">
-                    {myBlogs.map((blog,index) => {
-                        return (
-                            <div key={index} 
-                            id={blog._id}
-                            className="flex flex-col shadow-lg p-4 cursor-pointer text-center" 
-                            onClick={(e) =>handlePostClick(blog)}
-                            >
-                                <h2 className="text-center xs:text-xs sm:text-sm font-medium"> <Title title={blog.title}  /></h2>
-                                <PostImage postImg={blog.titleImage} title={blog.title} />
-                                <TextContent content={blog.content} />
-                            </div>
-                        )
-                        
-                    })}
+                    {!searching ? allBlogsGlobally?.map((blog,index) => 
+                        {
+                            return (
+                                <div key={index} 
+                                id={blog._id}
+                                className="flex flex-col shadow-lg p-4 cursor-pointer text-center" 
+                                onClick={(e) =>handlePostClick(blog)}
+                                >
+                                    <h2 className="text-center xs:text-xs sm:text-sm font-medium"> <Title title={blog.title}  /></h2>
+                                    <PostImage postImg={blog.titleImage} title={blog.title} />
+                                    <TextContent content={blog.content} />
+                                </div>
+                            )
+                        })
+                        :
+                        filteredBlogs?.map((blog, index) => {
+                            return (
+                                <div key={index} 
+                                id={blog._id}
+                                className="flex flex-col shadow-lg p-4 cursor-pointer text-center" 
+                                onClick={(e) =>handlePostClick(blog)}
+                                >
+                                    <h2 className="text-center xs:text-xs sm:text-sm font-medium"> <Title title={blog.title}  /></h2>
+                                    <PostImage postImg={blog.titleImage} title={blog.title} />
+                                    <TextContent content={blog.content} />
+                                </div>
+                            )
+                        })
+                    }
+                   
+                    
                     </div>
                 </div>
             )}

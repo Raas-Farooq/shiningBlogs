@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom"
 import {useNavigate} from 'react-router-dom';
+import { useGlobalContext } from "../globalContext/globalContext";
 
 
 export default function About() {
 
     const [shortText, setShortText] = useState('');
+    const {setInHomePage} = useGlobalContext();
     const moveTo = useNavigate();
 
     function smallText(text){
@@ -18,7 +20,7 @@ export default function About() {
         console.log("short Text inside funtion: ", shortText);
     }
     useEffect(() => {
-        console.log("LIving On Edge")
+        setInHomePage(false);
     }, [])
     
     return(

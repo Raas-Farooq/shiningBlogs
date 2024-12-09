@@ -33,12 +33,21 @@ export default function Write() {
 
     
 
+    // useEffect(() => {
+    //     if(!loggedIn){
+    //         alert("You are not Logged In! You should login in order to Write Blog");
+    //         moveTo('/login');
+    //     }
+    // })
     useEffect(() => {
         if(!loggedIn){
             const moveToLoginPage = window.confirm("you are logged out. please Login Again and Write Your Post");
-
+            console.log("moveToLogIn result: ", moveToLoginPage);
             if(moveToLoginPage){
                 moveTo('/login')
+            }
+            else{
+               
             }
         }
     }, [loggedIn,moveTo])
@@ -222,7 +231,7 @@ export default function Write() {
             
             catch(err){
                 console.log("error while posting new Blog ", err.response.data);
-                if(err.response.data.error === 'jwt expired'){
+                if(err.response.data.error === 'jwt expired' || err.response.data.message === 'Unable to get Token Bearer'){
                     // alert("You are logged Out! Please Login In First");
                     const confirmMovingLogin = window.confirm("you Are Logged Out! please login and Come Again.");
 

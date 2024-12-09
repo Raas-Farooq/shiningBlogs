@@ -9,7 +9,7 @@ import Navbar from '../Components/Navbar/navbar';
 
 const BlogPost = () => {
 
-    const {currentUser, loggedIn,setLoggedIn} = useGlobalContext();
+    const {setInHomePage,currentUser, loggedIn,setLoggedIn,setSearching} = useGlobalContext();
     console.log("loggeIn after useGlobal: ", loggedIn)
     const [blogOwner, setBlogOwner] = useState(false);
     const [post, setPost] = useState({});
@@ -19,9 +19,8 @@ const BlogPost = () => {
     id = id.startsWith(':') ? id.slice(1) : id;
     const moveTo = useNavigate();
     useEffect(() => {
-        console.log("loggedn insisde use:Effect", loggedIn
-        )
-    },[loggedIn])
+        setInHomePage(false);
+    },[])
     // const {post, myBlogs} = location.state || {};
     useEffect(() => {
         const userId = localStorage.getItem('userId');
@@ -61,8 +60,8 @@ const BlogPost = () => {
             catch(err){
                 console.log("error while ensuring the privileges of user: ", err);
                 if(err.response.data.error === 'jwt expired'){
-                    console.log("Token Expired");
-                    alert("Your session has expired, You are logged Out");
+                    // console.log("Token Expired");
+                    // alert("Your session has expired, You are logged Out");
                     setLoggedIn(false);
                 }
                 if(err.response.data.error === 'Not-Authorized'){
@@ -113,7 +112,7 @@ const BlogPost = () => {
     // Always have a conscious self to recognize the small thing which made You to Procrastinate. think about the Kite flying ? how you were planned to do even the intense heat and no air but you were committed
     return (
         <>
-            <Navbar />
+            <Navbar showSearch={false} />
             <div data-component="post-container" className={`${loggedIn ? 'flex xs:flex-col sm:flex-row' : 'w-full'}`}>
                 {console.log("posst: ", Object.keys(post).length)}
               {!Object.keys(post).length ? <h1> Loading the Blog..</h1> :

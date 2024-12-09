@@ -9,12 +9,17 @@ const AppContext = React.createContext();
 export const GlobalState = ({children}) => {
     const [openUserAccount, setOpenUserAccount] = useState(false);
     const [editProfile, setEditProfile] = useState(false);
+    const [allBlogsGlobally, setAllBlogsGlobally] = useState([]);
+    const [filteredBlogs, setFilteredBlogs] = useState([]);
     const [showMenu, setShowMenu] = useState(false);
+    const [searchValue,setSearchValue] = useState('');
     const [loggedIn, setLoggedIn] = useState(false);
+    const [searching, setSearching] = useState(false);
     const [loading, setLoading] = useState(true);
     const [registerData, setRegisterData] = useState({});
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [imagePreview, setImagePreview] = useState('');
+    const [inHomePage, setInHomePage] = useState(true);
     const [globalEmail, setGlobalEmail] = useState('');
     const [currentUser, setCurrentUser] = useState(null);
 
@@ -110,7 +115,17 @@ export const GlobalState = ({children}) => {
             setCurrentUser,
             imagePreview,
             setImagePreview,
-            userAuthentication
+            userAuthentication,
+            allBlogsGlobally,
+            setAllBlogsGlobally,
+            filteredBlogs,
+            setFilteredBlogs,
+            searching,
+            setSearching,
+            searchValue,
+            setSearchValue,
+            inHomePage,
+            setInHomePage
         }}>
             {children}
         </AppContext.Provider>

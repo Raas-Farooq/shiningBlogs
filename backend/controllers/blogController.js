@@ -49,7 +49,7 @@ const registerUser = async (req,res) => {
            delete newUserObject.password;
             jwt.sign({user: {userId:newUserObject._id}}, 
             process.env.JWT_SECRET, 
-            {expiresIn:'5m'},
+            {expiresIn:'1m'},
             (err,token) => {
                 if(err){
                     return res.status(500).json({
@@ -394,29 +394,19 @@ const updateBlogPost = async(req,res) => {
     const user_id = req.user.userId;
     // console.log("req. body: ", req.body);
     const {title, newContent, positions, savedImages} = req.body;
-<<<<<<< HEAD
     const useSavedImages = JSON.parse(savedImages) || [];
     const newPositions = JSON.parse(positions) || [];
     useSavedImages.forEach(image => {
         console.log("useSaved Image before combining; ", image);
     })
-=======
-    const useSavedImages = JSON.parse(savedImages);
-    const newPositions = JSON.parse(positions);
 
->>>>>>> feature/handleEditPost
     const id = req.params.id; 
     // newPositions.forEach(position => {
     //     console.log("position: ", position)
     // })
-<<<<<<< HEAD
-    const parsedContent = JSON.parse(newContent);
-    // console.log("parsedContent: ", parsedContent);
-=======
  
     const parsedContent = JSON.parse(newContent);
    
->>>>>>> feature/handleEditPost
     req.files['contentImages']?.forEach((image,ind) => {
         useSavedImages.push({
             path:image.path,
@@ -424,11 +414,7 @@ const updateBlogPost = async(req,res) => {
             fileName:newPositions[ind].fileName
         })
     });
-<<<<<<< HEAD
-    console.log("useSavedImages after combining", useSavedImages);
-=======
     
->>>>>>> feature/handleEditPost
     const newTitleImage = req.files['titleImage'] ? req.files['titleImage'][0].path : ''
     console.log("newTitleImage ", newTitleImage);
     try{
@@ -452,13 +438,9 @@ const updateBlogPost = async(req,res) => {
         }
       
         if(title) blogPost.title = title;
-<<<<<<< HEAD
-        if(newContent) blogPost.content = parsedContent;
-=======
     
         if(parsedContent) blogPost.content = parsedContent;
        
->>>>>>> feature/handleEditPost
         if(newTitleImage) blogPost.titleImage = newTitleImage;
       
         if(useSavedImages) blogPost.contentImages = useSavedImages;

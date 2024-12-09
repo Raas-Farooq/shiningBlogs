@@ -428,8 +428,11 @@ const EditPost = () => {
       setNewTitleImage(false);
     } catch (err) {
       console.log("You can deal with errors: ", err);
-      if(err.response.data.error === 'jwt expired'){
-        alert("Your session has Expired! You are Logged Out")
+      if(err.response.data.error === 'jwt expired' || err.response.data.message === 'Unable to get Token Bearer'){
+        const confirmMovingToLogin = window.confirm("Your session has Expired! You are Logged Out");
+        if(confirmMovingToLogin){
+          moveTo('/login')
+        }
       }
     }
     console.log("editPost data DRWE REPOSTING: ", editPostData.titleImage);

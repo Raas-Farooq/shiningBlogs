@@ -8,9 +8,9 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import '../../App.css';
 import axios from 'axios';
 
-export default function Navbar(){
+export default function Navbar({showSearch=true}){
 
-    const {setCurrentUser, currentUser, setOpenUserAccount, openUserAccount, setShowMenu, showMenu, loggedIn, setLoggedIn} = useGlobalContext();
+    const {inHomePage,searchValue, setInHomePage, setSearchValue, filteredBlogs, setSearching, setFilteredBlogs, allBlogsGlobally,setAllBlogsGlobally, setOpenUserAccount, openUserAccount, setShowMenu, showMenu, loggedIn, setLoggedIn} = useGlobalContext();
     
     // console.log("openUserAccount: ", openUserAccount);
     // console.log("showMenu: ", showMenu);
@@ -19,25 +19,61 @@ export default function Navbar(){
     const size = WindowSize();
     const moveTo = useNavigate();
 
-    useEffect(() => {
-        
-        console.log("loggedIn: ", loggedIn);
-    }, [loggedIn]);
 
-    
+    useEffect(() => {
+        // setSearching(false);
+        // setSearchValue('');
+        console.log("if search Value: ", searchValue)
+        console.log("showSearch inside navbar: ", showSearch);
+        setInHomePage(showSearch);
+        console.log("search valuee: boolean", searchValue.length>0);
+    }, []);
+
+    const handleSearchChange = (e) => {
+        console.log("handleSearch value: ", e.target.value);
+        const blogSearch = e.target.value;
+        setSearchValue(blogSearch);
+        setSearching(true);
+        const filtered = allBlogsGlobally?.filter(blog => {
+            if(blog.title.toString().toLowerCase().includes(blogSearch?.toString().toLowerCase())){
+                return blog;
+            }
+        })
+        setFilteredBlogs(filtered);
+    } 
+
     useEffect(() => {
         if(size.width > 768){
             console.log("logeed In inside navbar: ", loggedIn);
             setShowMenu(false);
-            setSearchClicked(false)
+            if(searchValue.length>0){
+                setSearchClicked(true)
+            }else{
+                setSearchClicked(false)
+            }
+            
         }
     }, [size.width, loggedIn])
+
+    const handleWriteClick = (e) => {
+        e.preventDefault();
+
+        if(!loggedIn){
+            const confirmMessage= window.confirm("You are Not Logged In! Logged In and create a blog");
+            if(confirmMessage){
+                moveTo('/login')
+            }
+            
+        }else{
+            moveTo('/write')
+        }
+    }
     if(loading){
         return <h1> Loading.. </h1>
     }
     return(
         <nav className={`flex bg-[#5D62FF]-300 shadow-lg text-white bg-[#FFFFFF] top-0 z-10 items-center fixed w-full justify-between ${showMenu ? 'flex-col pb-[8rem] ' : 'flex'} ${showMenu &&  openUserAccount ?'flex-col fixed': 'relative'}` }> 
-            
+           {console.log("inHomePage inside navbar DOM: ", inHomePage)}
             <div className={`pl-12 pb-4 md:hidden text-black text-xl `}>
                 <button onClick={() => setShowMenu(!showMenu)} className="border border-red-200 p-2 mt-2"> {showMenu ?  <FaTimes /> : <FaBars />}</button>
                     
@@ -45,6 +81,8 @@ export default function Navbar(){
             <div className={` ${showMenu ? 'flex-grow ': 'hidden'}`}>
                 <input type="search" 
                     id="search" 
+                    value={searchValue}
+                    onChange={handleSearchChange}
                     placeholder='Search Dream Blog' 
                     className='text-black pb-1 bg-white border border-green-300 rounded'/>
             </div>
@@ -57,7 +95,7 @@ export default function Navbar(){
                    <Link to={'/about'} className='px-2 ml-3 pointer py-2 bg-green-300 hover:bg-green-200 md:w-auto w-24 mb-2'>About</Link>   
                 </li>
                 <li className=" flex">
-                   <Link to={'/write'} className='px-2 ml-3 pointer py-2 bg-green-300 hover:bg-green-200 md:w-auto w-24 mb-2'>Write</Link>   
+                   <button onClick={handleWriteClick} className='px-2 ml-3 pointer text-blue-600 py-2 bg-green-300 hover:bg-green-200 md:w-auto w-24 mb-2'>Write</button>   
                 </li>
                 <li className=" flex">
                    <Link to={'/content'} className='px-2 ml-3 pointer py-2 bg-green-300 hover:bg-green-200 md:w-auto w-24 mb-2'>Content</Link>   
@@ -72,22 +110,23 @@ export default function Navbar(){
             </ul>
 
             <ul className={`md:flex mb-2 w-1/3 md:text-sm ${showMenu ? 'flex': 'hidden'} ${!loggedIn && 'md:text-xl ml-12 xs:flex'}`}>
-                <li className={`${searchClicked || loggedIn ? 'hidden': 'none'} `}><Link to={"/login"} className='px-2 py-2 hover:text-gray-300'> Login </Link></li>
-                <li className={` ${searchClicked || loggedIn ? 'hidden': 'none'} `} ><Link to={"/registerUser"} className='px-2 py-2 hover:text-gray-300'> Register </Link></li>
+                <li className={`${searchClicked || loggedIn || searchValue && inHomePage? 'hidden': 'none'} `}><Link to={"/login"} className='px-2 py-2 hover:text-gray-300'> Login </Link></li>
+                <li className={` ${searchClicked || loggedIn || searchValue && inHomePage? 'hidden': 'none'} `} ><Link to={"/registerUser"} className='px-2 py-2 hover:text-gray-300'> Register </Link></li>
 
-                <div className={`mt-2 lg:block ${showMenu ? 'hidden': 'block'} ${searchClicked || loggedIn && !showMenu ? 'xs:block' : 'xs:hidden'}`}>
+                <div className={`mt-2 lg:block ${searchValue.length>0 && 'block'} ${searchValue.length>0 || loggedIn && !showMenu ? 'xs:block' : 'xs:hidden'} ${showMenu || !inHomePage ? 'xs:hidden': 'block'}`}>
                     <input type="search" 
                     id="search" 
                     placeholder='Search Blog' 
-                    // onChange={handleSearchChange}
+                    onChange={handleSearchChange}
+                    value={searchValue}
                     className='text-black w-28 pb-1 bg-white border border-green-300 rounded'/>
                 </div>
                 <button 
                 onClick={() => {
-                    console.log("Search is Growing ", searchClicked)
+                    setSearchValue('');
                     setSearchClicked(!searchClicked)}
                 }
-                className={`lg:hidden text-black p-2 px-3 bg-none ${showMenu && 'hidden'} ${loggedIn && 'xs:hidden'}`}> <CiSearch /> </button>
+                className={`lg:hidden text-black p-2 px-3 bg-none ${showMenu && 'hidden'} ${loggedIn || searchValue && !inHomePage && 'xs:hidden'}`}> <CiSearch /> </button>
                 
             </ul>
 
