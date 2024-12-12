@@ -20,6 +20,7 @@ const BlogPost = () => {
     const moveTo = useNavigate();
     useEffect(() => {
         setInHomePage(false);
+
     },[])
     // const {post, myBlogs} = location.state || {};
     useEffect(() => {

@@ -10,7 +10,7 @@ import axios from 'axios';
 
 export default function Navbar({showSearch=true}){
 
-    const {inHomePage,searchValue, setInHomePage, setSearchValue, filteredBlogs, setSearching, setFilteredBlogs, allBlogsGlobally,setAllBlogsGlobally, setOpenUserAccount, openUserAccount, setShowMenu, showMenu, loggedIn, setLoggedIn} = useGlobalContext();
+    const {inHomePage,searchValue, setInHomePage, setSearchValue, filteredBlogs, searching, setSearching, setFilteredBlogs, allBlogsGlobally,setAllBlogsGlobally, setOpenUserAccount, openUserAccount, setShowMenu, showMenu, loggedIn, setLoggedIn} = useGlobalContext();
     
     // console.log("openUserAccount: ", openUserAccount);
     // console.log("showMenu: ", showMenu);
@@ -19,6 +19,7 @@ export default function Navbar({showSearch=true}){
     const size = WindowSize();
     const moveTo = useNavigate();
 
+    
 
     useEffect(() => {
         // setSearching(false);
@@ -26,19 +27,62 @@ export default function Navbar({showSearch=true}){
         console.log("if search Value: ", searchValue)
         console.log("showSearch inside navbar: ", showSearch);
         setInHomePage(showSearch);
-        console.log("search valuee: boolean", searchValue.length>0);
-    }, []);
+        if(!showSearch){
+            setShowMenu(false)
+        }
+    }, [showSearch]);
 
-    const handleSearchChange = (e) => {
-        console.log("handleSearch value: ", e.target.value);
-        const blogSearch = e.target.value;
-        setSearchValue(blogSearch);
+    const handleSearchFocus = (e) => {
+        console.log("focus has been clicked: ");
+        console.log("showmMenu: ", showMenu )
         setSearching(true);
+        
+    }
+    function handleHome(){
+        console.log("Home cliccked: ")
+        setShowMenu(false)
+    }
+    const handleShowCancel = (e) => {
+        e.stopPropagation();
+        if(!inHomePage){
+            setSearching(false)
+        }
+        setShowMenu(!showMenu);
+        // setSearching(false);
+        // setSearchValue('')
+    }
+    function handleSearchBlur(){
+        
+        setSearching(false);
+    }
+    function handleSearchSubmit(e){
+        e.preventDefault();
+        console.log("submit result: ",e.targetValue )
+        const blogSearch = e.target.value;
+        setSearchValue('');
+        setSearching(true);
+        
         const filtered = allBlogsGlobally?.filter(blog => {
             if(blog.title.toString().toLowerCase().includes(blogSearch?.toString().toLowerCase())){
                 return blog;
             }
         })
+        setFilteredBlogs(filtered);
+
+    }
+    const handleSearchChange = (e) => {
+        console.log("handleSearch value: ", e.target.value);
+        
+        const blogSearch = e.target.value;
+        setSearchValue(blogSearch);
+        setSearching(true);
+        
+        const filtered = allBlogsGlobally?.filter(blog => {
+            if(blog.title.toString().toLowerCase().includes(blogSearch?.toString().toLowerCase())){
+                return blog;
+            }
+        })
+        console.log("filtered blogs: ", filtered)
         setFilteredBlogs(filtered);
     } 
 
@@ -72,37 +116,39 @@ export default function Navbar({showSearch=true}){
         return <h1> Loading.. </h1>
     }
     return(
-        <nav className={`flex bg-[#5D62FF]-300 shadow-lg text-white bg-[#FFFFFF] top-0 z-10 items-center fixed w-full justify-between ${showMenu ? 'flex-col pb-[8rem] ' : 'flex'} ${showMenu &&  openUserAccount ?'flex-col fixed': 'relative'}` }> 
+        <nav className={`flex bg-[#5D62FF]-300 shadow-lg text-white bg-[#FFFFFF] top-0 z-10 items-center fixed w-full justify-between ${showMenu ? 'flex-col pb-[8rem] ' : 'flex'} ${showMenu &&  openUserAccount ?'flex-col fixed': 'relative'} ${showMenu && searching && 'flex-col pb-[1rem]'}` }> 
            {console.log("inHomePage inside navbar DOM: ", inHomePage)}
             <div className={`pl-12 pb-4 md:hidden text-black text-xl `}>
-                <button onClick={() => setShowMenu(!showMenu)} className="border border-red-200 p-2 mt-2"> {showMenu ?  <FaTimes /> : <FaBars />}</button>
+                <button onMouseDown={(e) => handleShowCancel(e)} className="border border-red-200 p-2 mt-2 hover:bg-gray-200"> {showMenu ?  <FaTimes /> : <FaBars />}</button>
                     
             </div> 
-            <div className={` ${showMenu ? 'flex-grow ': 'hidden'}`}>
+            <div className={` ${showMenu ? 'flex-grow ': 'hidden'} ${!inHomePage && 'xs:hidden'}`}>
                 <input type="search" 
                     id="search" 
                     value={searchValue}
                     onChange={handleSearchChange}
+                    onFocus={handleSearchFocus}
+                    onBlur={handleSearchBlur}
                     placeholder='Search Dream Blog' 
                     className='text-black pb-1 bg-white border border-green-300 rounded'/>
             </div>
            
-            <ul className={`md:flex mb-2 ml-10 mt-2 w-1/3 ${showMenu ? 'flex flex-col items-start mt-2 ': 'hidden'}`}>
+            <ul className={`md:flex mb-2 ml-10 mt-2 w-1/3 ${showMenu ? 'flex flex-col items-start mt-2 ': 'hidden'} ${showMenu && searching && 'hidden'}`}>
                 <li className=" flex">
-                   <Link to={'/'} className='px-2 ml-3 pointer py-2 bg-green-300 hover:bg-green-200 md:w-auto w-24 mb-2'>Home</Link>   
+                   <Link to={'/'} onClick={handleHome} className='px-2 ml-3 pointer py-2 bg-green-300 hover:bg-green-200 md:w-auto w-24 mb-2'>Home</Link>   
                 </li>
                 <li className=" flex">
-                   <Link to={'/about'} className='px-2 ml-3 pointer py-2 bg-green-300 hover:bg-green-200 md:w-auto w-24 mb-2'>About</Link>   
-                </li>
-                <li className=" flex">
-                   <button onClick={handleWriteClick} className='px-2 ml-3 pointer text-blue-600 py-2 bg-green-300 hover:bg-green-200 md:w-auto w-24 mb-2'>Write</button>   
+                   <Link to={'/about'} className='px-2 ml-3 pointer py-2 bg-green-300 hover:bg-green-200 md:w-auto w-24 mb-2'>About</Link>
+                   </li>
+                <li className="flex">
+                   <li onClick={handleWriteClick} className='px-2 ml-3 pointer text-blue-600 py-2 bg-green-300 hover:bg-green-200 md:w-auto w-24 mb-2'>Write</li>   
                 </li>
                 <li className=" flex">
                    <Link to={'/content'} className='px-2 ml-3 pointer py-2 bg-green-300 hover:bg-green-200 md:w-auto w-24 mb-2'>Content</Link>   
                 </li>
             </ul>
             
-            <ul className={`md:flex mb-2 ml-5 w-1/3 md:w-1/4 ${showMenu ? 'flex-col ': 'hidden'}`}>
+            <ul className={`md:flex mb-2 ml-5 w-1/3 md:w-1/4 ${showMenu ? 'flex-col ': 'hidden'} ${showMenu && searching && 'hidden'}`}>
                 <li className="px-2 ml-3 py-2 " ><a href=""><FaFacebook /> </a></li>
                 <li className="px-2 ml-3 py-2" ><a href=""><FaTwitter /> </a></li>
                 <li className="px-2 ml-3 py-2" ><a href=""><FaPinterest /> </a></li>
@@ -110,14 +156,15 @@ export default function Navbar({showSearch=true}){
             </ul>
 
             <ul className={`md:flex mb-2 w-1/3 md:text-sm ${showMenu ? 'flex': 'hidden'} ${!loggedIn && 'md:text-xl ml-12 xs:flex'}`}>
-                <li className={`${searchClicked || loggedIn || searchValue && inHomePage? 'hidden': 'none'} `}><Link to={"/login"} className='px-2 py-2 hover:text-gray-300'> Login </Link></li>
-                <li className={` ${searchClicked || loggedIn || searchValue && inHomePage? 'hidden': 'none'} `} ><Link to={"/registerUser"} className='px-2 py-2 hover:text-gray-300'> Register </Link></li>
+                <li className={`${searchClicked && !showMenu || loggedIn || searchValue && inHomePage? 'hidden': 'none'} ${!loggedIn && searchValue ? 'md:block' : 'none'} `}><Link to={"/login"} className='px-2 py-2 hover:text-gray-300'> Login </Link></li>
+                <li className={` ${searchClicked && !showMenu || loggedIn || searchValue && inHomePage? 'hidden': 'none'} ${!loggedIn && searchValue ? 'md:block' : 'none'}`} ><Link to={"/registerUser"} className='px-2 py-2 hover:text-gray-300'> Register </Link></li>
 
-                <div className={`mt-2 lg:block ${searchValue.length>0 && 'block'} ${searchValue.length>0 || loggedIn && !showMenu ? 'xs:block' : 'xs:hidden'} ${showMenu || !inHomePage ? 'xs:hidden': 'block'}`}>
+                <div className={`mt-2 lg:block ${!searchValue && 'hidden'} ${searchClicked ? 'block' : 'none'} ${searchClicked || searchValue.length>0 || loggedIn && !showMenu ? 'xs:block' : 'xs:hidden'} ${showMenu || !inHomePage ? 'xs:hidden lg:hidden': 'block'} `}>
                     <input type="search" 
                     id="search" 
                     placeholder='Search Blog' 
                     onChange={handleSearchChange}
+                    onSubmit={handleSearchSubmit}
                     value={searchValue}
                     className='text-black w-28 pb-1 bg-white border border-green-300 rounded'/>
                 </div>
@@ -126,7 +173,7 @@ export default function Navbar({showSearch=true}){
                     setSearchValue('');
                     setSearchClicked(!searchClicked)}
                 }
-                className={`lg:hidden text-black p-2 px-3 bg-none ${showMenu && 'hidden'} ${loggedIn || searchValue && !inHomePage && 'xs:hidden'}`}> <CiSearch /> </button>
+                className={`lg:hidden text-black p-2 px-3 bg-none ${showMenu && 'hidden'} ${searchValue && !inHomePage && 'xs:hidden'} ${loggedIn || !inHomePage && 'hidden'}`}> <CiSearch /> </button>
                 
             </ul>
 

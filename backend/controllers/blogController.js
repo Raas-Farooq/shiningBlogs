@@ -49,7 +49,7 @@ const registerUser = async (req,res) => {
            delete newUserObject.password;
             jwt.sign({user: {userId:newUserObject._id}}, 
             process.env.JWT_SECRET, 
-            {expiresIn:'1m'},
+            {expiresIn:'5m'},
             (err,token) => {
                 if(err){
                     return res.status(500).json({
@@ -271,7 +271,7 @@ const logging =  async(req,res) => {
         jwt.sign(
             ({user:{userId:user._id}}), 
             process.env.JWT_SECRET,
-             {expiresIn: '1m'}
+             {expiresIn: '5m'}
              , (err, token) => {
                 if(err){
                     return res.status(500).json({
@@ -474,9 +474,7 @@ const deleteBlog = async(req, res) => {
     console.log("delId: ", delId , " userId Authorization: ", userId);
 
     try{
-        // console.log("All Blogs inside delete: ",your_blogs);
-        // const your_blogs = await Blog.find({});
-        // console.log("All Blogs inside delete: ",your_blogs);
+    
         const delBlog = await Blog.findById(delId);
         console.log("delBlog after using findById: ", delBlog);
         if(delBlog.userId.toString() !== userId){

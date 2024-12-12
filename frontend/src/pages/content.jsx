@@ -5,7 +5,7 @@ import { useGlobalContext } from "../globalContext/globalContext";
 
 
 export default function Content() {
-    const {setInHomePage} = useGlobalContext();
+    const {setInHomePage, setShowMenu} = useGlobalContext();
     const moveTo= useNavigate();
     useEffect(() => {
         console.log("Content useEffect ran");
@@ -16,6 +16,9 @@ export default function Content() {
 
     }, [])
 
+    function handleHome(){
+        setShowMenu(false)
+    }
     return(
         <div className="page-content">
             <h1> I am Content </h1> 
@@ -23,7 +26,7 @@ export default function Content() {
             <div>
                 <button className="text-blue-500" onClick={() => moveTo(-1)}> Back </button>
             </div>
-            <button><Link to={'/'} className=''> Back To Home</Link></button>
+            <button><Link to={'/'} onClick={handleHome} className=''> Back To Home</Link></button>
         </div>
     )
 } 

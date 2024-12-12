@@ -9,7 +9,7 @@ import { Link, useNavigate } from "react-router-dom";
 
 export default function BlogContent(){
 
-    const {setSearchValue,filteredBlogs,searching, setSearching,loggedIn, currentUser,allBlogsGlobally,setAllBlogsGlobally, setCurrentUser,imagePreview} = useGlobalContext()
+    const {inHomePage, searchValue, setFilteredBlogs, setSearchValue,filteredBlogs,searching, setSearching,loggedIn, currentUser,allBlogsGlobally,setAllBlogsGlobally, setCurrentUser,imagePreview} = useGlobalContext()
     const [loading, setLoading] = useState(true); 
     let   [slicedTitle, setSlicedTitle] = useState({});
     const [profileImage, setProfileImage] = useState('');
@@ -17,6 +17,7 @@ export default function BlogContent(){
     const navigateTo = useNavigate();
     let showBlogsResult;
     useEffect(() => {
+        
         if(currentUser?.profileImg){
             console.log("What exactly the current User: ", currentUser);
             const myImage = `http://localhost:4100/${currentUser.profileImg}`;
@@ -35,7 +36,7 @@ export default function BlogContent(){
      }, []);
 
     useEffect(() => {
-        // let titleReceived = reduceTitle();
+
         console.log("searching blogContent: ",searching );
         // setSlicedTitle(titleReceived);
         clearLocalStorage();
@@ -61,26 +62,30 @@ export default function BlogContent(){
     function handleRefresh(e){
         e.preventDefault();
         setSearching(false);
+        setFilteredBlogs([])
         setSearchValue('');
     }
-    const handlePostClick = (post) => {
+    const handlePostClick = (e,post) => {
+        e.stopPropagation();
        navigateTo(`/BlogPost/:${post._id}`, {state:{post, myBlogs:myBlogs} })
     }
+  
     if(loading) return <h2 className="text-2xl font-medium"> Loading Blogs...</h2>
     return (
         <div data-component="AllBlogsParent" className=" flex xs:flex-col sm:flex-row" >
             {!allBlogsGlobally ? <h1> Please Wait..</h1> :
             (
                 <div className="blogsContainer xs:w-[95vw] w-[70vw] text-center m-10">
+                    {console.log("filteredBlogs inside bllogcontent DOM: ", filteredBlogs, "search VAlue: ", searchValue)}
                     <button onClick={handleRefresh} className="text-green-600 text-lg shadow-xl p-2">Load All</button>
                     <div data-component="bottomBlogsContainer" className="flex flex-wrap gap-5 text-center justify-center">
-                    {!searching ? allBlogsGlobally?.map((blog,index) => 
+                    {!searchValue && !filteredBlogs.length ? allBlogsGlobally?.map((blog,index) => 
                         {
                             return (
                                 <div key={index} 
                                 id={blog._id}
                                 className="flex flex-col shadow-lg p-4 cursor-pointer text-center" 
-                                onClick={(e) =>handlePostClick(blog)}
+                                onMouseDown={(e) => handlePostClick(e,blog)}
                                 >
                                     <h2 className="text-center xs:text-xs sm:text-sm font-medium"> <Title title={blog.title}  /></h2>
                                     <PostImage postImg={blog.titleImage} title={blog.title} />
@@ -93,8 +98,8 @@ export default function BlogContent(){
                             return (
                                 <div key={index} 
                                 id={blog._id}
-                                className="flex flex-col shadow-lg p-4 cursor-pointer text-center" 
-                                onClick={(e) =>handlePostClick(blog)}
+                                className="flex flex-col shadow-lg p-4 cursor-pointer text-center" s
+                                onMouseDown={(e) =>handlePostClick(e, blog)}
                                 >
                                     <h2 className="text-center xs:text-xs sm:text-sm font-medium"> <Title title={blog.title}  /></h2>
                                     <PostImage postImg={blog.titleImage} title={blog.title} />
