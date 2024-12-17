@@ -138,6 +138,7 @@ const BlogPost = () => {
                         </div>
                     </div>
                     <div className={`text-center mb-4 ${loggedIn ? 'w-full': 'w-4/5' } `}>
+                        <button onClick={() => moveTo(-1)} className="bg-red-400 p-2 m-2  "> Back </button>
                         <button onClick={() => moveTo('/')} className="bg-red-400 p-2"> Back To Home </button>
                     </div>
                 </div>

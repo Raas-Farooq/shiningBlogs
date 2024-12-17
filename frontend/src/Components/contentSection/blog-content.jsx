@@ -24,7 +24,9 @@ export default function BlogContent(){
             console.log("myImage received in blogContent: ", myImage);
             setProfileImage(myImage);
         }
-        
+        if(!allBlogsGlobally){
+            setLoading(true)
+        }
 
     }, [])
     
@@ -44,9 +46,9 @@ export default function BlogContent(){
 
             try{
                 const response = await axios.get('http://localhost:4100/weblog/allBlogs');
-           
                 setAllBlogsGlobally(response.data.blogs)
                 if(response.data){
+                    
                     setLoading(false);
                 }
             }catch(err){
@@ -76,7 +78,7 @@ export default function BlogContent(){
             {!allBlogsGlobally ? <h1> Please Wait..</h1> :
             (
                 <div className="blogsContainer xs:w-[95vw] w-[70vw] text-center m-10">
-                    {console.log("filteredBlogs inside bllogcontent DOM: ", filteredBlogs, "search VAlue: ", searchValue)}
+                    {console.log("filteredBlogs inside bllogcontent DOM: ", filteredBlogs, "search VAlue: ", searchValue + "AllblogsGlobally: ")}
                     <button onClick={handleRefresh} className="text-green-600 text-lg shadow-xl p-2">Load All</button>
                     <div data-component="bottomBlogsContainer" className="flex flex-wrap gap-5 text-center justify-center">
                     {!searchValue && !filteredBlogs.length ? allBlogsGlobally?.map((blog,index) => 

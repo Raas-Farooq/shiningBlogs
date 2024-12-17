@@ -49,7 +49,7 @@ const registerUser = async (req,res) => {
            delete newUserObject.password;
             jwt.sign({user: {userId:newUserObject._id}}, 
             process.env.JWT_SECRET, 
-            {expiresIn:'5m'},
+            {expiresIn:'1h'},
             (err,token) => {
                 if(err){
                     return res.status(500).json({
@@ -271,7 +271,7 @@ const logging =  async(req,res) => {
         jwt.sign(
             ({user:{userId:user._id}}), 
             process.env.JWT_SECRET,
-             {expiresIn: '5m'}
+             {expiresIn: '1h'}
              , (err, token) => {
                 if(err){
                     return res.status(500).json({
@@ -313,7 +313,7 @@ const addBlog = async (req,res) => {
     if(!errors.isEmpty()){
         return res.status(400).json({
             success:false,
-            message:"Got validation Errors",
+            message:"errors came during validation",
             error: errors.array()
         })
     }
@@ -663,6 +663,34 @@ const canEditBlog = async(req,res) => {
     }
 
 }
+const getMyContent = async(req,res) => {
+    console.log("get My Content is Catching Pace MiddleWare userId", req.user.userId)
+    const id = req.params.id;
+    console.log("Id inside MyBontent: ", id);
+    try{
+        const yourBlogs = await Blog.find({userId:id});
+        console.log("your Blogs: ", yourBlogs);
+        if(!yourBlogs || yourBlogs.length === 0){
+            return res.status(404).json({
+                success:false,
+                message:"You don't have Content"
+            })
+        }
+
+        return res.status(200).json({
+            success:true,
+            message:"your content found successfully",
+            yourBlogs
+        })
+    }catch(err){
+        return res.status(500).json({
+            success:false,
+            message:"Server error while accessing your Posts",
+            error: err.message
+        })
+    }
+}
+
 const logout = (req,res) => {
     res.clearCookie('token');
     return res.status(200).json({
@@ -671,6 +699,6 @@ const logout = (req,res) => {
     })
 }
 
-export {current, registerUser, logging, allBlogs,addBlog, updateBlogPost, deleteBlog, updateUserProfile, getBlogPost, allUsers, getUser, logout, canEditBlog}
+export {current, registerUser, logging, getMyContent,allBlogs,addBlog, updateBlogPost, deleteBlog, updateUserProfile, getBlogPost, allUsers, getUser, logout, canEditBlog}
 
 // privilege few are made

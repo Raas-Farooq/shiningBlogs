@@ -19,7 +19,23 @@ const Register = () => {
         const emailTest = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
         return emailTest.test(email_text);
     } 
-
+    function outer() {
+        let count = 0; // Outer variable
+      
+        function inner() {
+          count++; // Accesses outer variable
+          console.log(count);
+        }
+      
+        return inner;
+      }
+      
+    const counter = outer();
+    
+    counter();
+    counter();
+    counter();
+    counter();
     useEffect(() => {
         if(loggedIn){
             navigateTo("/")
@@ -86,11 +102,7 @@ const Register = () => {
     
                 setTimeout(() => {
                     setConfirmMessage("");
-                }, 3000)
-                
-                
-                
-                
+                }, 3000)     
             }catch (err) {
                 // console.log("err.: ", err.response.data.message);
                 if (err.response) {
@@ -128,15 +140,14 @@ const Register = () => {
     }
     
     return (
-        <div className="mt-16 flex justify-center">
-            {console.log("server Errors inside return: ", errors)}
-                <div>
-                    <h1> Create New Account</h1>
-                    <form className="flex flex-col p-5" method="post" >
+        <div className="flex justify-center items-center min-h-screen w-screen bg-gray-50">
+                <section className="w-full mx-w-md px-6 py-12 bg-white">
+                    <h1 className="text-pink-600 text-center"> Create New Account</h1>
+                    <form className="flex flex-col p-5 justify-center items-center " method="post" >
                         
                         <input type="input" 
                         name="input" 
-                        className={`border border-gray-300 w-[25vw] p-2 m-5 ${errors.username && 'border border-red-400'}`} 
+                        className={`border border-gray-300 placeholder-gray-500 p-2 m-5 rounded-md ${errors.username && 'border border-red-400'}`} 
                         placeholder="Enter New Username" 
                         onChange={(e) => setUsername(e.target.value)}
                         value={username}
@@ -145,7 +156,7 @@ const Register = () => {
                         {errors.username && <p className="ml-5 text-red-500"> {errors.username}!</p>}
 
                         <input type="email" id="email" placeholder="Enter Your Email"
-                        className={`border border-gray-300 w-[25vw] p-2 m-5 ${errors.email && 'border border-red-400'}`}
+                        className={`border border-gray-300 p-2 m-5 rounded-lg ${errors.email && 'border border-red-400'}`}
                         onChange={(e) => setEmail(e.target.value)}
                         value={email}
                         />
@@ -154,21 +165,21 @@ const Register = () => {
 
                         <input type="password" 
                         name="password" 
-                        className={`border border-gray-300 w-[25vw] p-2 m-5 ${errors.password && 'border border-red-400'}`}
+                        className={`border border-gray-300 p-2 m-5 rounded-lg ${errors.password && 'border border-red-400'}`}
                         placeholder="Enter New Password" 
                         onChange={(e) => setPassword(e.target.value)}
                         value={password}
                         />
                         {errors.password && errors  ? <p className="ml-5 text-red-500"> {errors.password}!</p> : ''}
                       
-                        <button type="submit" onClick={handleSubmit} className="border border-gray-300 w-[15vw] p-2 m-5 bg-red-400 hover:bg-red-300 ">Create Account</button>
+                        <button type="submit" onClick={handleSubmit} className="border border-gray-300 p-2 m-5 bg-red-400 hover:bg-red-500 rounded-xl">Create Account</button>
                         {confirmMessage && <p className="text-green-600 text-lg"> {confirmMessage}</p>}
                     </form>
 
-                    <button><Link 
-                    className="bg-green-400 border p-3 ml-8 hover:bg-green-300"
+                    <button className="bg-white"><Link 
+                    className="text-gray-400 p-3 ml-8 hover:text-gray-900 hover:underline"
                     to="/">Go Back </Link></button>
-                </div>
+                </section>
             {/* )} */}
             
         </div>

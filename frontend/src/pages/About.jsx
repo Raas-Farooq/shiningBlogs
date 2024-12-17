@@ -1,73 +1,82 @@
-import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
+import { FaFacebook, FaTwitter, FaPinterest, FaWhatsapp } from "react-icons/fa";
 import { useGlobalContext } from "../globalContext/globalContext";
 
 export default function About() {
-  const { setShowMenu } = useGlobalContext();
-  const [shortText, setShortText] = useState("");
-  const { setInHomePage } = useGlobalContext();
-  const moveTo = useNavigate();
+  const { setShowMenu, setInHomePage } = useGlobalContext();
+
+  useEffect(() => {
+    setInHomePage(false); // Set state to indicate we're not on the homepage
+  }, []);
+
   function handleHome() {
     setShowMenu(false);
   }
-  function smallText(text) {
-    console.log("smallText Function Runs");
-    const joined = text.split(" ");
-
-    const short = joined.slice(0, 3);
-    setShortText(short);
-    console.log("short Text inside funtion: ", shortText);
-  }
-  var isSquare = function (n) {
-    let res = 0;
-    const num = Math.abs(n);
-    console.log("num: ", num);
-    console.log("is square running", n);
-    console.log("logic Test: orgbak ", n === 0);
-    if (num === 0) {
-      console.log("zero condition run");
-      res = 1;
-    } else {
-      for (let i = 0; i < num; i++) {
-        if (i * i === num) {
-          res = 1;
-        }
-      }
-    }
-    console.log("res value: ", res);
-    if (res === 1) {
-      console.log("Yes thhis is the square");
-    } else {
-      console.log("This is not a perfect squre ");
-    }
-  };
-  isSquare(26);
-  useEffect(() => {
-    setInHomePage(false);
-  }, []);
 
   return (
-    <div className="page-content">
-      <h1> I am ABout </h1>
-      <h2>
-        {" "}
-        I know Believing in Allah(SWT) and Being Patient Make you a Way More
-        Stronger Than you Think
-      </h2>
-      {/* {smallText('Fly over the Arizona')} */}
-      <div>
-        <button className="text-blue-500" onClick={() => moveTo(-1)}>
-          {" "}
-          Back{" "}
-        </button>
-      </div>
-      <button>
-        <Link to={"/"} onClick={handleHome} className="">
-          {" "}
-          Back To Home
-        </Link>
-      </button>
+    <div className="page-content bg-gray-50 min-h-screen">
+      {/* About Section */}
+      <section className="container mx-auto px-6 py-12">
+        <h1 className="text-4xl font-bold text-pink-600 text-center mb-8">About Us</h1>
+        <div className="text-gray-700 leading-relaxed text-lg text-center max-w-4xl mx-auto font-serif">
+          <p className="mb-4">
+            In this era of technological revolution, innovation and the quest for knowledge demand 
+            that we share our expertise, skills, and invaluable lessons with the world. This platform 
+            empowers you to share and gain knowledge with the best minds globally.
+          </p>
+          <p>
+            Unlock access to precious knowledge that awakens curiosity and inspires positive change. 
+            Together, we can brighten the light of learning and dispel the darkness of ignorance.
+          </p>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="bg-slate-900 text-gray-300 py-6">
+        <div className="container mx-auto px-6 flex flex-col md:flex-row justify-between items-center">
+          <div>
+            <p className="text-lg font-semibold mb-2 md:mb-0">Islamabad, Pakistan</p>
+          </div>
+          <ul className="flex space-x-6">
+            <li>
+              <a
+                href="#"
+                aria-label="Facebook"
+                className="hover:text-blue-600 transition-colors duration-300"
+              >
+                <FaFacebook size={24} />
+              </a>
+            </li>
+            <li>
+              <a
+                href="#"
+                aria-label="Twitter"
+                className="hover:text-blue-400 transition-colors duration-300"
+              >
+                <FaTwitter size={24} />
+              </a>
+            </li>
+            <li>
+              <a
+                href="#"
+                aria-label="Pinterest"
+                className="hover:text-red-400 transition-colors duration-300"
+              >
+                <FaPinterest size={24} />
+              </a>
+            </li>
+            <li>
+              <a
+                href="#"
+                aria-label="WhatsApp"
+                className="hover:text-green-400 transition-colors duration-300"
+              >
+                <FaWhatsapp size={24} />
+              </a>
+            </li>
+          </ul>
+        </div>
+      </footer>
     </div>
   );
 }

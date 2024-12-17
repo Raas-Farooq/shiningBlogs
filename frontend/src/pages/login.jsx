@@ -1,10 +1,8 @@
 import { useEffect, useState } from "react";
 import { useGlobalContext } from "../globalContext/globalContext";
 import { Link, useNavigate } from "react-router-dom";
-import { FaImage } from "react-icons/fa";
-import { set } from "mongoose";
 import axios from "axios";
-
+import { FaSpinner } from "react-icons/fa";
 const Login = () => {
 
     const {setIsAuthenticated,setCurrentUser, setLoggedIn, imagePreview, setImagePreview} = useGlobalContext();
@@ -50,128 +48,125 @@ const Login = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setLoading(true);
+        
         const validationErrors = handleValidation();
         if(Object.keys(validationErrors).length > 0){
             console.log("Got validation errors ")
             setErrors(validationErrors);
             return; 
         }
-        else{
-            setErrors({});
-            console.log(`before sending login data ; email: ${email}, password: ${password}`)
+        setLoading(true);
+        try{
             const loginData = {
                 email,
                 password
             }
+            const login_response = await axios.post(`http://localhost:4100/weblog/userLogin`,
+            loginData,
+            {
+                withCredentials:true
+            });
+
             
-            try{
-                const login_response = await axios.post(`http://localhost:4100/weblog/userLogin`,
-                loginData,
-                {
-                    withCredentials:true
-                });
-
-                  if(login_response){
-                    console.log("if condition runs true");
-                    setLoading(false);
-                  }
-                setCurrentUser(login_response.data.user);
-                const userId = login_response.data.user._id;
-                localStorage.setItem('userId', userId);
-                const user = login_response.data.user;
-                let imgPreview= '';
-                if (user.profileImg && user.profileImg.data) {
-                    const base64String = btoa(
-                        new Uint8Array(user.profileImg.data.data)
-                            .reduce((data, byte) => data + String.fromCharCode(byte), '')
-                    );
-                    imgPreview = `data:${user.profileImg.contentType};base64,${base64String}`;
-                }
-                setImagePreview(imgPreview);
-
-                console.log("img Preview inside login: ", imagePreview);
-                
-                setIsAuthenticated(true);
-                setEmail('');
-                setPassword('');
-                navigate('/');
-                setLoggedIn(true);
-               
+            const userId = login_response.data.user._id;
+            localStorage.setItem('userId', userId);
+            const user = login_response.data.user;
+            let imgPreview= '';
+            if (user.profileImg && user.profileImg.data) {
+                const base64String = btoa(
+                    new Uint8Array(user.profileImg.data.data)
+                        .reduce((data, byte) => data + String.fromCharCode(byte), '')
+                );
+                imgPreview = `data:${user.profileImg.contentType};base64,${base64String}`;
             }
-            catch(err){
-                // console.log("err while Login: ", err.response.data.message);
-                setLoading(false);
-                if(err.response){
-                    if(err.response.data && err.response.data.error){
-                       const serverErr = err.response.data.errors.reduce((acc, curr) => {
-                            acc[curr.param ] = curr.msg;
-                            return acc;
-                        }, {});
-                        setErrors(serverErr)
-                    }
-                    else if(err.response.data && err.response.data.message){
-                        setErrors({general:err.response.data.message})
-                    }else {
-                        
-                        setErrors({ general: "An error occurred. Please try again." });
-                    }
-                    
-                }
-                else if(err.request){
-                    setErrors({general:"No response from the server. Try Again later!"})
-                }
-                else{
-                    console.log("err inside else: ", err);
-                    setErrors({general:"An Error occurred. Try anytime Soon!"})
-                }
-            }   
+            setImagePreview(imgPreview);
+            setCurrentUser(login_response.data.user);
+            console.log("img Preview inside login: ", imagePreview);
+            
+            setIsAuthenticated(true);
+            setEmail('');
+            setPassword('');
+            navigate('/');
+            setLoggedIn(true);
             
         }
- 
+        catch(err){
+            const errorMsg =
+            err.response?.data?.message || "An error occurred. Please try again.";
+            setErrors({ general: errorMsg });
+            } 
+            finally{
+                setLoading(false)
+            }  
         // one how to check the object is it empty or contains
         // second you can also setErrors first then check from the errors lengt
     }
     
-    if(loading) return <h1> Please Wait..</h1>
+    // if(loading) return <h1> Please Wait..</h1>
     return (
-
-
-        <div className="mt-16 flex justify-center">
+        <div className="flex items-center justify-center min-h-screen w-screen bg-gray-50">
            
-                <div>
-                    <h1> Login Here</h1>
-                    <form className="flex flex-col p-5" method="post" >
-                        
-                        <input type="email" id="email" placeholder="Enter Your Email"
-                        className="border border-gray-300 w-[25vw] p-2 m-5"
-                        onChange={(e) => setEmail(e.target.value)}
-                        value={email}
+                <section className="w-full mx-w-md p-6 bg-white rounded-lg shadow-lg">
+                    <h1 className="text-3xl text-pink-600 font-bold text-center mb-8"> Login Here</h1>
+                    {loading && (
+                    <div className="text-center mb-4">
+                        <FaSpinner className="animate-spin inline mr-2" /> Please wait...
+                    </div>
+                    )}
+                    <form className="space-y-6 flex justify-center items-center" method="post" >
+                        <div className="flex flex-col gap-5 max-w-3xl">
+                            <input type="email" id="email" placeholder="Enter Your Email"
+                            className="border rounded-lg border-gray-300 px-4 py-2 focus-pink focus-ring-400"
+                            onChange={(e) => {setEmail(e.target.value)
+                                setErrors('')
+                            }}
+                            aria-label="Email"
+                            value={email}
 
-                        />
-                        {errors.email && <p className="ml-5 text-red-500"> {errors.email}!</p>}
-                        <input type="password" 
-                        name="password" 
-                        className="border border-gray-300 w-[25vw] p-2 m-5" 
-                        placeholder="Enter New Password" 
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        />
-                            {errors.password && <p className="ml-5 text-red-500"> {errors.password}!</p>}
-                            {errors.general && <p className="ml-5 text-red-500"> {errors.general}!</p>}
-                        <button type="submit" onClick={handleSubmit} className="border border-gray-300 w-[15vw] p-2 m-5 bg-red-400 hover:bg-red-300 ">Login</button>
-                        {message && <p> {message} </p>}
-                        
+                            />
+                            {errors.email && <p className="font-serif text-lg ml-5 text-red-500"> {errors.email}!</p>}
+                            <input type="password" 
+                            name="password" 
+                            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-400" 
+                            placeholder="Enter New Password"
+                            aria-label="Password" 
+                            value={password}
+                            onChange={(e) => {setPassword(e.target.value)
+                                setErrors('')
+                            }}
+                            />
+                                {errors.password && <p className="text-sm text-red-500"> {errors.password}!</p>}
+                                {errors.general && <p className="ml-5 text-red-500"> {errors.general}!</p>}
+                            <button type="submit" onClick={handleSubmit} 
+                            aria-label="Submit" 
+                            className="border transition-colors duration-300 text-lg border-gray-300 p-4 m-5 bg-red-400 rounded-2xl">
+                                Login
+                            </button>
+                            {message && <p> {message} </p>}
+                        </div>
                     </form>
-                    <h3 className="mb-5"> Do not have Account ?</h3>
-                    <button ><Link 
-                    className="bg-green-400 border p-3 ml-8"
-                    to="/registerUser">Register Here </Link></button>
-                    <button className="bg-green-400 border p-3 ml-8 text-blue-600" onClick={() => navigate(-1)}> Back </button>
-                    <button ><Link 
-                    className="bg-green-400 border p-3 ml-8"
-                    to="/">Back To Home</Link></button>
-                </div>
+                    <div className="text-center ">
+                        <p className="mb-5"> Do not have Account ?</p>
+                        <Link 
+                        className="border p-3 hover:underline rounded-xl"
+                        to="/registerUser">Register Here </Link>
+                        <div className="flex justify-center space-x-4 mt-4">
+                            <button
+                            onClick={() => navigate(-1)}
+                            className="text-sm text-gray-600 hover:text-gray-900"
+                            >
+                            Back
+                            </button>
+                            <Link
+                            to="/"
+                            className="text-sm text-gray-700 hover:text-gray-900"
+                            >
+                            Back to Home
+                            </Link>
+                        </div>
+                    </div>
+                    
+                </section>
             {/* )} */}
             
         </div>

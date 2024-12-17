@@ -42,7 +42,7 @@ export const GlobalState = ({children}) => {
     const userAuthentication = async () => {
         try {
             const response = await axios.get('http://localhost:4100/weblog/checkAuthen', {withCredentials: true});
-            console.log("response of auth inside globaL :", response);
+            console.log("USer AUTHENTICATIION GLobal Context :", response);
             const token = response.data.token;
             if(isTokenExpired(token)){
                 console.log("Token expred.. logging OUt");
@@ -70,6 +70,7 @@ export const GlobalState = ({children}) => {
             console.error("Authentication error:", err);
             setCurrentUser(null);
             setLoggedIn(false);
+            localStorage.removeItem('userId');
 
         } finally {
             setLoading(false);

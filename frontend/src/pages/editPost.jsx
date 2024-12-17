@@ -123,7 +123,9 @@ const EditPost = () => {
   });
 
   useEffect(() => {
+    console.log("post Id EditPost newly UseEffect: ", postId);
     async function getPost() {
+      
      if(!postId){
         setLoading(false);
         return;

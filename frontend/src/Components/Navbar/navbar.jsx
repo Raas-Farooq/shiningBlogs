@@ -32,9 +32,22 @@ export default function Navbar({showSearch=true}){
         }
     }, [showSearch]);
 
+    useEffect(() => {
+        if(size.width > 768){
+            console.log("logeed In inside navbar: ", loggedIn);
+            setShowMenu(false);
+            if(searchValue.length>0){
+                setSearchClicked(true)
+            }else{
+                setSearchClicked(false)
+            }
+            
+        }
+    }, [size.width, loggedIn])
+
     const handleSearchFocus = (e) => {
         console.log("focus has been clicked: ");
-        console.log("showmMenu: ", showMenu )
+        console.log("showmMenu: ", showMenu);
         setSearching(true);
         
     }
@@ -86,22 +99,12 @@ export default function Navbar({showSearch=true}){
         setFilteredBlogs(filtered);
     } 
 
-    useEffect(() => {
-        if(size.width > 768){
-            console.log("logeed In inside navbar: ", loggedIn);
-            setShowMenu(false);
-            if(searchValue.length>0){
-                setSearchClicked(true)
-            }else{
-                setSearchClicked(false)
-            }
-            
-        }
-    }, [size.width, loggedIn])
+    
 
     const handleWriteClick = (e) => {
         e.preventDefault();
-
+        console.log("you have entered the custody of new Post")
+        console.log("you clicked the Write Button", loggedIn)
         if(!loggedIn){
             const confirmMessage= window.confirm("You are Not Logged In! Logged In and create a blog");
             if(confirmMessage){
@@ -112,6 +115,18 @@ export default function Navbar({showSearch=true}){
             moveTo('/write')
         }
     }
+    const handleContentClick = () => 
+        {
+            if(!loggedIn){
+                const moveToLoggin = window.confirm("You Should Login If You want to see Your Content");
+                if(moveToLoggin){
+                    moveTo('/Login')
+                }
+
+            }else{
+                moveTo('/content')
+            }
+        }
     if(loading){
         return <h1> Loading.. </h1>
     }
@@ -141,10 +156,10 @@ export default function Navbar({showSearch=true}){
                    <Link to={'/about'} className='px-2 ml-3 pointer py-2 bg-green-300 hover:bg-green-200 md:w-auto w-24 mb-2'>About</Link>
                    </li>
                 <li className="flex">
-                   <li onClick={handleWriteClick} className='px-2 ml-3 pointer text-blue-600 py-2 bg-green-300 hover:bg-green-200 md:w-auto w-24 mb-2'>Write</li>   
+                   <span onClick={handleWriteClick} className='cursor-pointer px-2 ml-3 pointer text-blue-600 py-2 bg-green-300 hover:bg-green-200 md:w-auto w-24 mb-2'>Write</span>   
                 </li>
                 <li className=" flex">
-                   <Link to={'/content'} className='px-2 ml-3 pointer py-2 bg-green-300 hover:bg-green-200 md:w-auto w-24 mb-2'>Content</Link>   
+                   <span onClick={handleContentClick} className='px-2 ml-3 md:text-[13px] sm:text-[12px] cursor-pointer py-2 bg-green-300 text-blue-600 hover:bg-green-200 md:w-auto w-32 mb-2'>My Content</span>   
                 </li>
             </ul>
             
