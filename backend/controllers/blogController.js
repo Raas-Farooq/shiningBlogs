@@ -230,8 +230,6 @@ const updateUserProfile = async (req, res) => {
 const logging =  async(req,res) => {
     //checking Result of Validation
     const {email, password}= req.body;
-    console.log("Login RUns");
-    console.log(`Received email ${email} and password ${password} backend`);
     const loginErrors = validationResult(req);
     if(!loginErrors.isEmpty()){
         return res.status(400).json({
@@ -350,13 +348,13 @@ const addBlog = async (req,res) => {
         }
         return res.status(201).json({
             success:true,
-            message:"BlogPost has been Created successfuly"
+            message:"BlogPost Created successfuly"
         })
     }
     catch(err){
         return res.status(500).json({
             success:false,
-            message:"Server responded with Errror",
+            message:"Server Error",
             error:err.message
         })
     }

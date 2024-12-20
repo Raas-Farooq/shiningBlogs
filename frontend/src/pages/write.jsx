@@ -236,11 +236,13 @@ export default function Write() {
   };
 
   if (loadingErr) return <h1> Processing </h1>;
+  // also ask about 'max-w-md mx-auto'
 
   return (
-    <div className="bg-gray-50">
-      <div className="bg-white shadow-md rounded:lg px-3 py-4">
-        <form method="post" className="ml-5 flex flex-col">
+    <div className="bg-gray-50 min-h-screen py-10">
+      <div className="bg-white shadow-md rounded:lg px-6 py-8 w-full mx-auto max-w-3xl">
+        <h2 className="text-3xl font-bold text-center text-purple-600"> Your Shinning Post</h2>
+        <form method="post" className="space-y-3 flex flex-col">
           <label htmlFor="title" className="text-pink-600">
             {" "}
             Enter your title
@@ -249,7 +251,7 @@ export default function Write() {
             type="text"
             name="title"
             placeholder="Enter the Title of Post "
-            className="border border-gray-500 w-100 rounded-md placeholder:text-gray-500"
+            className="border border-gray-500 w-100 rounded-md placeholder:text-gray-500 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
             onChange={handleTitles}
             value={blogTitle.title}
             required
@@ -261,7 +263,7 @@ export default function Write() {
           {errors.titleError && (
             <p className="text-red-600"> {errors.titleError}* </p>
           )}
-          <label htmlFor="titleImage" className="text-pink-600 mt-4">
+          <label htmlFor="titleImage" className="text-pink-600">
             Upload Your Title Image
           </label>
           <input
@@ -272,7 +274,7 @@ export default function Write() {
             className="w-[88px] cursor-pointer rounded-md placeholder:text-gray-500"
           />
           {blogTitle && blogTitle.imgPreview ? (
-            <img src={blogTitle.imgPreview} className="w-24 h-24 mt-3" />
+            <img src={blogTitle.imgPreview} className="w-24 h-24 " />
           ) : (
             ""
           )}
@@ -283,7 +285,7 @@ export default function Write() {
             </p>
           )}
 
-          <label htmlFor="titleImage" className="text-pink-600 mt-5">
+          <label htmlFor="titleImage" className="text-pink-600 w-fit">
             Start Writing Your Post Content
           </label>
           <div className="">
@@ -291,7 +293,7 @@ export default function Write() {
               placeholder="start writing your Blog"
               ref={currentTextArea}
               name="value"
-              className="border-gray-500 border w-4/5 h-[350px] mt-2 px-16 rounded-md placeholder:text-gray-500"
+              className="border-gray-500 border w-full h-[350px] px-16 rounded-md placeholder:text-gray-500"
               onChange={handleContent}
               onClick={handleAreaSelect}
               onKeyUp={handleAreaSelect}
@@ -302,30 +304,32 @@ export default function Write() {
             <div
               className={`${
                 blogTitle.imgPreview
-                  ? "absolute top-[45%] right-[20%]"
-                  : "absolute top-64 xs:right-28 sm:right-48 lg:right-56"
-              }`}
-            >
-              <label htmlFor="imageUpload" className="text-bold p-2 mr-4">
+                  ? "absolute top-[38%] lg:right-64 md:right-32 xs:right-20"
+                  : "absolute top-[35%] xs:right-20 md:right-32 lg:right-64"
+                  
+              } ${contentImages.length > 0 && 'absolute top-[30%]'}`}
+              >
+              <label htmlFor="imageUpload" className="text-bold p-2">
                 {" "}
               </label>
-              <input
+              <input   
                 type="file"
                 name="image"
                 accept="image/*"
                 onChange={handleContentImage}
-                className="w-[88px] cursor-pointer rounded:md lg:mr-16"
+                className="w-[88px] cursor-pointer rounded:md relative"
                 id="contentImg"
               />
             </div>
-            {contentImages.length > 0 && (
+            
+          </div>
+          {contentImages.length > 0 && (
               <ContentImages
                 contentImages={contentImages}
                 removeImage={removeContentImage}
                 contentText={contentText}
               />
             )}
-          </div>
           {errors.textContentError && (
             <p className="text-red-600 font-larger absolute top-[40%] right-48">
               {" "}
@@ -335,19 +339,20 @@ export default function Write() {
           <button
             type="submit"
             onClick={handleSubmit}
-            className="border rounded-md border-blue-400 bg-blue-400 transition-colors duration:400 hover:bg-blue-600 w-fit mt-4 p-2"
+            className="border rounded-md border-blue-400 bg-blue-400 transition-colors duration:400 hover:bg-blue-600 w-fit p-2"
           >
             Publish Post
           </button>
         </form>
+        <button>
+          <Link to={"/"} className="text-gray-600 hover:text-gray-900">
+            {" "}
+            Back To Home
+          </Link>
+        </button>
       </div>
 
-      <button>
-        <Link to={"/"} className="text-gray-600 hover:text-gray-900">
-          {" "}
-          Back To Home
-        </Link>
-      </button>
+      
     </div>
   );
 }

@@ -72,17 +72,17 @@ export default function Content() {
         return <h2> Loading Your Content..</h2>
     }
     return(
-        <div className="page-content">
-            <h1 className="text-pink-600"> My POSTS </h1>
-            {!loading && yourContent.length > 0 ? console.log("Your Blogs loadded DOM: ", yourContent) : 'looking'}
-            <div className="BlogsContainer flex flex-wrap justify-center">
+        <div className="page-content bg-gradient-to-b from-gray-50 to-gray-100 px-6 py-8">
+            <h1 className="text-pink-600 text-center border-b-4 inline-block border-red-500 my-3"> My POSTS </h1>
+            <div className="BlogsContainer flex flex-wrap justify-center bg-white max-w-6xl mx-auto gap-6">
                 {yourContent?.map((blog,index) => 
                     <>
                         {
                             
                             <div key={index} 
                             id={blog._id}
-                            className="flex flex-col shadow-lg p-4 cursor-pointer text-center" 
+                            className="flex flex-col shadow-lg p-4 cursor-pointer text-center hover:shadow-3xl hover:scale-110 transition-all duration-300 " 
+                            
                             onMouseDown={(e) => handlePostClick(e,blog)}
                             >
                                 <h2 className="text-center xs:text-xs sm:text-sm font-medium"> <Title title={blog.title}  /></h2>
@@ -94,10 +94,10 @@ export default function Content() {
                     </>
                     )}
             </div>
-            <div>
-                <button className="text-blue-500" onClick={() => moveTo(-1)}> Back </button>
+            <div className="mt-6 flex justify-center space-x-4">
+                <button className="text-gray-600 hover:text-gray-900 hover:font-bold" onClick={() => moveTo(-1)}> Back </button>
+            <button onClick={() => moveTo('/')}  className='text-gray-600 hover:text-gray-900 hover:font-bold'> Back To Home</button>
             </div>
-            <button><Link to={'/'} onClick={handleHome} className=''> Back To Home</Link></button>
         </div>
     )
 } 

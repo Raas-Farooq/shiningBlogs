@@ -448,19 +448,20 @@ const EditPost = () => {
     return <h2>{errors.message}</h2>
   }
   return (
-    
-        <>
-          <form method="post" className="flex flex-col gap-4 my-4 mx-2">
+    <div className="bg-gray-50 min-h-screen py-10">
+      <div className="lg:max-w-5xl max-w-4xl bg-white rounded-lg shadow-lg mx-auto w-full p-5">
+          <form method="post" className="space-y-2 flex my-5 flex-col">
+            <label htmlFor="title" className="text-pink-600">Edit Title</label>
                 <input type="text" 
                 name="title" 
                 placeholder="Edit the Title" 
-                className="border border-gray-500 w-2/5"
+                className="border border-gray-500 w-100 m-0 p-0"
                 onChange={handleChange}
                 value={editPostData.title} />
                 
                 <div>
-                    <label htmlFor="image" className="block">Change Title Image</label>
-                    <input type="file" accept="image/*" name="titleImg" onChange={handleImageChange} className="w-[82px] mb-2"/>
+                    <label htmlFor="image" className="block text-pink-600">Change Title Image</label>
+                    <input type="file" accept="image/*" name="titleImg" onChange={handleImageChange} className="w-[82px] my-2"/>
                     {editPostData.imagePreview && 
                     <img src={editPostData.imagePreview} alt={editPostData.title} className="h-52 w-56" /> 
         
@@ -475,10 +476,11 @@ const EditPost = () => {
                         onChange={handleContentText}
                         onCursorPosition={setCursorPosition}
                     /> */}
+                  <label htmlFor="post Body" className="block text-pink-600">Post Body</label>
                   <textarea placeholder="start writing your Blog"
                     ref={currentArea}
                     name="value"
-                    className="border-gray-500 border w-4/5 h-[350px] mt-4"
+                    className="border-gray-500 border w-full h-[350px] my-2 px-5 rounded:md"
                     onChange={handleContentText}
                     onClick={selectCurrentSelection}
                     onKeyUp={selectCurrentSelection}
@@ -493,7 +495,7 @@ const EditPost = () => {
                         }
                     </div>
                         
-                    <div className="absolute top-[45%] right-[22%]">
+                    <div className="absolute top-[38%] lg:right-[28%] xs:right-[10%] md:right-[23%] ">
                             <input type="file" 
                             name="image"
                             accept="image/*" 
@@ -515,7 +517,8 @@ const EditPost = () => {
                 </div>
             </div>
           
-        </>
+        </div>
+    </div>
   );
 }
 

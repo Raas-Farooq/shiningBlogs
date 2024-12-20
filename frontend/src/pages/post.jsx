@@ -114,17 +114,17 @@ const BlogPost = () => {
     return (
         <>
             <Navbar showSearch={false} />
-            <div data-component="post-container" className={`${loggedIn ? 'flex xs:flex-col sm:flex-row' : 'w-full'}`}>
+            <div data-component="post-container" className={`${loggedIn ? 'flex xs:flex-col sm:flex-row' : 'w-full bg-gray-50'}`}>
                 {console.log("posst: ", Object.keys(post).length)}
               {!Object.keys(post).length ? <h1> Loading the Blog..</h1> :
               (
-                <div className="flex flex-col items-center w-full max-w-4xl mx-auto px-4 py-5">
+                <div className="w-full max-w-4xl mx-auto px-4 py-5 rounded:md shadow-lg bg-white">
                     <div className="">  
                         <div key={post._id}
                         id={post._id}
                         >
                             
-                            <h2 className="text-center w-4/5 text-2xl text-purple-600 font-medium mb-10 shadow-inner 300 p-5 shadow-2xl"> {post.title} </h2>
+                            <h2 className="text-center w-4/5 text-2xl text-purple-600 font-medium mb-10 p-5"> {post.title} </h2>
                             {console.log("logged In: ", loggedIn)}
                             {loggedIn && blogOwner ? <div className="text-right flex justify-end gap-2 mb-2 w-[80%]">
                                 <button onClick={(e) => handleEdit(e, post)} ><FaEdit size={20} /> </button>
@@ -137,18 +137,27 @@ const BlogPost = () => {
                             <TextContent content={post.content} isFullView={true} fromPost={true} contentImages={post.contentImages} />
                         </div>
                     </div>
-                    <div className={`text-center mb-4 ${loggedIn ? 'w-full': 'w-4/5' } `}>
-                        <button onClick={() => moveTo(-1)} className="bg-red-400 p-2 m-2  "> Back </button>
-                        <button onClick={() => moveTo('/')} className="bg-red-400 p-2"> Back To Home </button>
+                    <div className="flex justify-center my-3">
+                        <div className={`border-t-4 border-indigo-500 shadow-lg mb-4 ${
+                        loggedIn ? "w-[350px]" : "w-[350px]"
+                    }`}>
+                        </div>
                     </div>
+                    <div className={`text-center mb-4 ${loggedIn ? 'w-full': 'w-4/5' } `}>
+                        <button onClick={() => moveTo(-1)} className="bg-transparent text-gray-600 hover:text-gray-900 mx-2"> Back </button>
+                        <button onClick={() => moveTo('/')} className="bg-transparent text-gray-700 hover:text-gray-900 "> Back To Home </button>
+                    </div>
+                    
                 </div>
                 )}
-                <div className={`mt-5 p-4 ${loggedIn ? 'w-[30vw]' : 'w-0'} text-center relative xs:hidden sm:block ${!loggedIn && 'xs: sm:hidden'} `}>
+                <div className={`px-2 py-32 ${loggedIn ? 'w-[30vw]' : 'w-0'} bg-white text-center relative xs:hidden sm:block ${!loggedIn && 'xs: sm:hidden'} `}>
                     {currentUser ? (
                         <>
                             <h2 className="font-extrabold "> {currentUser.username && currentUser.username.length ? `About ${currentUser.username.toUpperCase()}` : 'About' }</h2>
-                            {currentUser.profileImg && (<Image postImg={currentUser.profileImg} 
-                             title={currentUser.username} />)}
+                            <div className="flex justify-center">
+                                {currentUser.profileImg && (<Image postImg={currentUser.profileImg} 
+                                title={currentUser.username} />)}
+                            </div>
                             
                             <h2 className="font-bold mt-4"> Goal</h2>
                             {currentUser.goal && currentUser.goal.length ? (<h3> {currentUser.goal} </h3>):
@@ -175,7 +184,7 @@ const BlogPost = () => {
                     <div className="flex justify-center">
                         <button 
                         onClick={() => moveTo('/userAccount')}
-                        className="xs:block sm:hidden border bg-green-400 text-center p-3 hover:bg-green-200">
+                        className="xs:block sm:hidden text-gray-600 border-none text-center p-3 bg-transparent hover:text-gray-900">
                             About Me</button>
                     </div>
                 }

@@ -5,6 +5,7 @@ import PostImage from './titleImage.jsx';
 import TextContent from "./textContent.jsx";
 import Title from './Title.jsx';
 import { Link, useNavigate } from "react-router-dom";
+import { FaRedo, FaSync } from "react-icons/fa";
 
 
 export default function BlogContent(){
@@ -79,14 +80,14 @@ export default function BlogContent(){
             (
                 <div className="blogsContainer xs:w-[95vw] w-[70vw] text-center m-10">
                     {console.log("filteredBlogs inside bllogcontent DOM: ", filteredBlogs, "search VAlue: ", searchValue + "AllblogsGlobally: ")}
-                    <button onClick={handleRefresh} className="text-green-600 text-lg shadow-xl p-2">Load All</button>
-                    <div data-component="bottomBlogsContainer" className="flex flex-wrap gap-5 text-center justify-center">
+                    <button onClick={handleRefresh} className="bg-transparent text-gray-600 hover:text-gray-900">Refresh</button>
+                    <div data-component="bottomBlogsContainer" className="flex flex-wrap gap-6 text-center justify-center">
                     {!searchValue && !filteredBlogs.length ? allBlogsGlobally?.map((blog,index) => 
                         {
                             return (
                                 <div key={index} 
                                 id={blog._id}
-                                className="flex flex-col shadow-lg p-4 cursor-pointer text-center" 
+                                className="flex flex-col shadow-xl p-4 cursor-pointer text-center hover:scale-110 hover:shadow-3xl transition-all duration-400" 
                                 onMouseDown={(e) => handlePostClick(e,blog)}
                                 >
                                     <h2 className="text-center xs:text-xs sm:text-sm font-medium"> <Title title={blog.title}  /></h2>
@@ -115,7 +116,7 @@ export default function BlogContent(){
                     </div>
                 </div>
             )}
-            <div className={`mt-10 p-4 w-[30vw] text-center relative xs:hidden sm:block ${!loggedIn && 'xs: sm:hidden'} `}>
+            <div className={`py-32 p-4 w-[30vw] text-center relative xs:hidden sm:block ${!loggedIn && 'xs: sm:hidden'} `}>
                     {currentUser ? (
                         <>
                             <h2 className="font-extrabold " > {currentUser.username && currentUser.username.length ? `About ${currentUser.username.toUpperCase()}` : 'About' }</h2>

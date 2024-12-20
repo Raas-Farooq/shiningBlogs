@@ -1,21 +1,11 @@
-import { useEffect } from "react";
+import { useEffect,useState } from "react";
 import { FaFacebook, FaTwitter, FaPinterest, FaWhatsapp } from "react-icons/fa";
 import { useGlobalContext } from "../globalContext/globalContext";
 
 export default function About() {
-  const { setShowMenu, setInHomePage } = useGlobalContext();
-
-  useEffect(() => {
-    setInHomePage(false); // Set state to indicate we're not on the homepage
-  }, []);
-
-  function handleHome() {
-    setShowMenu(false);
-  }
-
-  return (
+  return(
     <div className="page-content bg-gray-50 min-h-screen">
-      {/* About Section */}
+
       <section className="container mx-auto px-6 py-12">
         <h1 className="text-4xl font-bold text-pink-600 text-center mb-8">About Us</h1>
         <div className="text-gray-700 leading-relaxed text-lg text-center max-w-4xl mx-auto font-serif">
@@ -77,6 +67,7 @@ export default function About() {
           </ul>
         </div>
       </footer>
-    </div>
-  );
+    </div> 
+  )
 }
+

@@ -27,6 +27,25 @@ const Login = () => {
         return regex.test(email_text);
     }
 
+    function arrayWarrior(array1, array2){
+        let newArr = [];
+        for (const i of array1){
+            // console.log(i);
+            for(let j of array2){
+                if(i-j !== 0){
+                    newArr.push(j)
+                }else{
+                    console.log("this eliminates", i)
+                }
+            }
+            
+        }
+        console.log(
+            "new List: ", newArr
+        )
+    }
+
+    arrayWarrior([1,2,4,2,5], [1,2,4,7,6])
     // console.log("handle Validation outside; ", handleValidation());
     function handleValidation(){
         let newErrors = {};

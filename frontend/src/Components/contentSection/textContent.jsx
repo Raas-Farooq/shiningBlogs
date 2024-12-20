@@ -38,7 +38,7 @@ export default function TextContent({content, isFullView=false, fromPost=false, 
                 const paragraphs = partOfText.split(`\n`);
   
                 paragraphs.forEach((para, ind) => {
-                  contentWithImages.push(<p key={`para-${index}-${ind}`}> {para.trim()}</p>)
+                  contentWithImages.push(<p className="text-justify leading-relaxed text-gray-700" key={`para-${index}-${ind}`}> {para.trim()}</p>)
                 })
                 // console.log("withuot any modification: paragraph :", paragraphs.join(' ').trim(' '));
                 
@@ -56,7 +56,7 @@ export default function TextContent({content, isFullView=false, fromPost=false, 
                 const remaining = remainingText.split(`\n`);
                 remaining.forEach((remain,ind) => {
   
-                  contentWithImages.push(<p key={`remain${ind}`}>{remain}</p>)
+                  contentWithImages.push(<p className="text-justify leading-relaxed" key={`remain${ind}`}>{remain}</p>)
                   // console.log("remain.trim: ", )
                 })
               }
