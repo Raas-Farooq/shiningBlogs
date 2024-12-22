@@ -125,7 +125,7 @@ const BlogPost = () => {
                         >
                             
                             <h2 className="text-center w-4/5 text-2xl text-purple-600 font-medium mb-10 p-5"> {post.title} </h2>
-                            {console.log("logged In: ", loggedIn)}
+                           
                             {loggedIn && blogOwner ? <div className="text-right flex justify-end gap-2 mb-2 w-[80%]">
                                 <button onClick={(e) => handleEdit(e, post)} ><FaEdit size={20} /> </button>
                                 <button onClick={(e) => handleDelete(e,post._id)} ><FaTrash size={20} /> </button>
@@ -144,8 +144,8 @@ const BlogPost = () => {
                         </div>
                     </div>
                     <div className={`text-center mb-4 ${loggedIn ? 'w-full': 'w-4/5' } `}>
-                        <button onClick={() => moveTo(-1)} className="bg-transparent text-gray-600 hover:text-gray-900 mx-2"> Back </button>
-                        <button onClick={() => moveTo('/')} className="bg-transparent text-gray-700 hover:text-gray-900 "> Back To Home </button>
+                        <button onClick={() => moveTo(-1)} className="bg-transparent text-gray-600 hover:text-blue-600 hover:underline mx-2"> Back </button>
+                        <button onClick={() => moveTo('/')} className="bg-transparent text-gray-700 hover:text-blue-600 hover:underline "> Back To Home </button>
                     </div>
                     
                 </div>

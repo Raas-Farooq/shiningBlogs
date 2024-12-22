@@ -65,6 +65,14 @@ const Login = () => {
         return newErrors
     }
 
+    function filterOutStrings(list){
+        
+        const newArray = list.filter((item) => typeof(item) !== 'string')
+        console.log("Hope for the Best ", newArray);
+        
+        
+    }
+    filterOutStrings([1,2,'aasf','1','123',123]);
     const handleSubmit = async (e) => {
         e.preventDefault();
         

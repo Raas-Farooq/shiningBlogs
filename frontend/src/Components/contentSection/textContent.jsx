@@ -11,10 +11,11 @@ export default function TextContent({content, isFullView=false, fromPost=false, 
     const [transformedText, setTransformedText] = useState([]);
   
     const makeWords = (textData) => {
+    
         if(typeof textData !== 'string' || textData === "") return '';
-        const splitted = textData.split(' ');
-        const sliced = splitted.slice(0, 12);
-        const smallText = sliced.join(' ');
+        const splitted = textData.trim().split(' ');
+        const sliced = splitted.slice(0, 8);
+        const smallText = sliced.join(' ');   
         return smallText
     }
    
@@ -48,7 +49,7 @@ export default function TextContent({content, isFullView=false, fromPost=false, 
                 <img key={`img-${index}`}
                 src={image.path.startsWith('http://') ? image.path : `http://localhost:4100/${image.path}`}
                 alt={image.fileName}
-                className="block w-56 h-52 rounded-md max-w-full my-4"></img>
+                className="block w-56 h-52 rounded-t-lg max-w-full my-4"></img>
               )
               let remainingText;
               if(index === sortedImages.length-1){
@@ -83,7 +84,7 @@ export default function TextContent({content, isFullView=false, fromPost=false, 
     return (
         <div className={`${isFullView ? 'w-4/5': 'w-60'} `}>
             {!isFullView ? 
-            <p>{makeWords(text)}..</p>
+            <p className="text-gray-600 text-sm mt-2 h-12 overflow-hidden text-ellipsis">{makeWords(text)}..</p>
             : 
             <div>
               {transformedText}

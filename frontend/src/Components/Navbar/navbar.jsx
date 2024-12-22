@@ -132,38 +132,40 @@ export default function Navbar({showSearch=true}){
     }
     return(
         <nav className={`flex bg-[#5D62FF]-300 shadow-lg text-white bg-[#FFFFFF] top-0 z-10 items-center fixed w-full justify-between ${showMenu ? 'flex-col pb-[8rem] ' : 'flex'} ${showMenu &&  openUserAccount ?'flex-col fixed': 'relative'} ${showMenu && searching && 'flex-col pb-[1rem]'}` }> 
-           {console.log("inHomePage inside navbar DOM: ", inHomePage)}
-            <div className={`pl-12 pb-4 md:hidden text-black text-xl `}>
-                <button onMouseDown={(e) => handleShowCancel(e)} className="border border-red-200 p-2 mt-2 hover:bg-gray-200"> {showMenu ?  <FaTimes /> : <FaBars />}</button>
+            <div className={`pl-12 pb-4 md:hidden text-black text-xl`}>
+                <button onMouseDown={(e) => handleShowCancel(e)} className="border border-red-200 p-2 mt-2 hover:bg-gray-200 transition-transform duration-300 hover:scale-110"> {showMenu ?  <FaTimes /> : <FaBars />}</button>
                     
             </div> 
-            <div className={` ${showMenu ? 'flex-grow ': 'hidden'} ${!inHomePage && 'xs:hidden'}`}>
-                <input type="search" 
-                    id="search" 
-                    value={searchValue}
-                    onChange={handleSearchChange}
-                    onFocus={handleSearchFocus}
-                    onBlur={handleSearchBlur}
-                    placeholder='Search Dream Blog' 
-                    className='text-black pb-1 bg-white border border-green-300 rounded'/>
+            <div className={`transition-opacity duration-300 
+            ${showMenu? 'opacity-100' : 'opacity-0 hidden'}`}>
+                <div className={`${!inHomePage && 'xs:hidden'}`}>
+                    <input type="search" 
+                        id="search" 
+                        value={searchValue}
+                        onChange={handleSearchChange}
+                        onFocus={handleSearchFocus}
+                        onBlur={handleSearchBlur}
+                        placeholder='Search Dream Blog' 
+                        className='text-black pb-1 bg-white border border-green-300 rounded'/>
+                </div>
             </div>
-           
-            <ul className={`md:flex mb-2 ml-10 mt-2 w-1/3 ${showMenu ? 'flex flex-col items-start mt-2 ': 'hidden'} ${showMenu && searching && 'hidden'}`}>
+            {/* flex flex-col items-start mt-2 */}
+            <ul className={`md:flex md:translate-y-0 my-2 ml-10 w-1/3 ${showMenu ? 'opacity-100 translate-y-0': '-translate-y-20 hidden'} ${showMenu && searching && 'hidden'} transition-all duration-300`}>
                 <li className=" flex">
-                   <Link to={'/'} onClick={handleHome} className='px-2 ml-3 pointer py-2 bg-green-300 hover:bg-green-200 md:w-auto w-24 mb-2'>Home</Link>   
+                   <Link to={'/'} onClick={handleHome} className='px-2 py-2 ml-3 bg-green-300 hover:bg-green-200 xs:w-24 md:w-auto my-2 '>Home</Link>   
                 </li>
                 <li className=" flex">
-                   <Link to={'/about'} className='px-2 ml-3 pointer py-2 bg-green-300 hover:bg-green-200 md:w-auto w-24 mb-2'>About</Link>
+                   <Link to={'/about'} className='px-2 py-2 ml-3 bg-green-300 hover:bg-green-200 xs:w-24 md:w-auto my-2 '>About</Link>
                    </li>
                 <li className="flex">
-                   <span onClick={handleWriteClick} className='cursor-pointer px-2 ml-3 pointer text-blue-600 py-2 bg-green-300 hover:bg-green-200 md:w-auto w-24 mb-2'>Write</span>   
+                   <span onClick={handleWriteClick} className='cursor-pointer px-2 py-2 ml-3 text-blue-600 bg-green-300 hover:bg-green-200 xs:w-24 md:w-auto my-2 '>Write</span>   
                 </li>
                 <li className=" flex">
-                   <span onClick={handleContentClick} className='px-2 ml-3 md:text-[13px] sm:text-[12px] cursor-pointer py-2 bg-green-300 text-blue-600 hover:bg-green-200 md:w-auto w-32 mb-2'>My Content</span>   
+                   <span onClick={handleContentClick} className='md:text-[13px] text-blue-600 sm:text-[12px] px-2 py-2 ml-3 bg-green-300 hover:bg-green-200 cursor-pointer my-2 xs:w-24 md:w-20'>My Posts</span>   
                 </li>
             </ul>
             
-            <ul className={`md:flex mb-2 ml-5 w-1/3 md:w-1/4 ${showMenu ? 'flex-col ': 'hidden'} ${showMenu && searching && 'hidden'}`}>
+            <ul className={`md:flex mb-2 ml-8 w-1/3 md:w-1/4 ${showMenu ? 'flex-col ': 'hidden'} ${showMenu && searching && 'hidden'}`}>
                 <li className="px-2 ml-3 py-2 " ><a href=""><FaFacebook /> </a></li>
                 <li className="px-2 ml-3 py-2" ><a href=""><FaTwitter /> </a></li>
                 <li className="px-2 ml-3 py-2" ><a href=""><FaPinterest /> </a></li>

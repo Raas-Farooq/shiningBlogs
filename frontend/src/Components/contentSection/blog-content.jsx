@@ -80,19 +80,25 @@ export default function BlogContent(){
             (
                 <div className="blogsContainer xs:w-[95vw] w-[70vw] text-center m-10">
                     {console.log("filteredBlogs inside bllogcontent DOM: ", filteredBlogs, "search VAlue: ", searchValue + "AllblogsGlobally: ")}
-                    <button onClick={handleRefresh} className="bg-transparent text-gray-600 hover:text-gray-900">Refresh</button>
+                    <button onClick={handleRefresh} className="bg-transparent text-gray-600 hover:text-blue-600 hover:underline">Refresh</button>
                     <div data-component="bottomBlogsContainer" className="flex flex-wrap gap-6 text-center justify-center">
                     {!searchValue && !filteredBlogs.length ? allBlogsGlobally?.map((blog,index) => 
                         {
                             return (
                                 <div key={index} 
                                 id={blog._id}
-                                className="flex flex-col shadow-xl p-4 cursor-pointer text-center hover:scale-110 hover:shadow-3xl transition-all duration-400" 
-                                onMouseDown={(e) => handlePostClick(e,blog)}
+                                className="flex flex-col shadow-lg rounded-lg p-4 cursor-pointer text-center hover:scale-110 hover:shadow-2xl transition-all duration-400" 
+                                
                                 >
                                     <h2 className="text-center xs:text-xs sm:text-sm font-medium"> <Title title={blog.title}  /></h2>
                                     <PostImage postImg={blog.titleImage} title={blog.title} />
                                     <TextContent content={blog.content} />
+                                    <button 
+                                        className="mt-4 bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600"
+                                        onMouseDown={(e) => handlePostClick(e, blog)}
+                                    >
+                                        Read More
+                                    </button>
                                 </div>
                             )
                         })
@@ -107,6 +113,12 @@ export default function BlogContent(){
                                     <h2 className="text-center xs:text-xs sm:text-sm font-medium"> <Title title={blog.title}  /></h2>
                                     <PostImage postImg={blog.titleImage} title={blog.title} />
                                     <TextContent content={blog.content} />
+                                    <button 
+                                        className="mt-4 bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600"
+                                        onMouseDown={(e) => handlePostClick(e, blog)}
+                                    >
+                                        Read More
+                                    </button>
                                 </div>
                             )
                         })

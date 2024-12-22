@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import ContentImages from "../Components/contentSection/ContentImage";
 import { useGlobalContext } from "../globalContext/globalContext";
+import { Upload } from "lucide-react";
 
 export default function Write() {
   const [blogTitle, setBlogTitle] = useState({
@@ -288,38 +289,39 @@ export default function Write() {
           <label htmlFor="titleImage" className="text-pink-600 w-fit">
             Start Writing Your Post Content
           </label>
-          <div className="">
+          <div className="relative">
+          {errors.textContentError && (
+            <p className="text-red-600 font-larger absolute top-2 right-2">
+              {" "}
+              {errors.textContentError}*{" "}
+            </p>
+          )}
             <textarea
               placeholder="start writing your Blog"
               ref={currentTextArea}
               name="value"
-              className="border-gray-500 border w-full h-[350px] px-16 rounded-md placeholder:text-gray-500"
+              className="border-gray-500 border w-full h-[350px] p-4 rounded-md placeholder:text-gray-500"
               onChange={handleContent}
               onClick={handleAreaSelect}
               onKeyUp={handleAreaSelect}
               value={contentText}
               required
             />
-
+  
             <div
-              className={`${
-                blogTitle.imgPreview
-                  ? "absolute top-[38%] lg:right-64 md:right-32 xs:right-20"
-                  : "absolute top-[35%] xs:right-20 md:right-32 lg:right-64"
-                  
-              } ${contentImages.length > 0 && 'absolute top-[30%]'}`}
+              className="absolute bottom-4 right-4 "
               >
-              <label htmlFor="imageUpload" className="text-bold p-2">
-                {" "}
+              <label htmlFor="contentImg" className="flex items-center bg-white hover:bg-gray-50 text-gray-700 px-4 py-2 rounded-full shadow-lg transition-all duration-300 cursor-pointer">
+                <span className="text-sm ">Add Image</span>
+                <input   
+                  type="file"
+                  name="image"
+                  accept="image/*"
+                  onChange={handleContentImage}
+                  id="contentImg"
+                  className="hidden"
+                />
               </label>
-              <input   
-                type="file"
-                name="image"
-                accept="image/*"
-                onChange={handleContentImage}
-                className="w-[88px] cursor-pointer rounded:md relative"
-                id="contentImg"
-              />
             </div>
             
           </div>
@@ -330,12 +332,7 @@ export default function Write() {
                 contentText={contentText}
               />
             )}
-          {errors.textContentError && (
-            <p className="text-red-600 font-larger absolute top-[40%] right-48">
-              {" "}
-              {errors.textContentError}*{" "}
-            </p>
-          )}
+          
           <button
             type="submit"
             onClick={handleSubmit}
@@ -356,3 +353,13 @@ export default function Write() {
     </div>
   );
 }
+
+
+
+
+// {`${
+//   blogTitle.imgPreview
+//     ? "absolute top-[38%] lg:right-64 md:right-32 xs:right-20"
+//     : "absolute top-[35%] xs:right-20 md:right-32 lg:right-64"
+    
+// } ${contentImages.length > 0 && 'absolute top-[30%]'}`}

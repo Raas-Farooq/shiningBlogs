@@ -342,7 +342,7 @@ const addBlog = async (req,res) => {
         if(!blogCreated){
             return res.status(404).json({
                 success:false,
-                message:"Not Able to Create Blog. Try again Later",
+                message:"Unable to Create Blog. Try again Later",
                 
             })
         }

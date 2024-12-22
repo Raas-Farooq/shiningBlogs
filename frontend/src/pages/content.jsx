@@ -5,6 +5,7 @@ import { useGlobalContext } from "../globalContext/globalContext";
 import Title from '../Components/contentSection/Title.jsx';
 import TextContent from "../Components/contentSection/textContent";
 import TitleImage from '../Components/contentSection/titleImage.jsx'
+import { FaSpinner } from "react-icons/fa";
 
 
 export default function Content() {
@@ -68,13 +69,16 @@ export default function Content() {
         console.log("postId inside Content: ", post._id);
         moveTo(`/BlogPost/${post._id}`)
     }
-    if(loading){
-        return <h2> Loading Your Content..</h2>
-    }
     return(
         <div className="page-content bg-gradient-to-b from-gray-50 to-gray-100 px-6 py-8">
-            <h1 className="text-pink-600 text-center border-b-4 inline-block border-red-500 my-3"> My POSTS </h1>
+            <h1 className="text-purple-600 text-center border-b-4 inline-block border-red-500 my-3"> My POSTS </h1>
             <div className="BlogsContainer flex flex-wrap justify-center bg-white max-w-6xl mx-auto gap-6">
+            {loading && (
+                <div>
+                    <FaSpinner className="animate-spin font-bold text-lg inline" /> Please Wait..
+
+                </div>)
+                }
                 {yourContent?.map((blog,index) => 
                     <>
                         {
