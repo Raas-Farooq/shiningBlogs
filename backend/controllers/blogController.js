@@ -384,7 +384,8 @@ const updateBlogPost = async(req,res) => {
     if(!errs.isEmpty()){
         return res.status(400).json({
             success:false,
-            message:"Validation Error",
+            message:"Validation Error during EditPost",
+            name:"super Dooper",
             error:errs.array()
         })
     }
@@ -622,8 +623,6 @@ const allBlogs = async(req, res) => {
 }
 
 const canEditBlog = async(req,res) => {
-    console.log("canEditBlog running ");
-    console.log("userId: ", req.user.userId);
     const userIdReceived = req.user.userId.toString();
     console.log("BlogId received from frontEnd", req.params.id);
     const blogId = req.params.id;
@@ -632,14 +631,15 @@ const canEditBlog = async(req,res) => {
         if(!blog){
             res.status(404).json({
                 success:false,
-                message:"Blog not fuond"
+                message:"Blog not fuond",
             })
         }
         console.log("creator ID: ", blog.userId.toString());
         if(blog.userId.toString() === userIdReceived){
             return res.status(200).json({
                 success:true,
-                message:"Yes! you are authorize to Edit It"
+                message:"Yes! you are authorize to Edit It",
+                
             })
         }
         else{
@@ -664,7 +664,6 @@ const canEditBlog = async(req,res) => {
 const getMyContent = async(req,res) => {
     console.log("get My Content is Catching Pace MiddleWare userId", req.user.userId)
     const id = req.params.id;
-    console.log("Id inside MyBontent: ", id);
     try{
         const yourBlogs = await Blog.find({userId:id});
         console.log("your Blogs: ", yourBlogs);

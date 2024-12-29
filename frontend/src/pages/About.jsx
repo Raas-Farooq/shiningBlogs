@@ -1,13 +1,15 @@
-import { useEffect,useState } from "react";
-import { FaFacebook, FaTwitter, FaPinterest, FaWhatsapp } from "react-icons/fa";
+import React,{ useEffect,useState } from "react";
+import { FaFacebook, FaTwitter, FaPinterest, FaWhatsapp, FaSpinner } from "react-icons/fa";
 import { useGlobalContext } from "../globalContext/globalContext";
+import axios from "axios";
+import { useParams } from "react-router-dom";
 
-export default function About() {
+const About = () => {
   return(
     <div className="page-content bg-gray-50 min-h-screen">
 
+      <h1 className="text-4xl font-bold text-pink-600 text-center py-5">About Us</h1>
       <section className="container mx-auto px-6 py-12">
-        <h1 className="text-4xl font-bold text-pink-600 text-center mb-8">About Us</h1>
         <div className="text-gray-700 leading-relaxed text-lg text-center max-w-4xl mx-auto font-serif">
           <p className="mb-4">
             In this era of technological revolution, innovation and the quest for knowledge demand 
@@ -20,8 +22,6 @@ export default function About() {
           </p>
         </div>
       </section>
-
-      {/* Footer */}
       <footer className="bg-slate-900 text-gray-300 py-6">
         <div className="container mx-auto px-6 flex flex-col md:flex-row justify-between items-center">
           <div>
@@ -66,8 +66,10 @@ export default function About() {
             </li>
           </ul>
         </div>
-      </footer>
+      </footer>   
+      
     </div> 
   )
 }
 
+export default About

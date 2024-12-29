@@ -1,3 +1,4 @@
+
 import {useCallback, useEffect, useState } from "react";
 import { useGlobalContext } from "../../globalContext/globalContext";
 import axios from "axios";
@@ -5,24 +6,76 @@ import PostImage from './titleImage.jsx';
 import TextContent from "./textContent.jsx";
 import Title from './Title.jsx';
 import { Link, useNavigate } from "react-router-dom";
-import { FaRedo, FaSync } from "react-icons/fa";
+import { FaRedo, FaSpider, FaSpinner, FaSync } from "react-icons/fa";
+import { Sidebar, User } from "lucide-react";
 
+function UserProfile({currentUser, profileImage}){
+    return (
+        <aside className={`py-8 p-4 w-[30vw] text-center bg-gray-50 shadow:sm rounded:lg`}>
+            <h2 className="font-bold text:xl mb-6" > {currentUser.username && currentUser.username.length ? `About ${currentUser.username.toUpperCase()}` : 'About' }</h2>
+            {profileImage && (<img src={profileImage} 
+            alt="greenry"
+            className="w-auto h-52 mx-auto rounded-lg shadow-md mb-6 " />)}
+            <div className="space-y-6">
+                <section>
+                    <h2 className="font-bold mt-4"> Goal</h2>
+                    {currentUser.goal && currentUser.goal.length ? (<h3> {currentUser.goal} </h3>):
+                    <h3>Goal is Empty</h3>}
+                </section>
+                <section>
+                    <h3 className="text-bold text-lg font-bold mt-4 text-center border-t border-blue-400"> Interest </h3>
+                    <span className="border-t border-blue-400"></span>
+                    
+                    {currentUser.TopicsInterested && currentUser.TopicsInterested.length ? (
+                        currentUser.TopicsInterested.map((interest, index) => (
+                            <h5 key={index}>{interest} </h5>
+                        ))
+                    ):
+                    <h3> interests are not Added</h3>
+                    }
+                </section>
+                
+                
+            </div>
+            
+        </aside>)
+}
+const BlogCard = ({blog, handlePostClick, filtering=false}) => {
+    console.log("filtering ", filtering);
+    return (
+        <article 
+          className="flex flex-col items-center p-4 rounded-lg transition-all duration-300 hover:scale-105
+                     shadow-md hover:shadow-xl bg-white
+                     max-w-sm w-full"
+        >
+          <h2 className="text-center text-base sm:text-lg font-medium mb-4">
+            <Title title={blog.title} />
+          </h2>
+          <PostImage postImg={blog.titleImage} title={blog.title} />
+          <TextContent content={blog.content} />
+          <button 
+            className="mt-4 bg-blue-500 text-white py-2 px-4 rounded-lg 
+                       hover:bg-blue-600 transition-colors duration-200
+                       focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+            onClick={(e) => handlePostClick(e, blog)}
+          >
+            Read More
+          </button>
+        </article>
+      )
+}
+      
 
 export default function BlogContent(){
 
-    const {inHomePage, searchValue, setFilteredBlogs, setSearchValue,filteredBlogs,searching, setSearching,loggedIn, currentUser,allBlogsGlobally,setAllBlogsGlobally, setCurrentUser,imagePreview} = useGlobalContext()
+    const {searchValue, setFilteredBlogs, setSearchValue,filteredBlogs,searching, setSearching,loggedIn, currentUser,allBlogsGlobally,setAllBlogsGlobally} = useGlobalContext()
     const [loading, setLoading] = useState(true); 
-    let   [slicedTitle, setSlicedTitle] = useState({});
     const [profileImage, setProfileImage] = useState('');
-    const [myBlogs, setMyBlogs] = useState([]);
     const navigateTo = useNavigate();
-    let showBlogsResult;
     useEffect(() => {
         
         if(currentUser?.profileImg){
-            console.log("What exactly the current User: ", currentUser);
             const myImage = `http://localhost:4100/${currentUser.profileImg}`;
-            console.log("myImage received in blogContent: ", myImage);
             setProfileImage(myImage);
         }
         if(!allBlogsGlobally){
@@ -32,29 +85,23 @@ export default function BlogContent(){
     }, [])
     
     const clearLocalStorage = useCallback(() => {
-        localStorage.removeItem('titleStorage');
-        localStorage.removeItem('titleImagePreview');
-        localStorage.removeItem('textContent');
-        localStorage.removeItem('localContentImages');
+        const keys = ['titleStorage','titleImagePreview', 'textContent', 'localContentImages'];
+        keys.forEach(key => localStorage.removeItem(key))
      }, []);
 
     useEffect(() => {
-
-        console.log("searching blogContent: ",searching );
-        // setSlicedTitle(titleReceived);
         clearLocalStorage();
         const fetchBlogs = async() => {
 
             try{
                 const response = await axios.get('http://localhost:4100/weblog/allBlogs');
                 setAllBlogsGlobally(response.data.blogs)
-                if(response.data){
-                    
-                    setLoading(false);
-                }
+                
             }catch(err){
-                setLoading(false);
                 console.log("got errors while fetching all blogs: ", err);
+            }
+            finally{
+                setLoading(false)
             }
         }
         fetchBlogs();
@@ -70,90 +117,43 @@ export default function BlogContent(){
     }
     const handlePostClick = (e,post) => {
         e.stopPropagation();
-       navigateTo(`/BlogPost/:${post._id}`, {state:{post, myBlogs:myBlogs} })
-    }
-  
-    if(loading) return <h2 className="text-2xl font-medium"> Loading Blogs...</h2>
+       navigateTo(`/BlogPost/:${post._id}`, {state:{post} })
+    } 
+    const BlogsToShow = searchValue || filteredBlogs.length ? filteredBlogs : allBlogsGlobally;
     return (
         <div data-component="AllBlogsParent" className=" flex xs:flex-col sm:flex-row" >
-            {!allBlogsGlobally ? <h1> Please Wait..</h1> :
-            (
-                <div className="blogsContainer xs:w-[95vw] w-[70vw] text-center m-10">
-                    {console.log("filteredBlogs inside bllogcontent DOM: ", filteredBlogs, "search VAlue: ", searchValue + "AllblogsGlobally: ")}
-                    <button onClick={handleRefresh} className="bg-transparent text-gray-600 hover:text-blue-600 hover:underline">Refresh</button>
-                    <div data-component="bottomBlogsContainer" className="flex flex-wrap gap-6 text-center justify-center">
-                    {!searchValue && !filteredBlogs.length ? allBlogsGlobally?.map((blog,index) => 
-                        {
-                            return (
-                                <div key={index} 
-                                id={blog._id}
-                                className="flex flex-col shadow-lg rounded-lg p-4 cursor-pointer text-center hover:scale-110 hover:shadow-2xl transition-all duration-400" 
-                                
-                                >
-                                    <h2 className="text-center xs:text-xs sm:text-sm font-medium"> <Title title={blog.title}  /></h2>
-                                    <PostImage postImg={blog.titleImage} title={blog.title} />
-                                    <TextContent content={blog.content} />
-                                    <button 
-                                        className="mt-4 bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600"
-                                        onMouseDown={(e) => handlePostClick(e, blog)}
-                                    >
-                                        Read More
-                                    </button>
-                                </div>
-                            )
-                        })
-                        :
-                        filteredBlogs?.map((blog, index) => {
-                            return (
-                                <div key={index} 
-                                id={blog._id}
-                                className="flex flex-col shadow-lg p-4 cursor-pointer text-center" s
-                                onMouseDown={(e) =>handlePostClick(e, blog)}
-                                >
-                                    <h2 className="text-center xs:text-xs sm:text-sm font-medium"> <Title title={blog.title}  /></h2>
-                                    <PostImage postImg={blog.titleImage} title={blog.title} />
-                                    <TextContent content={blog.content} />
-                                    <button 
-                                        className="mt-4 bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600"
-                                        onMouseDown={(e) => handlePostClick(e, blog)}
-                                    >
-                                        Read More
-                                    </button>
-                                </div>
-                            )
-                        })
-                    }
-                   
+            {!allBlogsGlobally.length && loading && <div className="text-center my-5">
+                <FaSpinner className="animate-spin text-lg" /> Loading Blogs
+            </div>
+            }
+            <div className="blogsContainer xs:w-[95vw] w-[70vw] text-center m-10">
+                {console.log("filteredBlogs inside bllogcontent DOM: ", filteredBlogs, "search VAlue: ", searchValue + "AllblogsGlobally: ")}
+                <button onClick={handleRefresh} className="bg-transparent text-gray-600 hover:text-blue-600 hover:underline">Refresh</button>
+                <div data-component="bottomBlogsContainer" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 text-center justify-center">
+                  {BlogsToShow.map((blog,index) => 
+                    (
+                        <BlogCard 
+                        key={index}
+                        blog={blog}
+                        handlePostClick={handlePostClick} />
+                  ))
                     
-                    </div>
+                }
                 </div>
-            )}
-            <div className={`py-32 p-4 w-[30vw] text-center relative xs:hidden sm:block ${!loggedIn && 'xs: sm:hidden'} `}>
-                    {currentUser ? (
-                        <>
-                            <h2 className="font-extrabold " > {currentUser.username && currentUser.username.length ? `About ${currentUser.username.toUpperCase()}` : 'About' }</h2>
-                            {profileImage && (<img src={profileImage} 
-                            alt="greenry"
-                            className="w-auto md:h-[210px] mx-auto " />)}
-                            
-                            <h2 className="font-bold mt-4"> Goal</h2>
-                            {currentUser.goal && currentUser.goal.length ? (<h3> {currentUser.goal} </h3>):
-                            <h3>Goal is Empty</h3>}
-                            
-                            <h3 className="text-bold text-lg font-bold mt-4 text-center border-t border-blue-400"> Interest </h3>
-                            <span className="border-t border-blue-400"></span>
-                           
-                            {currentUser.TopicsInterested && currentUser.TopicsInterested.length ? (
-                                currentUser.TopicsInterested.map((interest, index) => (
-                                    <h5 key={index}>{interest} </h5>
-                                ))
-                            ):
-                            <h3> interests are not Added</h3>
-                            }
-                        </>
+            </div>
+          
+            <div className={`hidden md:block`}>
+                {loggedIn && 
+                <UserProfile 
+                currentUser={currentUser}
+                profileImage={profileImage}
+                />
+            }
+                    {/* {currentUser ? (
+                        
                     ):
                     <h2> Loading..</h2>
-                    }
+                    } */}
                 
             </div>
 
@@ -164,3 +164,8 @@ export default function BlogContent(){
     )
 
 }
+
+// why did you use grid instead of flex for cards
+//why using aside as Parent container for UserProfile
+// what are the main difference of styles from my file and why 
+// why using useCallback with small functions like clearLocalStorage

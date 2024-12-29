@@ -23,9 +23,7 @@ export default function Navbar({showSearch=true}){
 
     useEffect(() => {
         // setSearching(false);
-        // setSearchValue('');
-        console.log("if search Value: ", searchValue)
-        console.log("showSearch inside navbar: ", showSearch);
+        // setSearchValue(''); 
         setInHomePage(showSearch);
         if(!showSearch){
             setShowMenu(false)
@@ -127,6 +125,7 @@ export default function Navbar({showSearch=true}){
                 moveTo('/content')
             }
         }
+
     if(loading){
         return <h1> Loading.. </h1>
     }
@@ -155,7 +154,7 @@ export default function Navbar({showSearch=true}){
                    <Link to={'/'} onClick={handleHome} className='px-2 py-2 ml-3 bg-green-300 hover:bg-green-200 xs:w-24 md:w-auto my-2 '>Home</Link>   
                 </li>
                 <li className=" flex">
-                   <Link to={'/about'} className='px-2 py-2 ml-3 bg-green-300 hover:bg-green-200 xs:w-24 md:w-auto my-2 '>About</Link>
+                   <Link to={'/about'} className='px-2 py-2 ml-3 text-blue-600 bg-green-300 hover:bg-green-200 xs:w-24 md:w-auto my-2 '>About</Link>
                    </li>
                 <li className="flex">
                    <span onClick={handleWriteClick} className='cursor-pointer px-2 py-2 ml-3 text-blue-600 bg-green-300 hover:bg-green-200 xs:w-24 md:w-auto my-2 '>Write</span>   

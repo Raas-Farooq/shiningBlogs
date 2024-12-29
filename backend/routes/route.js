@@ -90,7 +90,7 @@ updateUploads.fields(
     ,
     authMiddleware,
     [
-        body('title').optional().isLength({min:1, max:60}).trim().escape().withMessage("title should be btween 1 and 200 characters"),
+        body('title').optional().isLength({min:1, max:60}).trim().escape().withMessage("title should be btween 1 and 60 characters"),
         body('newContent').isJSON().withMessage("Content should be in JSON formate"),
         // body('content').optional().isArray().withMessage("Content should be inside Array"),
         // body('content.*.type').optional().isIn(['text', 'image', 'video']).withMessage("Data should be in Text, image or video format"),

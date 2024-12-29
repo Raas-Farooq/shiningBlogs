@@ -3,7 +3,7 @@ import { useGlobalContext } from "../globalContext/globalContext"
 import Image from "../Components/contentSection/titleImage";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import TextContent from '../Components/contentSection/textContent';
-import { FaEdit, FaTrash } from "react-icons/fa";
+import { FaEdit, FaSpinner, FaTrash } from "react-icons/fa";
 import axios from "axios";
 import Navbar from '../Components/Navbar/navbar';
 
@@ -13,7 +13,8 @@ const BlogPost = () => {
     console.log("loggeIn after useGlobal: ", loggedIn)
     const [blogOwner, setBlogOwner] = useState(false);
     const [post, setPost] = useState({});
-    const [loading, setLoading] = useState(true);
+    const [postLoading, setPostLoading] = useState(true)
+    const [ownerLoading, setOwnerLoading] = useState(true)
     const location = useLocation();
     let {id} = useParams();
     id = id.startsWith(':') ? id.slice(1) : id;
@@ -40,6 +41,9 @@ const BlogPost = () => {
             }
             catch(err){
                 console.log("I'm here Err : while getting the Post ", err)
+            }
+            finally{
+                setPostLoading(false)
             }
         }
         getPost();
@@ -69,16 +73,14 @@ const BlogPost = () => {
                     setBlogOwner(false);
                 }
             }
+            finally{
+                setOwnerLoading(false)
+            }
         }
 
         userPrivileges();
         // console.log("POST inside Post: ", post);
     }, [id]);
-
-    if(!Object.keys(post).length){
-
-        return <h1> Loading.. </h1>
-    }
     const handleEdit = (e,post) => {
         e.preventDefault();
         console.log("postId: ", post._id);
@@ -115,8 +117,10 @@ const BlogPost = () => {
         <>
             <Navbar showSearch={false} />
             <div data-component="post-container" className={`${loggedIn ? 'flex xs:flex-col sm:flex-row' : 'w-full bg-gray-50'}`}>
-                {console.log("posst: ", Object.keys(post).length)}
-              {!Object.keys(post).length ? <h1> Loading the Blog..</h1> :
+              {!Object.keys(post).length ? 
+              <div className="text-center">
+                    <FaSpinner className="animate-spin text-center inline"/> Loading the Post..
+                </div> :
               (
                 <div className="w-full max-w-4xl mx-auto px-4 py-5 rounded:md shadow-lg bg-white">
                     <div className="">  
@@ -125,13 +129,15 @@ const BlogPost = () => {
                         >
                             
                             <h2 className="text-center w-4/5 text-2xl text-purple-600 font-medium mb-10 p-5"> {post.title} </h2>
-                           
-                            {loggedIn && blogOwner ? <div className="text-right flex justify-end gap-2 mb-2 w-[80%]">
+                           {ownerLoading && 
+                           <div className="text-center font-bold">
+                                <FaSpinner className="animate-spin text-center mx-3" /> Loading User Privileges..
+                            </div>
+                            }
+                            {loggedIn && blogOwner && <div className="text-right flex justify-end gap-2 mb-2 w-[80%]">
                                 <button onClick={(e) => handleEdit(e, post)} ><FaEdit size={20} /> </button>
                                 <button onClick={(e) => handleDelete(e,post._id)} ><FaTrash size={20} /> </button>
                             </div>
-                            :
-                            null
                             }
                             {post.titleImage && <Image postImg={post.titleImage} title={post.title} isFullView={true} /> }
                             <TextContent content={post.content} isFullView={true} fromPost={true} contentImages={post.contentImages} />
@@ -150,7 +156,7 @@ const BlogPost = () => {
                     
                 </div>
                 )}
-                <div className={`px-2 py-32 ${loggedIn ? 'w-[30vw]' : 'w-0'} bg-white text-center relative xs:hidden sm:block ${!loggedIn && 'xs: sm:hidden'} `}>
+                <div className={`px-2 py-32 flex justify-right ml-auto ${loggedIn ? 'w-[30vw]' : 'w-0'} bg-white text-center relative xs:hidden sm:block ${!loggedIn && 'xs: sm:hidden'} `}>
                     {currentUser ? (
                         <>
                             <h2 className="font-extrabold "> {currentUser.username && currentUser.username.length ? `About ${currentUser.username.toUpperCase()}` : 'About' }</h2>
