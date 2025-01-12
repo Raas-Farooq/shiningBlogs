@@ -27,26 +27,6 @@ const Login = () => {
         return regex.test(email_text);
     }
 
-    function arrayWarrior(array1, array2){
-        let newArr = [];
-        for (const i of array1){
-            // console.log(i);
-            for(let j of array2){
-                if(i-j !== 0){
-                    newArr.push(j)
-                }else{
-                    console.log("this eliminates", i)
-                }
-            }
-            
-        }
-        console.log(
-            "new List: ", newArr
-        )
-    }
-
-    arrayWarrior([1,2,4,2,5], [1,2,4,7,6])
-    // console.log("handle Validation outside; ", handleValidation());
     function handleValidation(){
         let newErrors = {};
         if(!email){
@@ -65,14 +45,6 @@ const Login = () => {
         return newErrors
     }
 
-    function filterOutStrings(list){
-        
-        const newArray = list.filter((item) => typeof(item) !== 'string')
-        console.log("Hope for the Best ", newArray);
-        
-        
-    }
-    filterOutStrings([1,2,'aasf','1','123',123]);
     const handleSubmit = async (e) => {
         e.preventDefault();
         
@@ -128,12 +100,21 @@ const Login = () => {
         // one how to check the object is it empty or contains
         // second you can also setErrors first then check from the errors lengt
     }
-    
+    [4, 10]
+    const findBreaker = (numList) => {
+        let greater=0;
+        const breaker = numList.find((num,ind) => ind < numList.length - 1 && num > numList[ind+1])
+        console.log('breaker: ', breaker)
+        
+    }
+    findBreaker([0,-4])
+
     // if(loading) return <h1> Please Wait..</h1>
     return (
         <div className="flex items-center justify-center min-h-screen w-screen bg-gray-50">
            
                 <section className="w-full mx-w-md p-6 bg-white rounded-lg shadow-lg">
+                    {/* <button className="p-4 rounded-full text-center text-white shadow-lg bg-blue-600" onClick={handleMagicButton()}>Magic Button</button> */}
                     <h1 className="text-3xl text-pink-600 font-bold text-center mb-8"> Login Here</h1>
                     {loading && (
                     <div className="text-center mb-4">
