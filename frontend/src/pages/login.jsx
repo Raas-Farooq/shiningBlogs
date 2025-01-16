@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
-import { useGlobalContext } from "../globalContext/globalContext";
+import { useAuthenContext, useGlobalContext } from "../globalContext/globalContext";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { FaSpinner } from "react-icons/fa";
 const Login = () => {
 
-    const {setIsAuthenticated,setCurrentUser, setLoggedIn, imagePreview, setImagePreview} = useGlobalContext();
+    const {setIsAuthenticated,setCurrentUser, setLoggedIn, imagePreview, setImagePreview} = useAuthenContext();
     const [email, setEmail] = useState('');
     const [message, setMessage] = useState('');
     const [password, setPassword] = useState('');

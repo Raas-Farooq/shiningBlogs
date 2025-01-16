@@ -7,8 +7,17 @@ import cookieParser from 'cookie-parser';
 const app = express();
 
 app.use(express.json());
+
+const allowedOrigins = ['http://localhost:5173', 'http://localhost:5174'];
+
 app.use(cors({
-    origin:'http://localhost:5173',
+    origin:function (origin, callback){
+        if(allowedOrigins.includes(origin) || !origin){
+            callback(null, true)
+        }else{
+            callback(new Error('Not allowed by Cors or Not a Valid Origin'))
+        }
+    },
     credentials:true,
 }));
 app.use(cookieParser());

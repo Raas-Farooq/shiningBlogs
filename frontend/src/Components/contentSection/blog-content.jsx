@@ -1,6 +1,5 @@
 
 import {useCallback, useEffect, useState } from "react";
-import { useGlobalContext } from "../../globalContext/globalContext";
 import axios from "axios";
 import PostImage from './titleImage.jsx';
 import TextContent from "./textContent.jsx";
@@ -8,6 +7,7 @@ import Title from './Title.jsx';
 import { Link, useNavigate } from "react-router-dom";
 import { FaRedo, FaSpider, FaSpinner, FaSync } from "react-icons/fa";
 import { Sidebar, User } from "lucide-react";
+import { useAuthenContext, useBlogContext, useUIContext } from "../../globalContext/globalContext";
 
 function UserProfile({currentUser, profileImage}){
     return (
@@ -68,7 +68,9 @@ const BlogCard = ({blog, handlePostClick, filtering=false}) => {
 
 export default function BlogContent(){
 
-    const {searchValue, setFilteredBlogs, setSearchValue,filteredBlogs,searching, setSearching,loggedIn, currentUser,allBlogsGlobally,setAllBlogsGlobally} = useGlobalContext()
+    const {searchValue, setFilteredBlogs, setSearchValue,setSearching,filteredBlogs,allBlogsGlobally,setAllBlogsGlobally} = useBlogContext()
+    const {loggedIn, currentUser} = useAuthenContext();
+    const {} = useBlogContext();
     const [loading, setLoading] = useState(true); 
     const [profileImage, setProfileImage] = useState('');
     const navigateTo = useNavigate();

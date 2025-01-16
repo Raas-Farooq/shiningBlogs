@@ -1,9 +1,10 @@
-import { useGlobalContext } from "../../globalContext/globalContext"
+import { useBlogContext, useUIContext } from "../../globalContext/globalContext"
 
 
 const MainSection = () => {
 
-    const {openUserAccount, showMenu, editProfile,searching} = useGlobalContext();
+    const {openUserAccount, showMenu, editProfile} = useUIContext();
+    const {searching} = useBlogContext();
     return (
         <>
             <div className={`flex justify-center h-full ${(openUserAccount || showMenu || editProfile) && 'mt-12'} ${showMenu && searching && 'hidden'}`}>

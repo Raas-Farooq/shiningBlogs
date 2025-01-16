@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import {FaBars, FaTimes, FaFacebook, FaPinterest, FaSearch, FaTwitter, FaWhatsapp, FaUser, FaRegUser} from 'react-icons/fa';
-import { useGlobalContext } from '../../globalContext/globalContext';
+import { useAuthenContext, useBlogContext, useGlobalContext, useUIContext } from '../../globalContext/globalContext';
 import { FaTwitch } from 'react-icons/fa';
 import {CiSearch} from 'react-icons/ci';
 import WindowSize from '../../windowSize';
@@ -10,7 +10,9 @@ import axios from 'axios';
 
 export default function Navbar({showSearch=true}){
 
-    const {inHomePage,searchValue, setInHomePage, setSearchValue, filteredBlogs, searching, setSearching, setFilteredBlogs, allBlogsGlobally,setAllBlogsGlobally, setOpenUserAccount, openUserAccount, setShowMenu, showMenu, loggedIn, setLoggedIn} = useGlobalContext();
+    const {inHomePage, setInHomePage, setOpenUserAccount, openUserAccount, setShowMenu, showMenu} = useUIContext();
+    const {searchValue,setSearchValue, searching, setSearching, setFilteredBlogs, allBlogsGlobally} = useBlogContext();
+    const {loggedIn} = useAuthenContext();
     
     // console.log("openUserAccount: ", openUserAccount);
     // console.log("showMenu: ", showMenu);

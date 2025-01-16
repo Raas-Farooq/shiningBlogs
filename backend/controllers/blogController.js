@@ -599,7 +599,7 @@ const getBlogPost = async(req,res) => {
 
 
 const allBlogs = async(req, res) => {
-    console.log("allBlogs run");
+    console.log("allBlogs Shines");
     try{
         const blogs = await Blog.find({});
         if(!blogs){

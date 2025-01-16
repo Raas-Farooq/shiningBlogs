@@ -3,26 +3,36 @@ import axios from 'axios';
 import { jwtDecode } from "jwt-decode";
 import UserAccount from "../Components/userAccount/userAccout";
 // import { isButtonElement } from "react-router-dom/dist/dom";
+const AuthenContext = React.createContext();
+const UIContext = React.createContext();
+const BlogContext= React.createContext();
 
-const AppContext = React.createContext();
 
-export const GlobalState = ({children}) => {
-    const [openUserAccount, setOpenUserAccount] = useState(false);
-    const [editProfile, setEditProfile] = useState(false);
-    const [allBlogsGlobally, setAllBlogsGlobally] = useState([]);
-    const [filteredBlogs, setFilteredBlogs] = useState([]);
-    const [showMenu, setShowMenu] = useState(false);
-    const [searchValue,setSearchValue] = useState('');
+
+
+export const AuthenContextProvider = ({children}) => {
     const [loggedIn, setLoggedIn] = useState(false);
-    const [searching, setSearching] = useState(false);
-    const [loading, setLoading] = useState(true);
     const [registerData, setRegisterData] = useState({});
     const [isAuthenticated, setIsAuthenticated] = useState(false);
-    const [imagePreview, setImagePreview] = useState('');
-    const [inHomePage, setInHomePage] = useState(true);
-    const [globalEmail, setGlobalEmail] = useState('');
+    const [loading, setLoading] = useState(true);
     const [currentUser, setCurrentUser] = useState(null);
-
+    const [imagePreview, setImagePreview] = useState('');
+    
+    useEffect(() => {
+        const userId = localStorage.getItem('userId');
+        if (userId) {
+          userAuthentication(); // Fetch full user data if we have a userId
+        } else {
+            setLoading(false);
+        }
+    }, []);
+    useEffect(() => {
+        const interval = setInterval(() => {
+            userAuthentication();
+        }, 60000);
+    
+        return () => clearInterval(interval)
+    },[])
     const decodeToken = (token) => {
         try{
             return jwtDecode(token)
@@ -30,12 +40,11 @@ export const GlobalState = ({children}) => {
             return null
         }
     }
-
     const isTokenExpired = (token) => {
         const decoded = decodeToken(token);
-
+    
         if(!decoded || !decoded.exp) return true
-
+    
         return Date.now() > decoded.exp * 1000
         
     }
@@ -57,7 +66,7 @@ export const GlobalState = ({children}) => {
                 const user = response.data.user;
                 setCurrentUser(user);
                 let imgLink=`http://localhost:4100/${user.profileImg}`;
-
+    
                 setImagePreview(imgLink)
                 
                 localStorage.setItem('userId', response.data.user._id);
@@ -71,52 +80,42 @@ export const GlobalState = ({children}) => {
             setCurrentUser(null);
             setLoggedIn(false);
             localStorage.removeItem('userId');
-
+    
         } finally {
             setLoading(false);
         }
     }
 
-    useEffect(() => {
-        const interval = setInterval(() => {
-            userAuthentication();
-        }, 60000);
 
-        return () => clearInterval(interval)
-    },[])
-    useEffect(() => {
-        console.log("Navbar runs: ")
-    }, [currentUser,loggedIn]);
-
-    useEffect(() => {
-      const userId = localStorage.getItem('userId');
-      if (userId) {
-        userAuthentication(); // Fetch full user data if we have a userId
-      } else {
-          setLoading(false);
-      }
-  }, []);
     return (
-        <AppContext.Provider value={{
-            openUserAccount,
-            setOpenUserAccount,
-            setShowMenu,
-            showMenu,
-            editProfile,
-            setEditProfile,
+        <AuthenContext.Provider value={{
             loggedIn,
             setLoggedIn,
             registerData,
             setRegisterData,
-            loading, 
-            setLoading,
             isAuthenticated,
             setIsAuthenticated,
+            userAuthentication,
+            loading, 
+            setLoading,
             currentUser,
             setCurrentUser,
             imagePreview,
             setImagePreview,
-            userAuthentication,
+        }}>
+            {children}
+        </AuthenContext.Provider>
+    )
+} 
+
+export const BlogContextProvider = ({children}) => {
+    const [allBlogsGlobally, setAllBlogsGlobally] = useState([]);
+    const [filteredBlogs, setFilteredBlogs] = useState([]);
+    const [searchValue,setSearchValue] = useState('');
+    const [searching, setSearching] = useState(false);
+
+    return(
+        <BlogContext.Provider value={{
             allBlogsGlobally,
             setAllBlogsGlobally,
             filteredBlogs,
@@ -125,14 +124,64 @@ export const GlobalState = ({children}) => {
             setSearching,
             searchValue,
             setSearchValue,
+        }}>
+        {children}
+        </BlogContext.Provider>
+    )
+
+}
+
+
+export const UIContextProvider = ({children}) => {
+    const [openUserAccount, setOpenUserAccount] = useState(false);
+    const [editProfile, setEditProfile] = useState(false);
+    const [showMenu, setShowMenu] = useState(false);  
+    const [inHomePage, setInHomePage] = useState(true);
+    
+
+    
+    // useEffect(() => {
+    //     console.log("Navbar runs: ")
+    // }, [currentUser,loggedIn]);
+
+    
+    return (
+        <UIContext.Provider value={{
+            openUserAccount,
+            setOpenUserAccount,
+            setShowMenu,
+            showMenu,
+            editProfile,
+            setEditProfile,
             inHomePage,
             setInHomePage
         }}>
             {children}
-        </AppContext.Provider>
+        </UIContext.Provider>
     );
 }
 
-export const useGlobalContext = () => {
-    return useContext(AppContext);
+
+
+export function useBlogContext(){
+    const context = useContext(BlogContext);
+    if(context === null){
+        throw new Error("UseBlogContext can only be used inside BlogContext Provider");
+    }
+    return context
+} 
+
+export const useAuthenContext = () => {
+    const context = useContext(AuthenContext);
+    if(context === null){
+        throw new Error('AuthenContext can only use within AuthenContext Provider')
+    }
+    return context;
+}
+export const useUIContext = () => {
+    const context = useContext(UIContext);
+    if(context === null){
+        throw new Error('useUIContext can only use within useUIContext Provider')
+    }
+    return context;
 }
