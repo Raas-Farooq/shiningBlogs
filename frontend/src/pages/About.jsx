@@ -6,7 +6,7 @@ import {
   FaWhatsapp,
   FaSpinner,
 } from "react-icons/fa";
-import { useGlobalContext } from "../globalContext/globalContext";
+
 import axios from "axios";
 import { useParams } from "react-router-dom";
 import { slice } from "lodash";

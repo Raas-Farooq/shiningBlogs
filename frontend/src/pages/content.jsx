@@ -1,7 +1,7 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useGlobalContext } from "../globalContext/globalContext";
+import { useUIContext } from "../globalContext/globalContext";
 import Title from '../Components/contentSection/Title.jsx';
 import TextContent from "../Components/contentSection/textContent";
 import TitleImage from '../Components/contentSection/titleImage.jsx'
@@ -9,7 +9,7 @@ import { FaSpinner } from "react-icons/fa";
 
 
 export default function Content() {
-    const {setInHomePage, setShowMenu} = useGlobalContext();
+    const {setInHomePage, setShowMenu} = useUIContext();
     const [loading, setLoading] = useState(true);
     let yourBlogs=[];
     const [yourContent, setYourContent] = useState([]);

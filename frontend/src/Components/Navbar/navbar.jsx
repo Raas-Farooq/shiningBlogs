@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import {FaBars, FaTimes, FaFacebook, FaPinterest, FaSearch, FaTwitter, FaWhatsapp, FaUser, FaRegUser} from 'react-icons/fa';
-import { useAuthenContext, useBlogContext, useGlobalContext, useUIContext } from '../../globalContext/globalContext';
+import { useAuthenContext, useBlogContext,useUIContext } from '../../globalContext/globalContext';
 import { FaTwitch } from 'react-icons/fa';
 import {CiSearch} from 'react-icons/ci';
 import WindowSize from '../../windowSize';

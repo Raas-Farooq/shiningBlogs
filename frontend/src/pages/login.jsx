@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useAuthenContext, useGlobalContext } from "../globalContext/globalContext";
+import { useAuthenContext } from "../globalContext/globalContext";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { FaSpinner } from "react-icons/fa";

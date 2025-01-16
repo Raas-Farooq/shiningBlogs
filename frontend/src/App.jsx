@@ -5,10 +5,10 @@ import './App.css'
 import Navbar from './Components/Navbar/navbar';
 import MainSection from  './Components/mainSection/main-section.jsx';
 import BlogContent from './Components/contentSection/blog-content.jsx';
-import { useGlobalContext } from './globalContext/globalContext.jsx';
+import { useAuthenContext } from './globalContext/globalContext.jsx';
 
 function App() {
-  const {loading} = useGlobalContext();
+  const {loading} = useAuthenContext();
   return (
     <>
     {loading ? <h1> ..Loading </h1> : (

@@ -11,7 +11,7 @@ import UpdateProfile from "../pages/updateProfile"
 import Register from "../pages/register"
 import Login from "../pages/login"
 import { useRef } from "react"
-import { useGlobalContext } from "../globalContext/globalContext"
+import { useAuthenContext } from "../globalContext/globalContext"
 import BlogPost from "../pages/post"
 import EditPost from '../pages/editPost'
 
@@ -52,7 +52,7 @@ const PageTransition = () => {
 }
 
 const ProtecedRoute = ({children, stayOnPage=false }) => {
-    const {loggedIn, loading, setLoggedIn} = useGlobalContext();
+    const {loggedIn, loading} = useAuthenContext();
 
     if(loading){
         return <h1> Loading.. </h1>

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useGlobalContext } from "../globalContext/globalContext"
+import { useAuthenContext, useUIContext } from "../globalContext/globalContext"
 import Image from "../Components/contentSection/titleImage";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import TextContent from '../Components/contentSection/textContent';
@@ -9,7 +9,8 @@ import Navbar from '../Components/Navbar/navbar';
 
 const BlogPost = () => {
 
-    const {setInHomePage,currentUser, loggedIn,setLoggedIn,setSearching} = useGlobalContext();
+    const {setInHomePage} = useUIContext();
+    const {currentUser, loggedIn,setLoggedIn} = useAuthenContext();
     console.log("loggeIn after useGlobal: ", loggedIn)
     const [blogOwner, setBlogOwner] = useState(false);
     const [post, setPost] = useState({});

@@ -5,10 +5,10 @@ import TextContent from "../Components/contentSection/textContent";
 import ContentImages from "../Components/contentSection/ContentImage";
 import axios from "axios";
 import { debounce } from "lodash";
-import { useGlobalContext } from "../globalContext/globalContext";
+import { useAuthenContext } from "../globalContext/globalContext";
 
 const EditPost = () => {
-  const { loggedIn, setLoggedIn } = useGlobalContext();
+  const { loggedIn } = useAuthenContext();
   const [cursorPosition, setCursorPosition] = useState(0);
   const [newTitleImage, setNewTitleImage] = useState(false);
   const [removedImages, setRemovedImages] = useState([]);

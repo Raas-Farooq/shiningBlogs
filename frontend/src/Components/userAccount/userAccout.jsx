@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useGlobalContext } from "../../globalContext/globalContext";
+import { useAuthenContext, useUIContext } from "../../globalContext/globalContext";
 import { Link, useNavigate } from "react-router-dom";
 import { FaImage } from "react-icons/fa";
 import updateProfile from "../../pages/updateProfile";
@@ -7,7 +7,8 @@ import UpdateProfile from "../../pages/updateProfile";
 import axios from "axios";
 // eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7InVzZXJJZCI6IjY2ZGQ5YTZiMDllN2VjNzNjYjEzMThmOSIsImVtYWlsIjoiaG93bXVjaEBnbWFpbC5jb20ifSwiaWF0IjoxNzI1Nzk5MDE5LCJleHAiOjE3MjU4MDI2MTl9.30d-8wrkgIIbNR5iTJs-kpjV-6fhYYMoJtO68M_My-0
 const UserAccount = () => {
-  const { setIsAuthenticated, openUserAccount, setOpenUserAccount, setEditProfile,currentUser,setLoggedIn, imagePreview} = useGlobalContext();
+  const { setIsAuthenticated,setLoggedIn, imagePreview,currentUser} = useAuthenContext();
+  const {openUserAccount, setOpenUserAccount, setEditProfile} = useUIContext();
   console.log("inside user Account: openUser ",openUserAccount);
 
     const [userImage, setUserImage] = useState('');

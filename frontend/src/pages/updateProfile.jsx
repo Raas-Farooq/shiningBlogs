@@ -1,15 +1,14 @@
 import { useEffect, useState } from "react";
-import { useGlobalContext } from "../globalContext/globalContext";
+import { useAuthenContext, useUIContext } from "../globalContext/globalContext.jsx";
 import { Link, useNavigate, useNavigation} from "react-router-dom";
 import { FaImage } from "react-icons/fa";
 import axios from 'axios';
 
-// dua 
-// dua@gmail.com
-// lifeLamha
+
 const UpdateProfile = () => {
 
-    const {isAuthenticated, setEditProfile,setImagePreview, imagePreview} = useGlobalContext();
+    const {isAuthenticated,setImagePreview, imagePreview} = useAuthenContext();
+    const {setEditProfile} = useUIContext();
     // const [userImage, setUserImage] = useState('');
     const [userReceived, setUserReceived] = useState({});
     const [message, setMessage] = useState('');

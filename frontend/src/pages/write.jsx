@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import ContentImages from "../Components/contentSection/ContentImage";
-import { useGlobalContext } from "../globalContext/globalContext";
+import { useAuthenContext } from "../globalContext/globalContext";
 import { Upload } from "lucide-react";
 
 export default function Write() {
@@ -13,7 +13,7 @@ export default function Write() {
   });
   const moveTo = useNavigate();
   const currentTextArea = useRef(null);
-  const { loggedIn } = useGlobalContext();
+  const { loggedIn } = useAuthenContext();
   const [cursorPosition, setCursorPosition] = useState(0);
   // const [titleErr, setTitleErr] = useState('');
   const [loadingErr, setLoadingErr] = useState(false);

@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
-import { useGlobalContext } from "../globalContext/globalContext";
+import { useAuthenContext } from "../globalContext/globalContext";
 import { Link, Navigate, useNavigate } from "react-router-dom";
 import { FaImage } from "react-icons/fa";
 import axios from "axios";
 
 const Register = () => {
-    const {setLoggedIn, setRegisterData, loggedIn} = useGlobalContext();
+    const {setLoggedIn, setRegisterData, loggedIn} = useAuthenContext();
 
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
