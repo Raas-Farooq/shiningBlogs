@@ -2,7 +2,7 @@ import { useEffect, useState} from "react"
 
 
 const Title = ({title}) => {
-    const [slicedTitle, setSlicedTitle] = useState({});
+    const [slicedTitle, setSlicedTitle] = useState({initialWords:'', lastWords:''});
 
     useEffect(() => {
         if(title.length > 35){
