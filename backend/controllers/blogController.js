@@ -269,7 +269,7 @@ const logging =  async(req,res) => {
         jwt.sign(
             ({user:{userId:user._id}}), 
             process.env.JWT_SECRET,
-             {expiresIn: '1h'}
+             {expiresIn: '10m'}
              , (err, token) => {
                 if(err){
                     return res.status(500).json({
@@ -592,14 +592,13 @@ const getBlogPost = async(req,res) => {
         console.error("error occured", err)
         return res.status(500).json({
             success:false,
-            message:"Server error while accessing blog Post"
+            message: "Something went wrong while fetching the blog post. Please try again later."
         })
     }
 }
 
 
 const allBlogs = async(req, res) => {
-    console.log("allBlogs Shines");
     try{
         const blogs = await Blog.find({});
         if(!blogs){

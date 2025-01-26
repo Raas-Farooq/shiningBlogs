@@ -9,12 +9,12 @@ import { CSSTransition, Transition, TransitionGroup } from "react-transition-gro
 import UserAccount from "../Components/userAccount/userAccout"
 import UpdateProfile from "../pages/updateProfile"
 import Register from "../pages/register"
-import Login from "../pages/login"
-import { useRef } from "react"
-import { useAuthenContext } from "../globalContext/globalContext"
-import BlogPost from "../pages/post"
-import EditPost from '../pages/editPost'
-
+import Login from "../pages/login";
+import { useRef } from "react";
+import { useAuthenContext } from "../globalContext/globalContext";
+import BlogPost from "../pages/post";
+import EditPost from '../pages/editPost';
+import NotFound from '../pages/notFound.jsx';
 
 const PageTransition = () => {
     const location = useLocation();
@@ -41,7 +41,7 @@ const PageTransition = () => {
                     <Route path="/login" element ={<Login />} /> 
                     <Route path="/BlogPost/:id" element={<BlogPost />} />
                     <Route path="/editPost" element={<EditPost />} />
-                    
+                    <Route path="/notFound" element={<NotFound />} />
                 </Routes>
             </div>
             </CSSTransition>

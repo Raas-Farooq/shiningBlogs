@@ -11,7 +11,7 @@ const CheckAuthen = async(req, res) => {
         })
     }
 
-    jwt.verify(token, process.env.JWT_SECRET, {expiresIn:'1h'},
+    jwt.verify(token, process.env.JWT_SECRET, {expiresIn:'10m'},
         async (err, decoded) => {
             if(err){
                 return res.status(401).json({

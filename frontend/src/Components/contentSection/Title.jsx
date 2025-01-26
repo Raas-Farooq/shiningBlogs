@@ -9,23 +9,32 @@ const Title = ({title}) => {
             const words = title.split(" ");
             const initialWords = words.slice(0,6).join(" ");
             const lastWords = words.slice(6).join(' ');
-            let reduceTitle = {initialWords, lastWords};
-            setSlicedTitle(reduceTitle);
+            setSlicedTitle({initialWords, lastWords})
+        }else{
+            setSlicedTitle({initialWords:title, lastWords:''})
         }
     }, [title]);
 
     return (
-        <>
-            {title && title?.length > 35 ? (
-                <>
-                    <p className="text-center xs:text-xs sm:text-sm font-semibold text-gray-800">{slicedTitle?.initialWords}</p>
-                    <p className="text-center xs:text-xs sm:text-sm font-semibold">{slicedTitle?.lastWords}</p>
-                </>
-            ):
-            
-            <p className="text-center xs:text-xs sm:text-sm font-semibold pb-5"> {title} </p>
+        <div>
+            { !title? <h2> ... </h2>:
+            (<>
+                {slicedTitle.lastWords ? (
+                    <>
+                        <p className="text-center xs:text-xs sm:text-sm font-semibold text-gray-800">
+                            {slicedTitle?.initialWords}
+                        </p>
+                        <p className="text-center xs:text-xs sm:text-sm font-semibold">
+                            {slicedTitle?.lastWords}
+                        </p>
+                    </>
+                ):
+                
+                <p className="text-center xs:text-xs sm:text-sm font-semibold pb-5"> {slicedTitle?.initialWords} </p>
+                }
+            </>)
             }
-        </>
+        </div>
     )
 }
 

@@ -64,7 +64,7 @@ function UserProfile({ currentUser, profileImage }) {
   );
 }
 const BlogCard = ({ blog, handlePostClick, filtering = false }) => {
-  console.log("filtering ", filtering);
+  
   return (
     <article
       className="flex flex-col items-center p-4 rounded-lg transition-all duration-300 hover:scale-105
@@ -214,7 +214,4 @@ export default function BlogContent() {
   );
 }
 
-// why did you use grid instead of flex for cards
-//why using aside as Parent container for UserProfile
-// what are the main difference of styles from my file and why
-// why using useCallback with small functions like clearLocalStorage
+

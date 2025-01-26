@@ -17,40 +17,6 @@ const About = () => {
   const [localBlogs, setLocalBlogs] = useState([]);
   const [rule, setRule] = useState([]);
 
-  //controller Example
-
-  // useEffect(() => {
-  //   setLoading(true);
-  //   setError(null);
-  //   async function fetchResources(){
-  //    try{
-  //     const controller = new AbortController();
-
-  //     const fetchResponse = await axios.get('http://localhost:4100/weblog/allBlogs',{
-  //       signal:controller.signal
-  //     })
-  //     // const result = await fetchResponse.json();
-  //     console.log("controller way fetchResponse: ", fetchResponse);
-  //     setLocalBlogs(fetchResponse.data.blogs);
-  //     }
-  //     catch(err){
-  //       if (err.name === 'AbortError'){
-  //         console.log("request has been canceled");
-  //         setError(err)
-  //         return
-  //       }
-  //       throw err
-  //     }
-  //     finally{
-  //       setLoading(false)
-  //     }
-
-  //     return () => controller.abort();
-  //   }
-  //   fetchResources()
-  // },[])
-
-  
   return (
     <div className="page-content bg-gray-50 min-h-screen">
       <h1 className="text-4xl font-bold text-pink-600 text-center py-5">

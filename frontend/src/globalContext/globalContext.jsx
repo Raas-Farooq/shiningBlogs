@@ -17,7 +17,7 @@ export const AuthenContextProvider = ({children}) => {
     const [loading, setLoading] = useState(true);
     const [currentUser, setCurrentUser] = useState(null);
     const [imagePreview, setImagePreview] = useState('');
-    
+    const [errorMessage, setErrorMessage] = useState('');
     useEffect(() => {
         const userId = localStorage.getItem('userId');
         if (userId) {
@@ -102,6 +102,8 @@ export const AuthenContextProvider = ({children}) => {
             setCurrentUser,
             imagePreview,
             setImagePreview,
+            errorMessage,
+            setErrorMessage
         }}>
             {children}
         </AuthenContext.Provider>
