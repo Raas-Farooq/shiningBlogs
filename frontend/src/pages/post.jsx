@@ -8,36 +8,34 @@ import useFetchPost from "../Hooks/fetchPost";
 import axios from "axios";
 import Navbar from "../Components/Navbar/navbar";
 import useUserPrivileges from "../Hooks/ownerPrivileges";
+import makeApiCall from "./makeApiCall";
 import clsx from "clsx";
 
 //editpost error message if you click the editpost from Post and then it is unable to find the post because of wrong Id means style the Error message & send more appropriate message
 const BlogPost = () => {
   const { setInHomePage } = useUIContext();
-  const { currentUser, loggedIn,setErrorMessage,errorMessage } = useAuthenContext();
+  const { currentUser, loggedIn,setErrorMessage,errorMessage,loading,setLoading } = useAuthenContext();
   let { id } = useParams();
   const [isDeletingPost, setIsDeletingPost] = useState(false);
   id = id.startsWith(":") ? id.slice(1) : id;
   const { ownerLoading, blogOwner,setBlogOwner} = useUserPrivileges(id);
-  const { post, postLoading } = useFetchPost(id);
-  // console.log(`OutSide UseEffect combined loading ${loading}`)
+  const {post, postLoading} = useFetchPost(id);
+  console.log("post after useFetchPost inside BlogPost: ", post);
   const moveTo = useNavigate();
   useEffect(() => {
-    // ownerLoading ${ownerLoading} and blogOwner inside Post${blogOwner} and
-    // console.log(`combined loading ${loading}`)
-    console.log('ErrorMessage: ', errorMessage);
     setInHomePage(false);
+    
   }, []);
-  // const {post, myBlogs} = location.state || {};
+
   useEffect(() => {
     const userId = localStorage.getItem("userId");
     console.log("userId: ", userId);
-
-    // console.log("POST inside Post: ", post);
   }, [id]);
+
+
   const handleEdit = (e, post) => {
     e.preventDefault();
-    console.log("postId: ", post._id);
-    const postId = `92378shkdjh29384y`;
+    const postId = post._id;
     moveTo(`/editPost`, { state: { postId } });
   };
   function handleDelete(e, id) {
@@ -45,48 +43,57 @@ const BlogPost = () => {
     const confirm = window.confirm(
       "Are You sure to delete this Post. You won't be able to recover it!"
     );
-    // if()
+   
     const deletingPost = async () => {
+
       setBlogOwner(false);
       setIsDeletingPost(true)
-      try {
-        if (confirm) {
-          const response = await axios.delete(
-            `http://localhost:4100/weblog/deleteBlog/${id}`,
-            { withCredentials: true }
-          );
-          if (response.data.success) {
-            alert("Successfully Remove the Post");
-            moveTo("/");
-          }
+
+      const url = `http://localhost:4100/weblog/deleteBlog/${id}`;
+
+      const onSuccess=(response)=> {
+        if(response.data.success){
+          alert("Successfully Deleted the Blog");
+          moveTo('/');
         }
-      } catch (error) {
-        console.log("experiencing Error while deleting ", error);
-        if (error.response.data.error === "jwt expired") {
-          setErrorMessage("JWT Expired! Please Try again Later!");
-        } else if(error.request){
-          setErrorMessage('Server is failed to connect. Try again later')
+      }
+
+      function onError(err){
+        if(err.response?.data?.error === 'jwt expired'){
+          setErrorMessage('JWT Expired! Login Again');
+
         }
-        else{
+        else if(err.response?.data?.message){
+          setErrorMessage(err.response.data.message);
+        }
+        else if(err.request){
+          setErrorMessage("Not getting resposne from the server. Please Connect Again!")
+        }
+        else {
           setErrorMessage(err.message);
         }
       }
-      finally{
-        setBlogOwner(true);
-        setIsDeletingPost(false)
-      }
+
+      makeApiCall(setLoading, url, {method:'DELETE'}, onSuccess, onError);
+      setBlogOwner(true);
+      setIsDeletingPost(false);
+  
     };
-
-    deletingPost();
+    if(confirm){
+      deletingPost();
+    }
+    
   }
-
-  if(!postLoading && !post.title ){
-    moveTo('/notFound')
-  }
+  useEffect(() => {
+    if(!postLoading && !post.title ){
+      console.log("!loading & post.title has run")
+      moveTo('/notFound')
+    }
+  }, [postLoading, post, moveTo])
+  
   return (
     <>
       <Navbar showSearch={false} />
-      {console.log("error Message : ", errorMessage)}
       <div
         data-component="post-container"
         className={`${

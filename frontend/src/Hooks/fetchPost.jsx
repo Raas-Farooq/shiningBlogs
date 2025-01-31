@@ -1,46 +1,47 @@
 import React,{useState, useEffect} from 'react';
 import axios from 'axios';
 import { useAuthenContext } from '../globalContext/globalContext';
+import MakeApiCall from '../pages/makeApiCall';
+
 
 const useFetchPost = (id) => {
     const [post, setPost] = useState({});
 
     const [postLoading, setPostLoading] = useState(true);
-    const {isAuthenticated,setIsAuthenticated, errorMessage, setErrorMessage} = useAuthenContext();
+    const { setErrorMessage} = useAuthenContext();
 
     useEffect(() => {
         const getPost = async() => {
-            console.log("Post id: insidse UseFetchPost", id);
-            
-            try{
-                if(id){
-                    const response = await axios.get(`http://localhost:4100/weblog/getBlogPost/${id}`,
-                    { withCredentials:true}
-                );
-                    setPost(response.data.blogPost);
-                    console.log("response: insidse UseFetchPost", response);
+       
+            const url = `http://localhost:4100/weblog/getBlogPost/${id}`;
+
+            const onSuccess = (response) => {
+                console.log('reposne data blogPost inside fetchPost received from makeApicall: ', response.data.blogPost);
+                setPost(response.data.blogPost)
+            }
+
+
+            const onError = (error) => {
+                if(error?.response?.data.message) {
+                    setErrorMessage(error.response.data.message)
+                }
+                else if(error.request){
+                    setErrorMessage("Failed to Get the server response. Try Again Later!")
+                }
+                else {
+                    setErrorMessage(error.message);
                 }
             }
-            catch(err){
-                console.log("I'm here Err : while getting the Post ", err);
-                if(err.response.data.message){
-                    setErrorMessage(err.response.data.message);
-                }else if(err.request){
-                    setErrorMessage('Failed to Connect to the server. Please Try Again Later!')
-                }else{
-                    setErrorMessage(err.message);
-                }
-                
-            }
-            finally{
-                setPostLoading(false);
-            }
-    
-            
+            MakeApiCall(setPostLoading, url, {method:"GET"}, onSuccess, onError);   
         }
         getPost();
     },[id])
-    return {post, postLoading, isAuthenticated}
+
+    console.log('post inside fetchPost before return: ', post);
+
+    return {post, postLoading}
+
+    
 }
 
 export default useFetchPost;

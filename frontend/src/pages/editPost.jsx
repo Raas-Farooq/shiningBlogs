@@ -141,6 +141,25 @@ const EditPost = () => {
         setPost(response.data.blogPost);
       } catch (err) {
         console.error("error while getting the post ", err);
+        if(err?.response?.data.message){
+          setErrors({
+            message:err.response.data.message
+          })
+        }
+        else if(err?.response?.data){
+     
+            setErrors({
+              message:"Some Errors returned by the SErver "
+            })
+
+        }
+        else if(err?.request){
+          setErrors({
+            message:
+              "Not connected to the server. Plz check & Try Again!!",
+          });
+        }
+        else if(e)
         setErrors({
           message:
             "Post is not Loading, you are either logged out or internet connection err. Plz check & Try Again!!",
