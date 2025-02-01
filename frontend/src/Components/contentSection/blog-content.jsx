@@ -68,8 +68,8 @@ const BlogCard = ({ blog, handlePostClick, filtering = false }) => {
   return (
     <article
       className="flex flex-col items-center p-4 rounded-lg transition-all duration-300 hover:scale-105
-                     shadow-md hover:shadow-xl bg-white
-                     max-w-sm w-full"
+      shadow-md hover:shadow-xl bg-white
+      max-w-sm w-full"
     >
       <h2 className="text-center text-base sm:text-lg font-medium mb-4">
         <Title title={blog.title} />
@@ -78,8 +78,8 @@ const BlogCard = ({ blog, handlePostClick, filtering = false }) => {
       <TextContent content={blog.content} />
       <button
         className="mt-4 bg-blue-500 text-white py-2 px-4 rounded-lg 
-                       hover:bg-blue-600 transition-colors duration-200
-                       focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+        hover:bg-blue-600 transition-colors duration-200
+        focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
         onClick={(e) => handlePostClick(e, blog)}
       >
         Read More

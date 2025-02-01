@@ -1,0 +1,19 @@
+# Node dependencies
+node_modules/
+**/node_modules/
+
+# Build directories
+**/dist
+**/build
+**/.vite
+
+# Environment variables
+.env
+**/.env
+
+# IDE files
+.vscode/
+.idea/
+
+# System files
+.DS_Store
