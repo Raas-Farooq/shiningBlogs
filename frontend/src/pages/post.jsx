@@ -174,10 +174,9 @@ const BlogPost = () => {
               </button>
               <button
                 onClick={() => moveTo("/")}
-                className="bg-transparent text-gray-700 hover:text-blue-600 hover:underline "
+                className="bg-transparent text-gray-700 hover:text-blue-600 hover:underline"
               >
-                {" "}
-                Back To Home{" "}
+              Back To Home{" "}
               </button>
             </div>
           </div>

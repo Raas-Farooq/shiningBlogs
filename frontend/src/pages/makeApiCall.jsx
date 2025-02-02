@@ -28,3 +28,4 @@ const MakeApiCall =  async(setLoading,url, method, onSuccess, onError) => {
 }
 
 export default MakeApiCall
+
