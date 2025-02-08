@@ -1,0 +1,72 @@
+import {useState, useEffect} from 'react';
+// import axios from 'axios';
+import { useAuthenContext } from '../globalContext/globalContext';
+import MakeApiCall from '../pages/makeApiCall';
+
+interface Post {
+    id:string,
+    title:string,
+    titleImage:string,
+    content:string
+}
+
+interface ApiResponse {
+    data:{
+        blogPost:Post
+    }
+    
+}
+
+interface ApiError {
+    response?:{
+        data:{
+            message:string
+        }
+    }
+    request?:any,
+    message:string
+
+}
+
+
+const useFetchPost = (id:string) => {
+    
+    const [post, setPost] = useState<Post | null>(null);
+    const [postLoading, setPostLoading] = useState<Boolean>(true);
+    const { setErrorMessage}:{setErrorMessage:(errorMessage:string) => void} = useAuthenContext();
+
+    useEffect(() => {
+        const getPost = async() => {
+       
+            const url = `http://localhost:4100/weblog/getBlogPost/${id}`;
+
+            const onSuccess = (response:ApiResponse) => {
+                console.log('reposne data blogPost inside fetchPost received from makeApicall: ', response);
+                setPost(response.data.blogPost)
+            }
+
+
+            const onError = (error:ApiError) => {
+                if(error?.response?.data.message) {
+                    setErrorMessage(error.response.data.message)
+                }
+                else if(error.request){
+                    setErrorMessage("Failed to Get the server response. Try Again Later!")
+                }
+                else {
+                    setErrorMessage(error.message);
+                }
+            }
+            MakeApiCall(setPostLoading, url, {method:"GET"}, onSuccess, onError);   
+        }
+        getPost();
+    },[id])
+  
+    console.log('post inside fetchPost Ts before return: ', post, "postLoading", postLoading);
+    return {post, postLoading}
+
+}
+
+export default useFetchPost;
+
+

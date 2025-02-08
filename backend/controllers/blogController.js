@@ -12,7 +12,7 @@ import authMiddleware from '../middleAuthentication/authMiddleware.js';
 const registerUser = async (req,res) => {
     
     const errors = validationResult(req);
-    console.log("validation Result to Err: ", errors);
+    console.log("validation Result if Err: ", errors);
     if(!errors.isEmpty()){
         return res.status(404).json({
             success:false,
@@ -110,7 +110,7 @@ const current = async (req,res) => {
     try{
         const {email} = req.body;
         
-        const user = await User.find({email});
+        const user = await User.findOne({email});
 
         if(!user){
             return res.status(401).json({
@@ -242,9 +242,7 @@ const logging =  async(req,res) => {
     try{
 
         // accessing User
-        const allUsers = await User.find({});
-        console.log("all Users inside try block: ", allUsers);
-        const user = await User.findOne({email});
+        const user = await User.findOne({email}).lean();
         console.log("user: inside login ", user);
         // if user didn't exist
         if(!user) {
@@ -564,7 +562,7 @@ const getUser = async(req,res) => {
 const getBlogPost = async(req,res) => {
 
     let blogId = req.params.id;
-    console.log("getBlog post runs: ", blogId);
+    console.log("getBlog runs: ", blogId);
     blogId = blogId.startsWith(':') ? blogId.slice(1): blogId;
     if(!mongoose.Types.ObjectId.isValid(blogId)){
         console.log("not a valid blog Id");
@@ -592,7 +590,7 @@ const getBlogPost = async(req,res) => {
         console.error("error occured", err)
         return res.status(500).json({
             success:false,
-            message: "Something went wrong while fetching the blog post. Please try again later."
+            message: "Something went wrong while fetching the blog post. Please try later."
         })
     }
 }

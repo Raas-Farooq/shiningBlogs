@@ -2,7 +2,7 @@
 
 import { BrowserRouter, Navigate, Route,Routes, useLocation } from "react-router-dom"
 import App from "../App"
-import About from "../pages/About"
+import About from "../pages/About.tsx"
 import Write from "../pages/write"
 import Content from "../pages/content"
 import { CSSTransition, Transition, TransitionGroup } from "react-transition-group"
@@ -14,7 +14,7 @@ import { useRef } from "react";
 import { useAuthenContext } from "../globalContext/globalContext";
 import BlogPost from "../pages/post";
 import EditPost from '../pages/editPost';
-import NotFound from '../pages/notFound.jsx';
+import NotFound from '../pages/notFound.tsx';
 
 const PageTransition = () => {
     const location = useLocation();

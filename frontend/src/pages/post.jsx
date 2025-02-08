@@ -4,7 +4,7 @@ import Image from "../Components/contentSection/titleImage";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import TextContent from "../Components/contentSection/textContent";
 import { FaEdit, FaSpinner, FaTrash } from "react-icons/fa";
-import useFetchPost from "../Hooks/fetchPost";
+import useFetchPost from "../Hooks/fetchPost.ts";
 import axios from "axios";
 import Navbar from "../Components/Navbar/navbar";
 import useUserPrivileges from "../Hooks/ownerPrivileges";
@@ -85,7 +85,8 @@ const BlogPost = () => {
     
   }
   useEffect(() => {
-    if(!postLoading && !post.title ){
+    // console.log("postLoading: ", postLoading, "post title", post.title);
+    if(!postLoading && !post){
       console.log("!loading & post.title has run")
       moveTo('/notFound')
     }
@@ -122,10 +123,10 @@ const BlogPost = () => {
         ) : (
           <div className="w-full max-w-4xl mx-auto px-4 py-5 rounded:md shadow-lg bg-white">
             <div className="">
-              <div key={post._id} id={post._id}>
+              <div key={post?._id} id={post?._id}>
                 <h2 className="text-center w-4/5 text-2xl text-purple-600 font-medium mb-10 p-5">
                   {" "}
-                  {post.title}{" "}
+                  {post?.title}{" "}
                 </h2>
                 {loggedIn && blogOwner && (
                   <div className="text-right flex justify-end gap-2 mb-2 w-[80%]">
@@ -137,18 +138,18 @@ const BlogPost = () => {
                     </button>
                   </div>
                 )}
-                {post.titleImage && (
+                {post?.titleImage && (
                   <Image
-                    postImg={post.titleImage}
-                    title={post.title}
+                    postImg={post?.titleImage}
+                    title={post?.title}
                     isFullView={true}
                   />
                 )}
                 <TextContent
-                  content={post.content}
+                  content={post?.content}
                   isFullView={true}
                   fromPost={true}
-                  contentImages={post.contentImages}
+                  contentImages={post?.contentImages}
                 />
               </div>
             </div>

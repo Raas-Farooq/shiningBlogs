@@ -6,12 +6,16 @@ dotenv.config();
 const databaseConnection = async() => {
     // console.log("MONGODB URI ", process.env.MONGODB_URI);
     const connect = mongoose.connect(process.env.MONGODB_URI, {
-        // serverSelectionTimoutMS:5000,
-        connectTimeoutMS:10000
+        serverSelectionTimeoutMS: 30000,
+        connectTimeoutMS: 60000,
+        // socketTimeoutMS: 60000,
+        // heartbeatFrequencyMS: 30000,
+        // retryWrites: true,
+        // retryReads: true
     })
     .then(() => {
         
-    console.log("Database Connected. Hooo!");
+    console.log("Database Connected. Allah(SWT) has been MERciful whenever i called even in School times!");
         
 })
     .catch(err => {

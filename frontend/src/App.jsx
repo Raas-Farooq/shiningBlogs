@@ -4,7 +4,7 @@ import viteLogo from '/vite.svg'
 import './App.css'
 import Navbar from './Components/Navbar/navbar';
 import MainSection from  './Components/mainSection/main-section.jsx';
-import BlogContent from './Components/contentSection/blog-content.jsx';
+import BlogContent from './Components/contentSection/blog-content.tsx';
 import { useAuthenContext } from './globalContext/globalContext.jsx';
 
 function App() {

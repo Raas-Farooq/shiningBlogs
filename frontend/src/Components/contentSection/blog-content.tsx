@@ -4,8 +4,8 @@ import PostImage from "./titleImage.jsx";
 import TextContent from "./textContent.jsx";
 import Title from "./Title.jsx";
 import { Link, useNavigate } from "react-router-dom";
-import { FaRedo, FaSpider, FaSpinner, FaSync } from "react-icons/fa";
-import { Sidebar, User } from "lucide-react";
+import {FaSpinner } from "react-icons/fa";
+// import { Sidebar, User } from "lucide-react";
 // BlogContent
 //
 import {
@@ -13,10 +13,29 @@ import {
     useAuthenContext,
     useBlogContext,
     useUIContext,
-} from "../../globalContext/globalContext";
+} from "../../globalContext/globalContext.jsx";
 
-function UserProfile({ currentUser, profileImage }) {
+interface PresentUser{
+  _id:string,
+  username:string,
+  email:string,
+  password:string,
+  profileImg:string,
+  TopicsInterested:[],
+  goal:string,
+  createdAt:string,
+  updatedAt:string
+}
 
+interface userProfileProps {
+  currentUser:PresentUser,
+  profileImage:string
+}
+
+
+function UserProfile( {currentUser, profileImage}:userProfileProps) {
+ 
+  
   return (
     <aside
       className={`py-8 p-4 w-[30vw] text-center bg-gray-50 shadow:sm rounded:lg`}
@@ -63,8 +82,27 @@ function UserProfile({ currentUser, profileImage }) {
     </aside>
   );
 }
-const BlogCard = ({ blog, handlePostClick, filtering = false }) => {
+
+
+interface Blog{
+  _id:string,
+  userId:string,
+  title:string,
+  titleImage:string,
+  content:[],
+  contentImages:[],
+  createdAt:string,
+  updatedAt:string
+}
+
+interface BlogCardProps{
+  blog:Blog,
+  handlePostClick:(e:React.MouseEvent<HTMLButtonElement>, post:Blog) => void,
+  filtering:boolean
+}
+const BlogCard:React.FC<BlogCardProps> = ({ blog, handlePostClick, filtering = false }) => {
   
+  console.log("blog: ", blog, "handlePostClick: ", handlePostClick, "filtering: ", filtering)
   return (
     <article
       className="flex flex-col items-center p-4 rounded-lg transition-all duration-300 hover:scale-105
@@ -89,6 +127,8 @@ const BlogCard = ({ blog, handlePostClick, filtering = false }) => {
 };
 
 export default function BlogContent() {
+
+
   const {
     searchValue,
     setFilteredBlogs,
@@ -99,7 +139,7 @@ export default function BlogContent() {
     setAllBlogsGlobally,
   } = useBlogContext();
 
-  const { loggedIn, currentUser } = useAuthenContext();
+  const { loggedIn:boolean, currentUser: PresentUser} = useAuthenContext();
   const {showMenu,} = useUIContext();
   const [loading, setLoading] = useState(true);
   const [profileImage, setProfileImage] = useState("");
@@ -108,6 +148,7 @@ export default function BlogContent() {
     if (currentUser?.profileImg) {
       const myImage = `http://localhost:4100/${currentUser.profileImg}`;
       setProfileImage(myImage);
+      
     }
     if (!allBlogsGlobally) {
       setLoading(true);
@@ -195,11 +236,6 @@ export default function BlogContent() {
         {loggedIn && (
           <UserProfile currentUser={currentUser} profileImage={profileImage} />
         )}
-        {/* {currentUser ? (
-                        
-                    ):
-                    <h2> Loading..</h2>
-                    } */}
       </div>
 
       <div
@@ -213,5 +249,8 @@ export default function BlogContent() {
     </div>
   );
 }
+
+
+// suppose i dont destrcture them and used it like this then why doesn't it work 'function UserProfile( currentUser:PresentUser, profileImage:string) {'
 
 

@@ -5,7 +5,7 @@ import TextContent from "../Components/contentSection/textContent";
 import ContentImages from "../Components/contentSection/ContentImage";
 import axios from "axios";
 import { debounce } from "lodash";
-import { useAuthenContext } from "../globalContext/globalContext";
+import { useAuthenContext } from "../globalContext/globalContext.tsx";
 
 const EditPost = () => {
   const { loggedIn } = useAuthenContext();

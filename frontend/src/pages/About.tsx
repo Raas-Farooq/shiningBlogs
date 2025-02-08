@@ -1,21 +1,14 @@
-import React, { useEffect, useState } from "react";
+// import React, { useEffect, useState } from "react";
 import {
   FaFacebook,
   FaTwitter,
   FaPinterest,
-  FaWhatsapp,
-  FaSpinner,
+  FaWhatsapp
 } from "react-icons/fa";
 
-import axios from "axios";
-import { useParams } from "react-router-dom";
-import { slice } from "lodash";
 
 const About = () => {
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [localBlogs, setLocalBlogs] = useState([]);
-  const [rule, setRule] = useState([]);
+ 
 
   return (
     <div className="page-content bg-gray-50 min-h-screen">

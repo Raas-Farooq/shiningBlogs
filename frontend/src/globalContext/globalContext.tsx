@@ -1,21 +1,57 @@
-import React, { useContext, useEffect, useState } from "react"
+import React, { useContext, useEffect, useState, ReactNode } from "react"
 import axios from 'axios';
 import { jwtDecode } from "jwt-decode";
-import UserAccount from "../Components/userAccount/userAccout";
+// import { BiLogoMailchimp } from "react-icons/bi";
+// import UserAccount from "../Components/userAccount/userAccout";
 // import { isButtonElement } from "react-router-dom/dist/dom";
-const AuthenContext = React.createContext();
-const UIContext = React.createContext();
-const BlogContext= React.createContext();
+// find src -name "*.jsx" -exec sh -c 'mv "$0" "${0%.jsx}.tsx"' {} \; renaming all files
+
+interface User{
+  _id:string,
+  username:string,
+  email:string,
+  password:string,
+  profileImg:string,
+  TopicsInterested:[],
+  goal:string,
+  createdAt:string,
+  updatedAt:string
+}
+interface RegisterNewUser {
+    _id:string,
+    username:string,
+    email:string
+}
+interface decodedToken{
+    exp?:number
+}
+interface AuthenContentProps {
+    loggedIn: boolean;
+    setLoggedIn: React.Dispatch<React.SetStateAction<boolean>>; // Add this line
+    registerData: RegisterNewUser | null;
+    setRegisterData: React.Dispatch<React.SetStateAction<RegisterNewUser | null>>; // Also add this
+    isAuthenticated: boolean;
+    setIsAuthenticated: React.Dispatch<React.SetStateAction<boolean>>;
+    loading: boolean;
+    setLoading: React.Dispatch<React.SetStateAction<boolean>>;
+    currentUser: User | null;
+    setCurrentUser: React.Dispatch<React.SetStateAction<User | null>>;
+    imagePreview: string;
+    setImagePreview: React.Dispatch<React.SetStateAction<string>>;
+    errorMessage: string;
+    setErrorMessage: React.Dispatch<React.SetStateAction<string>>;
+    userAuthentication: () => Promise<void>;
+}
 
 
+const AuthenContext = React.createContext<AuthenContentProps | undefined>(undefined);
 
-
-export const AuthenContextProvider = ({children}) => {
+export const AuthenContextProvider = ({children} : {children:ReactNode}) => {
     const [loggedIn, setLoggedIn] = useState(false);
-    const [registerData, setRegisterData] = useState({});
+    const [registerData, setRegisterData] = useState<RegisterNewUser | null>(null)
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [loading, setLoading] = useState(true);
-    const [currentUser, setCurrentUser] = useState(null);
+    const [currentUser, setCurrentUser] = useState<User | null>(null);
     const [imagePreview, setImagePreview] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
     useEffect(() => {
@@ -33,14 +69,14 @@ export const AuthenContextProvider = ({children}) => {
     
         return () => clearInterval(interval)
     },[])
-    const decodeToken = (token) => {
+    const decodeToken = (token:string): decodedToken | null => {
         try{
             return jwtDecode(token)
         }catch{
             return null
         }
     }
-    const isTokenExpired = (token) => {
+    const isTokenExpired = (token:string):boolean => {
         const decoded = decodeToken(token);
     
         if(!decoded || !decoded.exp) return true
@@ -72,7 +108,7 @@ export const AuthenContextProvider = ({children}) => {
                 localStorage.setItem('userId', response.data.user._id);
             } else {
                 setLoggedIn(false);
-                setCurrentUser(false);
+                setCurrentUser(null);
                 localStorage.removeItem('userId');
             }
         } catch (err) {
@@ -110,11 +146,37 @@ export const AuthenContextProvider = ({children}) => {
     )
 } 
 
-export const BlogContextProvider = ({children}) => {
-    const [allBlogsGlobally, setAllBlogsGlobally] = useState([]);
-    const [filteredBlogs, setFilteredBlogs] = useState([]);
-    const [searchValue,setSearchValue] = useState('');
-    const [searching, setSearching] = useState(false);
+interface Blog{
+    _id:string,
+    userId:string,
+    title:string,
+    titleImage:string,
+    content:[],
+    contentImages:[],
+    createdAt:string,
+    updatedAt:string
+}
+
+
+interface BlogContextProps{
+    allBlogsGlobally: Blog | null,
+    setAllBlogsGlobally: React.Dispatch<React.SetStateAction<Blog |null>>,
+    filteredBlogs: Blog | null,
+    setFilteredBlogs: React.Dispatch<React.SetStateAction<Blog |null>>,
+    searchValue:string,
+    setSearchValue:React.Dispatch<React.SetStateAction<string>>,
+    searching:boolean,
+    setSearching:React.Dispatch<React.SetStateAction<boolean>>
+}
+
+const BlogContext = React.createContext<BlogContextProps | undefined>(undefined);
+export const BlogContextProvider = ({children}:{children:ReactNode}) => {
+    
+
+    const [allBlogsGlobally, setAllBlogsGlobally] = useState<Blog | null>(null);
+    const [filteredBlogs, setFilteredBlogs] = useState<Blog | null>(null);
+    const [searchValue,setSearchValue] = useState<string>('');
+    const [searching, setSearching] = useState<boolean>(false);
 
     return(
         <BlogContext.Provider value={{
@@ -133,12 +195,25 @@ export const BlogContextProvider = ({children}) => {
 
 }
 
+interface UIContextProps {
+    openUserAccount: boolean;
+    setOpenUserAccount: React.Dispatch<React.SetStateAction<boolean>>;
+    editProfile: boolean;
+    setEditProfile: React.Dispatch<React.SetStateAction<boolean>>;
+    showMenu: boolean;
+    setShowMenu: React.Dispatch<React.SetStateAction<boolean>>;
+    inHomePage: boolean;
+    setInHomePage: React.Dispatch<React.SetStateAction<boolean>>;
+}
 
-export const UIContextProvider = ({children}) => {
-    const [openUserAccount, setOpenUserAccount] = useState(false);
-    const [editProfile, setEditProfile] = useState(false);
-    const [showMenu, setShowMenu] = useState(false);  
-    const [inHomePage, setInHomePage] = useState(true);
+const UIContext = React.createContext<UIContextProps | undefined>(undefined);
+
+export const UIContextProvider = ({children}:{children:ReactNode}) => {
+   
+    const [openUserAccount, setOpenUserAccount] = useState<boolean>(false);
+    const [editProfile, setEditProfile] = useState<boolean>(false);
+    const [showMenu, setShowMenu] = useState<boolean>(false);  
+    const [inHomePage, setInHomePage] = useState<boolean>(true);
     
 
     
@@ -167,7 +242,7 @@ export const UIContextProvider = ({children}) => {
 
 export function useBlogContext(){
     const context = useContext(BlogContext);
-    if(context === null){
+    if(!context){
         throw new Error("UseBlogContext can only be used inside BlogContext Provider");
     }
     return context
@@ -187,3 +262,5 @@ export const useUIContext = () => {
     }
     return context;
 }
+
+

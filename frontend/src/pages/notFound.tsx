@@ -3,13 +3,14 @@ import { useAuthenContext } from "../globalContext/globalContext"
 
 
 
-export default function NotFound(){
+const NotFound:React.FC = () => {
     const moveTo = useNavigate();
 
     const {errorMessage} = useAuthenContext();
+
     return(
         <div>
-            <h1> Page is Not Found. Try Again Later!</h1>
+            <h1> Page is Not Found. Try Again Sometimes later!</h1>
             <p> 
                 Error 
                 "{errorMessage}" 
@@ -19,3 +20,5 @@ export default function NotFound(){
         </div>
     )
 } 
+
+export default NotFound
