@@ -4,10 +4,14 @@ import { useAuthenContext } from '../globalContext/globalContext';
 import MakeApiCall from '../pages/makeApiCall';
 
 interface Post {
-    id:string,
+    _id:string,
+    userId:string,
     title:string,
     titleImage:string,
-    content:string
+    content:[],
+    contentImages: [],
+    createdAt:string,
+    updatedAt:string
 }
 
 interface ApiResponse {
@@ -29,13 +33,23 @@ interface ApiError {
 }
 
 
-const useFetchPost = (id:string) => {
+const useFetchPost = (id:string | undefined) => {
     
-    const [post, setPost] = useState<Post | null>(null);
+    const [post, setPost] = useState<Post>({ 
+        _id: "", 
+        userId: "",
+        title: "",
+        titleImage: "",
+        content: [],
+        contentImages:[],
+        createdAt: "",
+        updatedAt: ""
+      });
     const [postLoading, setPostLoading] = useState<Boolean>(true);
     const { setErrorMessage}:{setErrorMessage:(errorMessage:string) => void} = useAuthenContext();
 
     useEffect(() => {
+        if(!id) return;
         const getPost = async() => {
        
             const url = `http://localhost:4100/weblog/getBlogPost/${id}`;

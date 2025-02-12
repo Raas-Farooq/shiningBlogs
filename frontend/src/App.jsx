@@ -5,7 +5,7 @@ import './App.css'
 import Navbar from './Components/Navbar/navbar';
 import MainSection from  './Components/mainSection/main-section.jsx';
 import BlogContent from './Components/contentSection/blog-content.tsx';
-import { useAuthenContext } from './globalContext/globalContext.jsx';
+import { useAuthenContext } from './globalContext/globalContext.tsx';
 
 function App() {
   const {loading} = useAuthenContext();

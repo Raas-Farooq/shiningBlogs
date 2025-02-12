@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useState, ReactNode } from "react"
 import axios from 'axios';
 import { jwtDecode } from "jwt-decode";
+
 // import { BiLogoMailchimp } from "react-icons/bi";
 // import UserAccount from "../Components/userAccount/userAccout";
 // import { isButtonElement } from "react-router-dom/dist/dom";
@@ -47,7 +48,7 @@ interface AuthenContentProps {
 const AuthenContext = React.createContext<AuthenContentProps | undefined>(undefined);
 
 export const AuthenContextProvider = ({children} : {children:ReactNode}) => {
-    const [loggedIn, setLoggedIn] = useState(false);
+    const [loggedIn, setLoggedIn] = useState<boolean>(false);
     const [registerData, setRegisterData] = useState<RegisterNewUser | null>(null)
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [loading, setLoading] = useState(true);
@@ -159,10 +160,10 @@ interface Blog{
 
 
 interface BlogContextProps{
-    allBlogsGlobally: Blog | null,
-    setAllBlogsGlobally: React.Dispatch<React.SetStateAction<Blog |null>>,
-    filteredBlogs: Blog | null,
-    setFilteredBlogs: React.Dispatch<React.SetStateAction<Blog |null>>,
+    allBlogsGlobally: Blog[],
+    setAllBlogsGlobally: React.Dispatch<React.SetStateAction<Blog[]>>,
+    filteredBlogs: Blog[],
+    setFilteredBlogs: React.Dispatch<React.SetStateAction<Blog[]>>,
     searchValue:string,
     setSearchValue:React.Dispatch<React.SetStateAction<string>>,
     searching:boolean,
@@ -173,8 +174,8 @@ const BlogContext = React.createContext<BlogContextProps | undefined>(undefined)
 export const BlogContextProvider = ({children}:{children:ReactNode}) => {
     
 
-    const [allBlogsGlobally, setAllBlogsGlobally] = useState<Blog | null>(null);
-    const [filteredBlogs, setFilteredBlogs] = useState<Blog | null>(null);
+    const [allBlogsGlobally, setAllBlogsGlobally] = useState<Blog[]>([]);
+    const [filteredBlogs, setFilteredBlogs] = useState<Blog[]>([]);
     const [searchValue,setSearchValue] = useState<string>('');
     const [searching, setSearching] = useState<boolean>(false);
 
@@ -250,17 +251,28 @@ export function useBlogContext(){
 
 export const useAuthenContext = () => {
     const context = useContext(AuthenContext);
-    if(context === null){
+    if(!context){
         throw new Error('AuthenContext can only use within AuthenContext Provider')
     }
     return context;
 }
 export const useUIContext = () => {
     const context = useContext(UIContext);
-    if(context === null){
+    if(!context){
         throw new Error('useUIContext can only use within useUIContext Provider')
     }
     return context;
 }
 
+// i'm doing this 'context === null)' why doesnt' it work
+// export const useUIContext = () => {
+//     const context = useContext(UIContext);
+//     if(context === null){
+//         throw new Error('useUIContext can only use within useUIContext Provider')
+//     }
+//     return context;
+// }
 
+
+// allBlogsGlobally: Blog[],
+// setAllBlogsGlobally: React.Dispatch<React.SetStateAction<Blog[]>>,does it mean it will always have either empty Array or Blogs

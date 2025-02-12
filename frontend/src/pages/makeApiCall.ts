@@ -20,6 +20,7 @@ interface ErrReceived {
     response? : {
         data: {
             message:string
+            error:string
         }
     },
     request?:any,

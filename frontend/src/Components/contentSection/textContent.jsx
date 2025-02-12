@@ -1,13 +1,28 @@
 import { useEffect, useState } from "react"
 import Image from "./titleImage";
-import ContentImages from "./ContentImage";
 import { FaCookieBite } from "react-icons/fa";
 
 
-export default function TextContent({content, isFullView=false, fromPost=false, contentImages=null}){
+// interface ContentItem {
+//   type:string,
+//   value:string
+// }
+// interface TextContentProps {
+//   content:ContentItem[],
+//   isFullView: boolean,
+//   contentImages: string[] | null
 
+// }
+
+// interface ContentWithImages {
+//   type:string,
+//   value:string,
+//   imageUrl?:string
+// }
+
+// export default function TextContent({content:[], isFullView=false, contentImages= []}:TextContentProps){
+  export default function TextContent({content, isFullView=false, contentImages=[]}){
     const [text, setText] = useState('');
-    const [image, setImage] = useState('');
     const [transformedText, setTransformedText] = useState([]);
   
     const makeWords = (textData) => {
@@ -24,7 +39,7 @@ export default function TextContent({content, isFullView=false, fromPost=false, 
       setText(textContent); 
         // console.log("actual text of the Post ", textContent);
         if(textContent){
-          const contentWithImages = [];
+          const contentWithImages= [];
           
           let endIndex = 0;
           const sortedImages = contentImages?.sort((a,b) => a.position - b.position);

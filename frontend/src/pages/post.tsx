@@ -1,64 +1,90 @@
 import { useEffect, useState } from "react";
-import { useAuthenContext, useUIContext } from "../globalContext/globalContext";
-import Image from "../Components/contentSection/titleImage";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
-import TextContent from "../Components/contentSection/textContent";
+import { useAuthenContext, useUIContext } from "../globalContext/globalContext.tsx";
+import Image from "../Components/contentSection/titleImage.jsx";
+import { useNavigate, useParams } from "react-router-dom";
+import TextContent from "../Components/contentSection/textContent.jsx";
 import { FaEdit, FaSpinner, FaTrash } from "react-icons/fa";
 import useFetchPost from "../Hooks/fetchPost.ts";
-import axios from "axios";
-import Navbar from "../Components/Navbar/navbar";
-import useUserPrivileges from "../Hooks/ownerPrivileges";
-import makeApiCall from "./makeApiCall";
+import Navbar from "../Components/Navbar/navbar.jsx";
+import useUserPrivileges from "../Hooks/ownerPrivileges.jsx";
+import makeApiCall from "./makeApiCall.ts";
 import clsx from "clsx";
 
-//editpost error message if you click the editpost from Post and then it is unable to find the post because of wrong Id means style the Error message & send more appropriate message
-const BlogPost = () => {
+
+
+interface Blog{
+  _id:string,
+  userId:string,
+  title:string,
+  titleImage:string,
+  content:[],
+  contentImages:[] | null,
+  createdAt:string,
+  updatedAt:string
+}
+
+interface EditHandle{
+(e:React.MouseEvent<HTMLButtonElement>, post:Blog):void;
+}
+interface DeleteHandle{
+(e:React.MouseEvent<HTMLButtonElement>, id:string):void;
+}
+
+interface ErrorResponse{
+  response? :{
+    data: {
+      message:string,
+      error?:string
+    }
+  },
+  request?:any,
+  message:string
+}
+
+interface RespReceived<T>{
+  data:T,
+  status:number
+}
+
+const BlogPost:React.FC = () => {
   const { setInHomePage } = useUIContext();
-  const { currentUser, loggedIn,setErrorMessage,errorMessage,loading,setLoading } = useAuthenContext();
+  const { currentUser, loggedIn,setErrorMessage,errorMessage,setLoading } = useAuthenContext();
   let { id } = useParams();
-  const [isDeletingPost, setIsDeletingPost] = useState(false);
-  id = id.startsWith(":") ? id.slice(1) : id;
+  const [isDeletingPost, setIsDeletingPost] = useState<boolean>(false);
   const { ownerLoading, blogOwner,setBlogOwner} = useUserPrivileges(id);
-  const {post, postLoading} = useFetchPost(id);
+  const {post, postLoading} = useFetchPost(id ?? '');
   console.log("post after useFetchPost inside BlogPost: ", post);
   const moveTo = useNavigate();
+  // const apiLink = import.meta.env.Vite_API_URL;
   useEffect(() => {
     setInHomePage(false);
     
   }, []);
 
-  useEffect(() => {
-    const userId = localStorage.getItem("userId");
-    console.log("userId: ", userId);
-  }, [id]);
-
-
-  const handleEdit = (e, post) => {
+  const handleEdit:EditHandle = (e, post) => {
     e.preventDefault();
     const postId = post._id;
     moveTo(`/editPost`, { state: { postId } });
   };
-  function handleDelete(e, id) {
+  const handleDelete:DeleteHandle =(e, id) => {
     e.preventDefault();
     const confirm = window.confirm(
       "Are You sure to delete this Post. You won't be able to recover it!"
     );
    
     const deletingPost = async () => {
-
       setBlogOwner(false);
-      setIsDeletingPost(true)
-
       const url = `http://localhost:4100/weblog/deleteBlog/${id}`;
-
-      const onSuccess=(response)=> {
+      const onSuccess=(response:RespReceived<{success:boolean}>)=> {
         if(response.data.success){
           alert("Successfully Deleted the Blog");
+          setBlogOwner(true);
+          setIsDeletingPost(true)
           moveTo('/');
         }
       }
 
-      function onError(err){
+      function onError(err:ErrorResponse){
         if(err.response?.data?.error === 'jwt expired'){
           setErrorMessage('JWT Expired! Login Again');
 
@@ -86,7 +112,7 @@ const BlogPost = () => {
   }
   useEffect(() => {
     // console.log("postLoading: ", postLoading, "post title", post.title);
-    if(!postLoading && !post){
+    if(!postLoading && !post._id){
       console.log("!loading & post.title has run")
       moveTo('/notFound')
     }
@@ -145,12 +171,14 @@ const BlogPost = () => {
                     isFullView={true}
                   />
                 )}
+                {post?.content && 
                 <TextContent
                   content={post?.content}
                   isFullView={true}
-                  fromPost={true}
-                  contentImages={post?.contentImages}
+                  contentImages={post?.contentImages && post.contentImages.length > 0 ? post.contentImages : []}
                 />
+              }
+                
               </div>
             </div>
             <div className="flex justify-center my-3">

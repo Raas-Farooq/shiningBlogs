@@ -3,7 +3,7 @@ import axios from "axios";
 import PostImage from "./titleImage.jsx";
 import TextContent from "./textContent.jsx";
 import Title from "./Title.jsx";
-import { Link, useNavigate } from "react-router-dom";
+import {useNavigate } from "react-router-dom";
 import {FaSpinner } from "react-icons/fa";
 // import { Sidebar, User } from "lucide-react";
 // BlogContent
@@ -12,8 +12,8 @@ import {
     
     useAuthenContext,
     useBlogContext,
-    useUIContext,
 } from "../../globalContext/globalContext.jsx";
+// import ContentImages from "./ContentImage.jsx";
 
 interface PresentUser{
   _id:string,
@@ -28,7 +28,7 @@ interface PresentUser{
 }
 
 interface userProfileProps {
-  currentUser:PresentUser,
+  currentUser:PresentUser | null,
   profileImage:string
 }
 
@@ -42,7 +42,7 @@ function UserProfile( {currentUser, profileImage}:userProfileProps) {
     >
       <h2 className="font-bold text:xl mb-6">
         {" "}
-        {currentUser.username && currentUser.username.length
+        {currentUser?.username && currentUser.username.length
           ? `About ${currentUser.username.toUpperCase()}`
           : "About"}
       </h2>
@@ -56,7 +56,7 @@ function UserProfile( {currentUser, profileImage}:userProfileProps) {
       <div className="space-y-6">
         <section>
           <h2 className="font-bold mt-4"> Goal</h2>
-          {currentUser.goal && currentUser.goal.length ? (
+          {currentUser?.goal && currentUser.goal.length ? (
             <h3> {currentUser.goal} </h3>
           ) : (
             <h3>Goal is Empty</h3>
@@ -69,7 +69,7 @@ function UserProfile( {currentUser, profileImage}:userProfileProps) {
           </h3>
           <span className="border-t border-blue-400"></span>
 
-          {currentUser.TopicsInterested &&
+          {currentUser?.TopicsInterested &&
           currentUser.TopicsInterested.length ? (
             currentUser.TopicsInterested.map((interest, index) => (
               <h5 key={index}>{interest} </h5>
@@ -100,9 +100,8 @@ interface BlogCardProps{
   handlePostClick:(e:React.MouseEvent<HTMLButtonElement>, post:Blog) => void,
   filtering:boolean
 }
-const BlogCard:React.FC<BlogCardProps> = ({ blog, handlePostClick, filtering = false }) => {
+const BlogCard:React.FC<BlogCardProps> = ({ blog, handlePostClick }) => {
   
-  console.log("blog: ", blog, "handlePostClick: ", handlePostClick, "filtering: ", filtering)
   return (
     <article
       className="flex flex-col items-center p-4 rounded-lg transition-all duration-300 hover:scale-105
@@ -113,7 +112,7 @@ const BlogCard:React.FC<BlogCardProps> = ({ blog, handlePostClick, filtering = f
         <Title title={blog.title} />
       </h2>
       <PostImage postImg={blog.titleImage} title={blog.title} />
-      <TextContent content={blog.content} />
+      <TextContent content={blog.content} isFullView={false} contentImages={blog?.contentImages} />
       <button
         className="mt-4 bg-blue-500 text-white py-2 px-4 rounded-lg 
         hover:bg-blue-600 transition-colors duration-200
@@ -128,7 +127,9 @@ const BlogCard:React.FC<BlogCardProps> = ({ blog, handlePostClick, filtering = f
 
 export default function BlogContent() {
 
-
+  interface PostClick{
+    (e:React.MouseEvent<HTMLButtonElement>, post:Blog):void;
+  }
   const {
     searchValue,
     setFilteredBlogs,
@@ -139,10 +140,10 @@ export default function BlogContent() {
     setAllBlogsGlobally,
   } = useBlogContext();
 
-  const { loggedIn:boolean, currentUser: PresentUser} = useAuthenContext();
-  const {showMenu,} = useUIContext();
-  const [loading, setLoading] = useState(true);
-  const [profileImage, setProfileImage] = useState("");
+  const { loggedIn, currentUser} = useAuthenContext();
+  
+  const [loading, setLoading] = useState<boolean>(true);
+  const [profileImage, setProfileImage] = useState<string>("");
   const navigateTo = useNavigate();
   useEffect(() => {
     if (currentUser?.profileImg) {
@@ -153,7 +154,7 @@ export default function BlogContent() {
     if (!allBlogsGlobally) {
       setLoading(true);
     }
-  }, []);
+  }, [currentUser?.profileImg, allBlogsGlobally]);
 
   const clearLocalStorage = useCallback(() => {
     const keys = [
@@ -167,30 +168,32 @@ export default function BlogContent() {
 
   useEffect(() => {
     clearLocalStorage();
-    const fetchBlogs = async () => {
-      try {
-        const response = await axios.get(
+    if(allBlogsGlobally.length === 0){
+      setLoading(true);
+      axios.get(
           "http://localhost:4100/weblog/allBlogs"
-        );
-        setAllBlogsGlobally(response.data.blogs);
-      } catch (err) {
-        console.log("got errors while fetching all blogs: ", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchBlogs();
-  }, []);
+        ).then(response => {
+          setAllBlogsGlobally(response.data.blogs);
+        })
+        .catch(err => {
+          console.log("got errors while fetching all blogs: ", err);
+        }).finally(() => {
+          setLoading(false);
+        })
+    }
+  }, [allBlogsGlobally.length]);
 
-  function handleRefresh(e) {
+  function handleRefresh(e:React.MouseEvent) {
     e.preventDefault();
-    setSearching(false);
-    setFilteredBlogs([]);
-    setSearchValue("");
+    if(!loading){
+      setSearching(false);
+      setFilteredBlogs([]);
+      setSearchValue("");
+    }
   }
-  const handlePostClick = (e, post) => {
+  const handlePostClick:PostClick = (e, post) => {
     e.stopPropagation();
-    navigateTo(`/BlogPost/:${post._id}`, { state: { post } });
+    navigateTo(`/BlogPost/${post._id}`, { state: { post } });
   };
   const BlogsToShow =
     searchValue || filteredBlogs.length ? filteredBlogs : allBlogsGlobally;
@@ -199,19 +202,12 @@ export default function BlogContent() {
       data-component="AllBlogsParent"
       className=" flex xs:flex-col sm:flex-row"
     >
-      {!allBlogsGlobally.length && loading && (
+      {!allBlogsGlobally?.length && loading && (
         <div className="text-center my-5">
           <FaSpinner className="animate-spin text-lg" /> Loading Blogs
         </div>
       )}
       <div className="blogsContainer xs:w-[95vw] w-[70vw] text-center m-10">
-        {console.log(
-          "filteredBlogs inside bllogcontent DOM: ",
-          filteredBlogs,
-          "search VAlue: ",
-          searchValue + "AllblogsGlobally: ",
-          "showMenu: ", showMenu
-        )}
         <button
           onClick={handleRefresh}
           className="bg-transparent text-gray-600 hover:text-blue-600 hover:underline"
@@ -227,13 +223,14 @@ export default function BlogContent() {
               key={index}
               blog={blog}
               handlePostClick={handlePostClick}
+              filtering={false}
             />
           ))}
         </div>
       </div>
 
       <div className={`hidden md:block`}>
-        {loggedIn && (
+        {loggedIn && currentUser &&(
           <UserProfile currentUser={currentUser} profileImage={profileImage} />
         )}
       </div>
