@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import axios from "axios";
 import PostImage from "./titleImage.jsx";
-import TextContent from "./textContent.jsx";
+import TextContent from "./textContent.tsx";
 import Title from "./Title.jsx";
 import {useNavigate } from "react-router-dom";
 import {FaSpinner } from "react-icons/fa";

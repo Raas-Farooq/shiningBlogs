@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useUIContext } from "../globalContext/globalContext";
 import Title from '../Components/contentSection/Title.jsx';
-import TextContent from "../Components/contentSection/textContent.jsx";
+import TextContent from "../Components/contentSection/textContent.tsx";
 import TitleImage from '../Components/contentSection/titleImage.jsx'
 import { FaSpinner } from "react-icons/fa";
 
