@@ -55,7 +55,6 @@ const useFetchPost = (id:string | undefined) => {
             const url = `http://localhost:4100/weblog/getBlogPost/${id}`;
 
             const onSuccess = (response:ApiResponse) => {
-                console.log('reposne data blogPost inside fetchPost received from makeApicall: ', response);
                 setPost(response.data.blogPost)
             }
 
@@ -75,8 +74,7 @@ const useFetchPost = (id:string | undefined) => {
         }
         getPost();
     },[id])
-  
-    console.log('post inside fetchPost Ts before return: ', post, "postLoading", postLoading);
+
     return {post, postLoading}
 
 }

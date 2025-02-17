@@ -53,7 +53,6 @@ const BlogPost:React.FC = () => {
   const [isDeletingPost, setIsDeletingPost] = useState<boolean>(false);
   const { ownerLoading, blogOwner,setBlogOwner} = useUserPrivileges(id);
   const {post, postLoading} = useFetchPost(id ?? '');
-  console.log("post after useFetchPost inside BlogPost: ", post);
   const moveTo = useNavigate();
   // const apiLink = import.meta.env.Vite_API_URL;
   useEffect(() => {
@@ -155,7 +154,7 @@ const BlogPost:React.FC = () => {
                   {post?.title}{" "}
                 </h2>
                 {loggedIn && blogOwner && (
-                  <div className="text-right flex justify-end gap-2 mb-2 w-[80%]">
+                  <div className="text-right flex justify-end gap-2 mb-2 w-[80%] text-black">
                     <button onClick={(e) => handleEdit(e, post)}>
                       <FaEdit size={20} />{" "}
                     </button>
@@ -214,19 +213,19 @@ const BlogPost:React.FC = () => {
           className={clsx(
             "px-2 py-32 flex justify-right ml-auto",
             loggedIn ? "w-[30vw]" : "w-0",
-            "bg-white text-center relative xs:hidden sm:block",
+            "bg-white text-gray-700 text-center relative xs:hidden sm:block",
             !loggedIn && "xs: sm:hidden"
           )}
         >
           {currentUser ? (
             <>
-              <h2 className="font-extrabold ">
+              <h2 className="font-extrabold text-gray-600 ">
                 {" "}
                 {currentUser.username && currentUser.username.length
                   ? `About ${currentUser.username.toUpperCase()}`
                   : "About"}
               </h2>
-              <div className="flex justify-center">
+              <div className="flex justify-center text-gray-600">
                 {currentUser.profileImg && (
                   <Image
                     postImg={currentUser.profileImg}
@@ -235,7 +234,7 @@ const BlogPost:React.FC = () => {
                 )}
               </div>
 
-              <h2 className="font-bold mt-4"> Goal</h2>
+              <h2 className="font-bold mt-4 text-gray-600"> Goal</h2>
               {currentUser.goal && currentUser.goal.length ? (
                 <h3> {currentUser.goal} </h3>
               ) : (

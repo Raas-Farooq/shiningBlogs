@@ -267,7 +267,7 @@ const logging =  async(req,res) => {
         jwt.sign(
             ({user:{userId:user._id}}), 
             process.env.JWT_SECRET,
-             {expiresIn: '10m'}
+             {expiresIn: '1h'}
              , (err, token) => {
                 if(err){
                     return res.status(500).json({

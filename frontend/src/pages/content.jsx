@@ -14,7 +14,6 @@ export default function Content() {
     let yourBlogs=[];
     const [yourContent, setYourContent] = useState([]);
     const user_id = localStorage.getItem('userId');
-    console.log("usr Id: ", user_id);
     const moveTo= useNavigate();
 
     useEffect(() =>{   

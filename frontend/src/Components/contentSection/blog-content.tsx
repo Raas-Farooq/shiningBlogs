@@ -38,7 +38,7 @@ function UserProfile( {currentUser, profileImage}:userProfileProps) {
   
   return (
     <aside
-      className={`py-8 p-4 w-[30vw] text-center bg-gray-50 shadow:sm rounded:lg`}
+      className={`py-8 p-4 w-[30vw] text-center bg-gray-50 shadow:sm rounded:lg text-gray-700`}
     >
       <h2 className="font-bold text:xl mb-6">
         {" "}

@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Navigate, useLocation, useNavigate } from "react-router-dom";
 import Image from "../Components/contentSection/titleImage";
 import TextContent from "../Components/contentSection/textContent";
-import ContentImages from "../Components/contentSection/ContentImage";
+import EditContentImages from "../Components/contentSection/editContentImages.tsx";
 import axios from "axios";
 import { debounce } from "lodash";
 import { useAuthenContext } from "../globalContext/globalContext.tsx";
@@ -125,7 +125,6 @@ const EditPost = () => {
   });
 
   useEffect(() => {
-    console.log("post Id EditPost newly UseEffect: ", postId);
     async function getPost() {
       if (!postId) {
         setLoading(false);
@@ -137,10 +136,10 @@ const EditPost = () => {
           `http://localhost:4100/weblog/getBlogPost/${postId}`
         );
 
-        console.log("Response: while getting Post", response);
+   
         setPost(response.data.blogPost);
       } catch (err) {
-        console.error("error while getting the post ", err);
+       
         if(err?.response?.data.message){
           setErrors({
             message:err.response.data.message
@@ -171,12 +170,12 @@ const EditPost = () => {
   }, [postId]);
 
   useEffect(() => {
-    console.log("post Id received at editPost: ", post);
+   
     // async function getPost(){
     //     const response = await axios.get(`http://localhost:4100/weblog/`)
     // }
     // Assign Title
-    console.log("Post of the year ", post);
+   
     async function loadInitialData() {
       if (!post) {
         setLoading(true);
@@ -184,11 +183,7 @@ const EditPost = () => {
       }
       try {
         const titleStored = JSON.parse(localStorage.getItem("titleStorage"));
-        // console.log('post title: initialLoad: ', post.title);
-        // console.log('titleStred:initialLoad ', titleStored);
         const newTitle = post?.title && !titleStored ? post.title : titleStored;
-
-        // console.log('newTitle assigned: initialLoad', newTitle);
         // Uploading Title Image
         const titleImage = localStorage.getItem("titleImagePreview");
         let newImagePreview = titleImage;
@@ -348,7 +343,7 @@ const EditPost = () => {
   };
   // removing the content Image
   const removeImage = (id, text) => {
-    console.log("id received inside removeImage: ", id);
+    console.log("id received inside removeImage: ", typeof(id));
     const newContentImages = contentImages.filter((image) => image.id != id);
     console.log(
       "newContentImages after filter inside removeImage: ",
@@ -548,7 +543,7 @@ const EditPost = () => {
           <div className="flex">
                         
               {contentImages &&              
-              <ContentImages contentImages={contentImages} removeImage={removeImage} contentText={editPostData?.contentText} />
+              <EditContentImages contentImages={contentImages} removeImage={removeImage} contentText={editPostData?.contentText} />
               }
           </div>
         </form>

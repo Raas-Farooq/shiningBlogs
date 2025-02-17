@@ -91,7 +91,7 @@ export const AuthenContextProvider = ({children} : {children:ReactNode}) => {
             console.log("USer AUTHENTICATIION GLobal Context :", response);
             const token = response.data.token;
             if(isTokenExpired(token)){
-                console.log("Token expred.. logging OUt");
+                alert("Token expred.. logging OUt from userAuthentication fetch globalContext");
                 setLoggedIn(false);
                 setCurrentUser(null);
                 localStorage.removeItem('userId');

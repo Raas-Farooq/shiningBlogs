@@ -10,13 +10,11 @@ const useUserPrivileges = (id) => {
 
     useEffect(() => {
         async function userPrivileges(){
-            console.log("id: userPrivilege inside useUserPrivileges: ", id)
                 try{
                     if(id){
                         const response = await axios.get(`http://localhost:4100/weblog/canEditBlog/${id}`
                             ,{withCredentials:true}
                         );
-                        console.log("response: inside useUserPrivileges", response);
                         if(response.data.success){
                             setBlogOwner(true);
                         }

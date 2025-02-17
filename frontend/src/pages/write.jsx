@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
-import ContentImages from "../Components/contentSection/ContentImage";
+import ContentImages from "../Components/contentSection/editContentImages.tsx";
 import { useAuthenContext } from "../globalContext/globalContext";
 import { Upload } from "lucide-react";
 

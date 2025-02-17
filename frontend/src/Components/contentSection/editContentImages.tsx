@@ -1,21 +1,40 @@
-import { useEffect } from "react";
+
 import {FaTimes} from "react-icons/fa";
 
-const ContentImages = ({contentImages, removeImage=null, contentText=null}) => {
+interface ContentImagesArray{
+    id:number,
+    fileName:string,
+    preview:string,
+    position:string
+}
 
+interface RemoveImageFunction {
+    (id:number, text:string) :void;
+}
 
-    const handleCancel = (e, id) => {
+interface EditContentImagesProps{
+    contentImages:ContentImagesArray[],
+    removeImage:RemoveImageFunction,
+    contentText:string
+}
+interface HandleCancelInterface {
+    (e:React.MouseEvent<HTMLButtonElement>, id:number):void
+}
+const EditContentImages:React.FC<EditContentImagesProps> = ({contentImages, removeImage=null, contentText}) => {
+
+    const handleCancel:HandleCancelInterface = (e, id) => {
         // newText="text without image Name";
         e.preventDefault();
         const imageMark = `[image-${id}]`
         const newText = contentText.split(imageMark).join(' ');
-    
-        removeImage(id, newText);
+        if(removeImage){
+            removeImage(id, newText);
+        }
+        
     }
 
     return (
         <div className="flex flex-wrap gap-2">
-            {console.log("contentImages inside the contentImage", contentImages)}
             {contentImages && contentImages.map((image, ind) => 
                 ( 
                 <div key={ind}>
@@ -34,4 +53,4 @@ const ContentImages = ({contentImages, removeImage=null, contentText=null}) => {
     )
 }
 
-export default ContentImages
+export default EditContentImages
