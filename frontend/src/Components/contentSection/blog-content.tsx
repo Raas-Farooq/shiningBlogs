@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import axios from "axios";
-import PostImage from "./titleImage.jsx";
+import PostImage from "./titleImage.tsx";
 import TextContent from "./textContent.tsx";
 import Title from "./Title.jsx";
 import {useNavigate } from "react-router-dom";
@@ -34,7 +34,6 @@ interface userProfileProps {
 
 
 function UserProfile( {currentUser, profileImage}:userProfileProps) {
- 
   
   return (
     <aside

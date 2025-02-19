@@ -1,8 +1,15 @@
 import { useEffect, useState} from "react"
 
+interface TitleProps{
+    title:string
+}
+interface SlicedTitle{
+    initialWords:string,
+    lastWords:string
+}
 
-const Title = ({title}) => {
-    const [slicedTitle, setSlicedTitle] = useState({initialWords:'', lastWords:''});
+const Title:React.FC<TitleProps> = ({title}) => {
+    const [slicedTitle, setSlicedTitle] = useState<SlicedTitle>({initialWords:'', lastWords:''});
 
     useEffect(() => {
         if(title.length > 35){
@@ -24,13 +31,13 @@ const Title = ({title}) => {
                         <p className="text-center xs:text-xs sm:text-sm font-semibold text-gray-800">
                             {slicedTitle?.initialWords}
                         </p>
-                        <p className="text-center xs:text-xs sm:text-sm font-semibold">
+                        <p className="text-center xs:text-xs sm:text-sm font-semibold text-gray-800">
                             {slicedTitle?.lastWords}
                         </p>
                     </>
                 ):
                 
-                <p className="text-center xs:text-xs sm:text-sm font-semibold pb-5"> {slicedTitle?.initialWords} </p>
+                <p className="text-center xs:text-xs sm:text-sm font-semibold pb-5 text-gray-800"> {slicedTitle?.initialWords} </p>
                 }
             </>)
             }

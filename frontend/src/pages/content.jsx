@@ -2,9 +2,9 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useUIContext } from "../globalContext/globalContext";
-import Title from '../Components/contentSection/Title.jsx';
+import Title from '../Components/contentSection/Title.tsx';
 import TextContent from "../Components/contentSection/textContent.tsx";
-import TitleImage from '../Components/contentSection/titleImage.jsx'
+import TitleImage from '../Components/contentSection/titleImage.tsx'
 import { FaSpinner } from "react-icons/fa";
 
 

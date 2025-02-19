@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Navigate, useLocation, useNavigate } from "react-router-dom";
-import Image from "../Components/contentSection/titleImage";
+import Image from "../Components/contentSection/titleImage.tsx";
 import TextContent from "../Components/contentSection/textContent";
 import EditContentImages from "../Components/contentSection/editContentImages.tsx";
 import axios from "axios";

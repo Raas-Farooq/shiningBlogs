@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 import { useAuthenContext, useUIContext } from "../globalContext/globalContext.tsx";
-import Image from "../Components/contentSection/titleImage.jsx";
+import Image from "../Components/contentSection/titleImage.tsx";
 import { useNavigate, useParams } from "react-router-dom";
 import TextContent from "../Components/contentSection/textContent.jsx";
 import { FaEdit, FaSpinner, FaTrash } from "react-icons/fa";
 import useFetchPost from "../Hooks/fetchPost.ts";
 import Navbar from "../Components/Navbar/navbar.jsx";
-import useUserPrivileges from "../Hooks/ownerPrivileges.jsx";
+import useUserPrivileges from "../Hooks/ownerPrivileges.tsx";
 import makeApiCall from "./makeApiCall.ts";
 import clsx from "clsx";
 
@@ -48,10 +48,10 @@ interface RespReceived<T>{
 
 const BlogPost:React.FC = () => {
   const { setInHomePage } = useUIContext();
-  const { currentUser, loggedIn,setErrorMessage,errorMessage,setLoading } = useAuthenContext();
+  const { currentUser, loggedIn,setErrorMessage,errorMessage, setLoading } = useAuthenContext();
   let { id } = useParams();
   const [isDeletingPost, setIsDeletingPost] = useState<boolean>(false);
-  const { ownerLoading, blogOwner,setBlogOwner} = useUserPrivileges(id);
+  const { ownerLoading, blogOwner,setBlogOwner} = useUserPrivileges(id ?? '');
   const {post, postLoading} = useFetchPost(id ?? '');
   const moveTo = useNavigate();
   // const apiLink = import.meta.env.Vite_API_URL;
@@ -120,16 +120,17 @@ const BlogPost:React.FC = () => {
   return (
     <>
       <Navbar showSearch={false} />
+      {errorMessage && 
+      <h2 className="text-center">
+        {errorMessage}
+        </h2>}
       <div
         data-component="post-container"
         className={`${
           loggedIn ? "flex xs:flex-col sm:flex-row" : "w-full bg-gray-50"
         }`}
       >
-        {errorMessage && <h2>
-        {errorMessage} 
-        </h2>
-        }
+        
         {isDeletingPost && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
           <div className="bg-white rounded-lg shadow-lg p-5 flex items-center gap-3">
@@ -140,14 +141,18 @@ const BlogPost:React.FC = () => {
           </div>
         </div>
       )}
+      
         {(postLoading || ownerLoading) ? (
           <div className="text-center flex justify-center">
             <FaSpinner className="animate-spin text-center inline text-xl" /> Loading
             the Post..
           </div>
         ) : (
+          
           <div className="w-full max-w-4xl mx-auto px-4 py-5 rounded:md shadow-lg bg-white">
+            
             <div className="">
+            
               <div key={post?._id} id={post?._id}>
                 <h2 className="text-center w-4/5 text-2xl text-purple-600 font-medium mb-10 p-5">
                   {" "}

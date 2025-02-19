@@ -98,7 +98,7 @@ export const AuthenContextProvider = ({children} : {children:ReactNode}) => {
                 return;
             }
             if (response.data.isAuthenticated) {
-              console.log("is validUser globaL :", response.data);
+    
                 setLoggedIn(true);
                 const user = response.data.user;
                 setCurrentUser(user);
