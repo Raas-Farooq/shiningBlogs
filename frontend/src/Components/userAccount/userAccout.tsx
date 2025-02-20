@@ -1,42 +1,32 @@
 import { useEffect, useState } from "react";
 import { useAuthenContext, useUIContext } from "../../globalContext/globalContext";
 import { Link, useNavigate } from "react-router-dom";
-import { FaImage } from "react-icons/fa";
-import updateProfile from "../../pages/updateProfile";
-import UpdateProfile from "../../pages/updateProfile";
 import axios from "axios";
-// eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7InVzZXJJZCI6IjY2ZGQ5YTZiMDllN2VjNzNjYjEzMThmOSIsImVtYWlsIjoiaG93bXVjaEBnbWFpbC5jb20ifSwiaWF0IjoxNzI1Nzk5MDE5LCJleHAiOjE3MjU4MDI2MTl9.30d-8wrkgIIbNR5iTJs-kpjV-6fhYYMoJtO68M_My-0
+
+interface Response{
+  isAuthenticated:boolean,
+  user?:any,
+  token:string
+}
+
 const UserAccount = () => {
   const { setIsAuthenticated,setLoggedIn, imagePreview,currentUser} = useAuthenContext();
   const {openUserAccount, setOpenUserAccount, setEditProfile} = useUIContext();
   console.log("inside user Account: openUser ",openUserAccount);
-
-    const [userImage, setUserImage] = useState('');
-    // const [imagePreview, setImagePreview] = useState('');
-    const [username, setUsername] = useState('');
-    const [password, setPassword] = useState('');
     const [accountLoading, setAccountLoading] = useState(false); 
     const navigate = useNavigate();
-    const handleImageSubmit = (e) => {
-        e.preventDefault();
-        const new_file = e.target.files[0];
-        console.log("new file: ", new_file);
-        setUserImage(new_file);
-
-        const preview = URL.createObjectURL(userImage);
-        // setImagePreview(preview);
-        console.log("image Preview: ", imagePreview.length)
-    }
-
     useEffect(() => {
-      console.log("useEffect inside user Account Runs")
       async function fetchingCurrentUser(){
         setAccountLoading(true);
         const userId = localStorage.getItem('userId');
+        console.log("useEffect inside user Account Runs  CURRENT USER:", currentUser, "USERID: ", userId)
         if(userId){
           try{
-            const response = await axios.get('http://localhost:4100/weblog/checkAuthen');
+            const response:Response = await axios.get('http://localhost:4100/weblog/checkAuthen');
            console.log('response inside userAccount', response);
+           if(response.isAuthenticated){
+            setAccountLoading(false)
+           }
           }catch(err){
             console.log("Caught the error while loading the user inside userAccount: ", err);
             setAccountLoading(false);
@@ -51,27 +41,7 @@ const UserAccount = () => {
       }
       
     }, [currentUser])
-
-
-
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        console.log("Preview after submit:", imagePreview);
-
-        console.log("Image of The User: ", userImage);
-        console.log("userName: ", username);
-        console.log("Password after submission: ", password);
-
-
-        // localStorage.setItem('thisUser', JSON.stringify(currentUser));
-        //         const thisUser = JSON.parse(localStorage.getItem('thisUser'));
-        //         console.log("this user inside login: ", thisUser);
-        
-    }
-    
-    
-
-    const handleLogout = async(e) => {
+    const handleLogout= async(e:React.MouseEvent<HTMLButtonElement>) => {
       e.preventDefault();
       try{
         const response = await axios.post('http://localhost:4100/weblog/logout', {}, {withCredentials:true});
@@ -84,13 +54,12 @@ const UserAccount = () => {
       }
       navigate("/");
     }
-    // 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
+    
 
   if(accountLoading) return <h1> Please Wait.. </h1>
   
   return (
     <>
-    {console.log("account Loading: ", accountLoading)}
     {accountLoading ? <h1> Please Wait.. </h1>
     :
     <div className="flex justify-center m-5 p-5 w-full">
@@ -117,8 +86,8 @@ const UserAccount = () => {
           </h3>
           <span className="border-t border-blue-400"></span>
           <div>
-            {currentUser && currentUser.TopicsInterested.map(interest => 
-              <h5> {interest} </h5>
+            {currentUser && currentUser.TopicsInterested.map((interest,ind) => 
+              <h5 key={ind}> {interest} </h5>
             )
             }
           </div>

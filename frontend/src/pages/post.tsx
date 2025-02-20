@@ -5,7 +5,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import TextContent from "../Components/contentSection/textContent.jsx";
 import { FaEdit, FaSpinner, FaTrash } from "react-icons/fa";
 import useFetchPost from "../Hooks/fetchPost.ts";
-import Navbar from "../Components/Navbar/navbar.jsx";
+import Navbar from "../Components/Navbar/navbar.tsx";
 import useUserPrivileges from "../Hooks/ownerPrivileges.tsx";
 import makeApiCall from "./makeApiCall.ts";
 import clsx from "clsx";

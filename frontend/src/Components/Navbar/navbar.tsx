@@ -1,12 +1,9 @@
 import { useEffect, useState } from 'react';
-import {FaBars, FaTimes, FaFacebook, FaPinterest, FaSearch, FaTwitter, FaWhatsapp, FaUser, FaRegUser} from 'react-icons/fa';
+import {FaBars, FaTimes, FaFacebook, FaPinterest, FaTwitter, FaWhatsapp, FaRegUser} from 'react-icons/fa';
 import { useAuthenContext, useBlogContext,useUIContext } from '../../globalContext/globalContext';
-import { FaTwitch } from 'react-icons/fa';
-import {CiSearch} from 'react-icons/ci';
 import WindowSize from '../../windowSize';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
-import '../../App.css';
-import axios from 'axios';
+import { Link, useNavigate } from 'react-router-dom';
+import clsx from 'clsx';
 
 export default function Navbar({showSearch=true}){
 
@@ -17,7 +14,6 @@ export default function Navbar({showSearch=true}){
     // console.log("openUserAccount: ", openUserAccount);
     // console.log("showMenu: ", showMenu);
     const [searchClicked, setSearchClicked] = useState(false);
-    const [loading, setLoading] = useState(false);
     const size = WindowSize();
     const moveTo = useNavigate();
 
@@ -34,7 +30,6 @@ export default function Navbar({showSearch=true}){
 
     useEffect(() => {
         if(size.width > 768){
-            console.log("logeed In inside navbar: ", loggedIn);
             setShowMenu(false);
             if(searchValue.length>0){
                 setSearchClicked(true)
@@ -45,17 +40,12 @@ export default function Navbar({showSearch=true}){
         }
     }, [size.width, loggedIn])
 
-    const handleSearchFocus = (e) => {
-        console.log("focus has been clicked: ");
-        console.log("showmMenu: ", showMenu);
-        setSearching(true);
-        
-    }
+    
     function handleHome(){
         console.log("Home cliccked: ")
         setShowMenu(false)
     }
-    const handleShowCancel = (e) => {
+    const handleShowCancel = (e:React.MouseEvent<HTMLButtonElement>) => {
         e.stopPropagation();
         if(!inHomePage){
             setSearching(false)
@@ -64,28 +54,7 @@ export default function Navbar({showSearch=true}){
         // setSearching(false);
         // setSearchValue('')
     }
-    function handleSearchBlur(){
-        
-        setSearching(false);
-    }
-    function handleSearchSubmit(e){
-        e.preventDefault();
-        console.log("submit result: ",e.targetValue )
-        const blogSearch = e.target.value;
-        setSearchValue('');
-        setSearching(true);
-        
-        const filtered = allBlogsGlobally?.filter(blog => {
-            if(blog.title.toString().toLowerCase().includes(blogSearch?.toString().toLowerCase())){
-                return blog;
-            }
-        })
-        setFilteredBlogs(filtered);
-
-    }
-    const handleSearchChange = (e) => {
-        console.log("handleSearch value: ", e.target.value);
-        
+    const handleSearchChange = (e:React.ChangeEvent<HTMLInputElement>) => {
         const blogSearch = e.target.value;
         setSearchValue(blogSearch);
         setSearching(true);
@@ -95,16 +64,13 @@ export default function Navbar({showSearch=true}){
                 return blog;
             }
         })
-        console.log("filtered blogs: ", filtered)
         setFilteredBlogs(filtered);
     } 
 
     
 
-    const handleWriteClick = (e) => {
+    const handleWriteClick = (e:React.MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();
-        console.log("you have entered the custody of new Post")
-        console.log("you clicked the Write Button", loggedIn)
         if(!loggedIn){
             const confirmMessage= window.confirm("You are Not Logged In! Logged In and create a blog");
             if(confirmMessage){
@@ -128,9 +94,24 @@ export default function Navbar({showSearch=true}){
             }
         }
 
-    if(loading){
-        return <h1> Loading.. </h1>
-    }
+        const getLogClass = () => clsx({
+            hidden: (searchClicked && !showMenu) || 
+            loggedIn || (searchValue && 
+            inHomePage),
+            'md:block':!loggedIn && searchValue
+        })
+
+        // md:absolute lg:relative lg:mt-0 
+       const searchBarClass = () => clsx({
+        'mt-7 md:block md:absolute lg:relative lg:mt-0': true,
+        'hidden': !searchValue,
+        'block': searchClicked || searchValue.length>0 || loggedIn && !showMenu,
+        'xs:block': searchClicked || searchValue.length > 0 || (loggedIn && !showMenu),
+        'xs:hidden': !(searchClicked || searchValue.length > 0 || (loggedIn && !showMenu)),
+        'xs:hidden lg:hidden': showMenu || !inHomePage,
+        'md:block md:mt-0': loggedIn,
+        })
+
     return(
         <nav className={`flex bg-[#5D62FF]-300 shadow-lg text-white bg-[#FFFFFF] top-0 z-10 items-center fixed w-full justify-between ${showMenu ? 'flex-col pb-[8rem] ' : 'flex'} ${showMenu &&  openUserAccount ?'flex-col fixed': 'relative'} ${showMenu && searching && 'flex-col pb-[1rem]'}` }> 
             <div className={`pl-12 pb-4 md:hidden text-black text-xl`}>
@@ -144,15 +125,15 @@ export default function Navbar({showSearch=true}){
                         id="search" 
                         value={searchValue}
                         onChange={handleSearchChange}
-                        onFocus={handleSearchFocus}
-                        onBlur={handleSearchBlur}
+                        onFocus={() => setSearching(true)} 
+                        onBlur={() => setSearching(false)} 
                         placeholder='Search Dream Blog' 
                         className='text-black pb-1 bg-white border border-green-300 rounded'/>
                 </div>
             </div>
             {/* flex flex-col items-start mt-2 */}
             <ul className={`md:flex md:translate-y-0 my-2 ml-10 w-1/3 ${showMenu ? 'opacity-100 translate-y-0': '-translate-y-20 hidden'} ${showMenu && searching && 'hidden'} transition-all duration-300`}>
-                <li className=" flex">
+                <li className="flex">
                    <Link to={'/'} onClick={handleHome} className='px-2 py-2 ml-3 bg-green-300 hover:bg-green-200 xs:w-24 md:w-auto my-2 '>Home</Link>   
                 </li>
                 <li className=" flex">
@@ -161,7 +142,7 @@ export default function Navbar({showSearch=true}){
                 <li className="flex">
                    <span onClick={handleWriteClick} className='cursor-pointer px-2 py-2 ml-3 text-blue-600 bg-green-300 hover:bg-green-200 xs:w-24 md:w-auto my-2 '>Write</span>   
                 </li>
-                <li className=" flex">
+                <li className="flex">
                    <span onClick={handleContentClick} className='md:text-[13px] text-blue-600 sm:text-[12px] px-2 py-2 ml-3 bg-green-300 hover:bg-green-200 cursor-pointer my-2 xs:w-24 md:w-20'>My Posts</span>   
                 </li>
             </ul>
@@ -173,25 +154,22 @@ export default function Navbar({showSearch=true}){
                 <li className="px-2 ml-3 py-2" ><a href=""><FaWhatsapp /> </a></li>
             </ul>
 
-            <ul className={`md:flex mb-2 w-1/3 md:text-sm ${showMenu ? 'flex': 'hidden'} ${!loggedIn && 'md:text-xl ml-12 xs:flex'}`}>
-                <li className={`${searchClicked && !showMenu || loggedIn || searchValue && inHomePage? 'hidden': 'none'} ${!loggedIn && searchValue ? 'md:block' : 'none'} `}><Link to={"/login"} className='px-2 py-2 hover:text-gray-300'> Login </Link></li>
-                <li className={` ${searchClicked && !showMenu || loggedIn || searchValue && inHomePage? 'hidden': 'none'} ${!loggedIn && searchValue ? 'md:block' : 'none'}`} ><Link to={"/registerUser"} className='px-2 py-2 hover:text-gray-300'> Register </Link></li>
+            <ul className={`md:flex mb-4 w-1/3 md:text-sm relative ${showMenu ? 'flex': 'hidden'} ${!loggedIn && 'md:text-xl ml-12 xs:flex'}`}>
+                <div className="flex mb-2 lg:mb-0">
+                    <li className={getLogClass()}><Link to={"/login"} className='px-2 py-2 hover:text-gray-300'> Login </Link></li>
+                    <li className={getLogClass()} ><Link to={"/registerUser"} className='px-2 py-2 hover:text-gray-300'> Register </Link></li>
 
-                <div className={`mt-2 lg:block ${!searchValue && 'hidden'} ${searchClicked ? 'block' : 'none'} ${searchClicked || searchValue.length>0 || loggedIn && !showMenu ? 'xs:block' : 'xs:hidden'} ${showMenu || !inHomePage ? 'xs:hidden lg:hidden': 'block'} `}>
+                </div>
+
+                <div className={searchBarClass()}>
                     <input type="search" 
                     id="search" 
                     placeholder='Search Blog' 
                     onChange={handleSearchChange}
-                    onSubmit={handleSearchSubmit}
+                    // onSubmit={handleSearchSubmit}
                     value={searchValue}
-                    className='text-black w-28 pb-1 bg-white border border-green-300 rounded'/>
+                    className='text-black w-28 pb-1 bg-white border border-green-300 rounded placeholder:text-sm'/>
                 </div>
-                <button 
-                onClick={() => {
-                    setSearchValue('');
-                    setSearchClicked(!searchClicked)}
-                }
-                className={`lg:hidden text-black p-2 px-3 bg-none ${showMenu && 'hidden'} ${searchValue && !inHomePage && 'xs:hidden'} ${loggedIn || !inHomePage && 'hidden'}`}> <CiSearch /> </button>
                 
             </ul>
 
@@ -214,8 +192,3 @@ export default function Navbar({showSearch=true}){
     )
     
 }
-
-
-
-
-

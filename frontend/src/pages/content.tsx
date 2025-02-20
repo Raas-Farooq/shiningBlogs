@@ -1,7 +1,7 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { useUIContext } from "../globalContext/globalContext";
+import { useNavigate } from "react-router-dom";
+import { useUIContext } from "../globalContext/globalContext.tsx";
 import Title from '../Components/contentSection/Title.tsx';
 import TextContent from "../Components/contentSection/textContent.tsx";
 import TitleImage from '../Components/contentSection/titleImage.tsx'
@@ -9,9 +9,8 @@ import { FaSpinner } from "react-icons/fa";
 
 
 export default function Content() {
-    const {setInHomePage, setShowMenu} = useUIContext();
+    const {setInHomePage} = useUIContext();
     const [loading, setLoading] = useState(true);
-    let yourBlogs=[];
     const [yourContent, setYourContent] = useState([]);
     const user_id = localStorage.getItem('userId');
     const moveTo= useNavigate();
@@ -42,7 +41,7 @@ export default function Content() {
             })
 
             setYourContent(response.data.yourBlogs);
-            console.log("yourBlogs Assigned ", yourBlogs);
+            
         }
         catch(err){
             console.error("error while accessing yourContent: ", err);
@@ -54,9 +53,19 @@ export default function Content() {
         }
         
     }
-        
-    function handlePostClick(e,post){
-        console.log("postId inside Content: ", post._id);
+interface PostClick {
+    post:{
+        _id:string,
+        userId:string,
+        title:string,
+        titleImage:string,
+        content:[],
+        contentImages:[],
+        createdAt:string,
+        updatedAt:string
+    }
+}
+    const handlePostClick:PostClick = (post) => {
         moveTo(`/BlogPost/${post._id}`)
     }
     return(

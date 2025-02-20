@@ -4,7 +4,7 @@ import { BrowserRouter, Navigate, Route,Routes, useLocation } from "react-router
 import App from "../App"
 import About from "../pages/About.tsx"
 import Write from "../pages/write"
-import Content from "../pages/content"
+import Content from "../pages/content.tsx"
 import { CSSTransition, Transition, TransitionGroup } from "react-transition-group"
 import UserAccount from "../Components/userAccount/userAccout"
 import UpdateProfile from "../pages/updateProfile"

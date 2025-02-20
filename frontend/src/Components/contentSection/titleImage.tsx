@@ -12,7 +12,6 @@ const Image:React.FC<ImageProps> = ({postImg, title, isFullView}) => {
     const [imageSrc, setImageSrc] = useState('');
 
     useEffect(() => {
-        console.log("postImage inside IMAGE : ", postImg, "title: ", title, "isFullView ", isFullView);
         const absUrl = postImg.startsWith('http://') || postImg.startsWith('https://');
         const relUrl = postImg.startsWith('uploads/');
         

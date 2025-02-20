@@ -97,17 +97,8 @@ const Login = () => {
             finally{
                 setLoading(false)
             }  
-        // one how to check the object is it empty or contains
-        // second you can also setErrors first then check from the errors lengt
     }
-    [4, 10]
-    const findBreaker = (numList) => {
-        let greater=0;
-        const breaker = numList.find((num,ind) => ind < numList.length - 1 && num > numList[ind+1])
-        console.log('breaker: ', breaker)
-        
-    }
-    findBreaker([0,-4])
+    
 
     // if(loading) return <h1> Please Wait..</h1>
     return (
