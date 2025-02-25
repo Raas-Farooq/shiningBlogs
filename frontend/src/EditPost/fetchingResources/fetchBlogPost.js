@@ -1,9 +1,13 @@
-import { useEffect } from "react";
+import { useState,useEffect } from "react";
 import { useAuthenContext } from "../../globalContext/globalContext";
+import axios from 'axios'; 
 
-const fetchingPost = (postId, setPost, setErrors) => {
-    const {setErrorMessage, setLoading} = useAuthenContext();
+const useFetchingPost = (postId) => {
+    const {setLoading} = useAuthenContext();
+    const [errors, setErrors]=useState('');
+    const [post, setPost]=useState([])
     useEffect(() => {
+      // console.log("postId: TechBlog ", postId);
         async function getPost() {
           if (!postId) {
             setLoading(false);
@@ -11,14 +15,16 @@ const fetchingPost = (postId, setPost, setErrors) => {
           }
           setLoading(true);
           try {
+            // console.log("GEL POST RUNNNSSS Id", postId);
             const response = await axios.get(
               `http://localhost:4100/weblog/getBlogPost/${postId}`
             );
     
-       
+            // console.log("response; GElPOst ", response);
+            // console.log("response .blogPost ", response.data.blogPost);
             setPost(response.data.blogPost);
           } catch (err) {
-           
+           console.log("err: Message ", err.message);
             if(err?.response?.data.message){
               setErrors({
                 message:err.response.data.message
@@ -27,7 +33,7 @@ const fetchingPost = (postId, setPost, setErrors) => {
             else if(err?.response?.data){
          
                 setErrors({
-                  message:"Some Errors returned by the SErver "
+                  message:err.response.data
                 })
     
             }
@@ -38,10 +44,9 @@ const fetchingPost = (postId, setPost, setErrors) => {
               });
             }
             else {
-                setErrors({
-                    message:
-                        "Post is not Loading, you are either logged out or internet connection err. Plz check & Try Again!!",
-                    });
+              setErrors({
+                message:err.message
+              });
             }
             
           }finally{
@@ -51,7 +56,7 @@ const fetchingPost = (postId, setPost, setErrors) => {
         getPost();
       }, [postId]);
 
-      // return post
+      return {post, errors}
 }
 
-export default fetchingPost
+export default useFetchingPost

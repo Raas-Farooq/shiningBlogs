@@ -562,8 +562,7 @@ const getUser = async(req,res) => {
 const getBlogPost = async(req,res) => {
 
     let blogId = req.params.id;
-    console.log("getBlog runs: ", blogId);
-    blogId = blogId.startsWith(':') ? blogId.slice(1): blogId;
+    console.log("GET BLOGPOST RUNNING BACKEND: ", blogId);
     if(!mongoose.Types.ObjectId.isValid(blogId)){
         console.log("not a valid blog Id");
         return res.status(400).json({
@@ -573,13 +572,14 @@ const getBlogPost = async(req,res) => {
     }
     try{
         const blog = await Blog.findById(blogId);     
+        
         if(!blog){
             return res.status(404).json({
                 success:false,
                 message:"Blog doesn't found"
             })
         }
-
+        console.log("blog result before return: ", blog);
         return res.status(200).json({
             success:true,
             message:"Blog Found successfully",

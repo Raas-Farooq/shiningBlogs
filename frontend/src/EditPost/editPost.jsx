@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import FetchBlogPost from './fetchingResources/fetchBlogPost.js'
+import useFetchPost from './fetchingResources/fetchBlogPost.js'
 import { Navigate, useLocation, useNavigate } from "react-router-dom";
 import Image from "../Components/contentSection/titleImage.tsx";
 import TextContent from "../Components/contentSection/textContent.tsx";
@@ -9,19 +9,17 @@ import { debounce } from "lodash";
 import { useAuthenContext } from "../globalContext/globalContext.tsx";
 import { Copy } from "lucide-react";
 import fetchImageAsBase64 from "./fetchingResources/fetchImageBase64.js";
+import useFetchLocalData from "./fetchingResources/useFetchLocalData.js";
 
 
 const EditPost = () => {
   const { loggedIn,loading } = useAuthenContext();
   const [cursorPosition, setCursorPosition] = useState(0);
-  const [savedTitleImage, setSavedTitleImage] = useState('');
   const [newTitleImage, setNewTitleImage] = useState(false);
   const [removedImages, setRemovedImages] = useState([]);
-  const [errors, setErrors] = useState({});
   const [editedSomething, setEditedSomething] = useState(false);
   const [fetchedPost, setFetchedPost] = useState({});
-  const [localLoading, setLocalLoading] = useState(true);
-  const [post, setPost] = useState(null);
+  // const [localLoading, setLocalLoading] = useState(true);
   const moveTo = useNavigate();
   const isNavigatingBack = useRef(false);
 
@@ -49,12 +47,10 @@ const EditPost = () => {
   const getState = useLocation();
 
   const postId = getState.state?.postId;
-  postId && FetchBlogPost(postId, setErrors, setPost)
-  // useEffect(() =>{
-  //   if(postId){
-  //     const {errors, post} = FetchBlogPost(postId, setErrors, setPost)
-  //   }
-  // }, [postId])
+  const{post, errors} = useFetchPost(postId);
+
+  const {localPostData} = useFetchLocalData(post);
+
   const selectCurrentSelection = () => {
     setCursorPosition(currentArea.current.selectionStart);
   };
@@ -116,92 +112,20 @@ const EditPost = () => {
 
   // Convert and Store image as base 64
   
+  // useEffect(() => {
+  //   console.log("localPostData: ",localPostData);
+  //   setEditPostData(prev => ({
+  //     ...prev,
+  //     title:localPostData.title || '',
+  //     titleImage:localPostData.titleImage || '',
+  //     contentText:localPostData.contentText || '',
+  //     imagePreview: localPostData.imagePreview || '',
+      
+  //   })
+  // )
+  // },[localPostData])
 
-  useEffect(() => {
-    let newImagePreview = '';
-        const loadTitleImage = async() => {
-          const titleImage = localStorage.getItem("titleImagePreview");
-          setSavedTitleImage(titleImage);
-          if (post?.titleImage && !titleImage) {
-            newImagePreview = await fetchImageAsBase64(post.titleImage);
-            localStorage.setItem('titleImagePreview', newImagePreview);
-            setSavedTitleImage(newImagePreview)
-          }
-          localStorage.setItem("titleImage", post?.titleImage);
-          // setSavedTitleImage(newImagePreview);
-        }
-        loadTitleImage();
-        console.log("savedTitleImage after loadTitleImage; ", savedTitleImage)
-  },[post?.titleImage])
-
-  useEffect(() => {
-    async function loadInitialData() {
-      if (!post) {
-        setLocalLoading(true);
-        return;
-      }
-      try {
-        const titleStored = JSON.parse(localStorage.getItem("titleStorage"));
-        const newTitle = post?.title && !titleStored ? post.title : titleStored;
-        // Uploading Title Image
-        if(savedTitleImage){
-          console.log("IF savedTitleImage on initial load: ", savedTitleImage);
-        }
-        
-
-        // load Save content Text (Text Data of Post)
-        const localContentText = JSON.parse(
-          localStorage.getItem("textContent")
-        );
-        // console.log('localContentText:initialLoad ',localContentText);
-        const newContentText =
-          post?.content && !localContentText
-            ? post.content.find((content) => content.type === "text")?.value ||
-              ""
-            : localContentText;
-        // console.log('New Content Text initial load: ', newContentText);
-        console.log("IF savedTitleImage on initial load: ", savedTitleImage);
-        setEditPostData((prev) => ({
-          ...prev,
-          title: newTitle || "",
-          titleImage: post.titleImage || "",
-          imagePreview: savedTitleImage || "",
-          contentText: newContentText || "",
-        }));
-
-        // load content Images
-        if (post?.contentImages) {
-          let localContentImages =
-            JSON.parse(localStorage.getItem("localContentImages")) || [];
-          // console.log("localContentImages on initial load: ", localContentImages, " post.contentImages: ", post.contentImages);
-          if (post?.contentImages && localContentImages.length === 0) {
-            // console.log("contentImages: if local is empty", post.contentImages);
-            const newImages = post.contentImages.map((image, index) => ({
-              id: index,
-              fileName: image.fileName,
-              preview: image.path.startsWith("http://")
-                ? image.path
-                : `http://localhost:4100/${image.path}`,
-              position: image.position,
-            }));
-            setContentImages(newImages);
-            localStorage.setItem(
-              "localContentImages",
-              JSON.stringify(newImages)
-            );
-          } else {
-            setContentImages(localContentImages);
-          }
-        }
-      } catch (err) {
-        console.error("Error while receiving post", err);
-      } finally {
-        setLocalLoading(false);
-      }
-    }
-
-    loadInitialData();
-  }, [post, savedTitleImage]);
+  
   // store image as base64
   function storeAsBase64(file) {
     const reader = new FileReader();
@@ -409,7 +333,7 @@ const EditPost = () => {
       }
       setNewTitleImage(false);
     } catch (err) {
-      console.log("You can deal with errors: ", err);
+      console.log("You can deal with errors: ", err.message);
       if (
         err.response.data.error === "jwt expired" ||
         err.response.data.message === "Unable to get Token Bearer"
@@ -426,7 +350,7 @@ const EditPost = () => {
     // console.log("contentImages after reposting: ", contentImages);
   };
 
-  if (localLoading || loading) {
+  if (loading) {
     return <h1>Loading the Post..</h1>;
   }
   if (errors.message) {
@@ -449,6 +373,7 @@ const EditPost = () => {
           />
 
           <div>
+          {console.log("DOM editPost: ", errors)}
             <label htmlFor="image" className="block text-pink-600">
               Change Title Image
             </label>
