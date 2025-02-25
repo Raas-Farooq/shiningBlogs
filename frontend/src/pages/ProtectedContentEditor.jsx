@@ -1,4 +1,8 @@
-import React, { useEffect, useRef, useState } from 'react';
+import {useEffect, useRef, useState } from 'react';
+
+// interface ProtectedConentProps{
+  
+// }
 
 const ProtectedContentEditor = ({ value, onChange, onCursorPosition }) => {
   const [segments, setSegments] = useState([]);
@@ -68,4 +72,4 @@ const ProtectedContentEditor = ({ value, onChange, onCursorPosition }) => {
   );
 };
 
-export default ProtectedContentEditor;
+// export default ProtectedContentEditor;

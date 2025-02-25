@@ -1,34 +1,43 @@
-import { useEffect, useState } from "react";
+import {useState } from "react";
 import { useAuthenContext } from "../globalContext/globalContext";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { FaSpinner } from "react-icons/fa";
+
+interface ErrorsProps{
+    email:string,
+    password:string,
+    general?:string
+}
+
+interface ErrorHandle{
+    response:{
+        data:{
+            message:string,
+            error?:string
+        }
+    },
+    request:any,
+    message:string    
+}
+
 const Login = () => {
 
     const {setIsAuthenticated,setCurrentUser, setLoggedIn, imagePreview, setImagePreview} = useAuthenContext();
-    const [email, setEmail] = useState('');
-    const [message, setMessage] = useState('');
-    const [password, setPassword] = useState('');
-    const [errors, setErrors] =useState({});
+    const [email, setEmail] = useState<string>('');
+    // const [message, setMessage] = useState<string>('');
+    const [password, setPassword] = useState<string>('');
+    const [errors, setErrors] =useState<ErrorsProps>({email:'', password:''})
     const navigate = useNavigate();
-    const [loading, setLoading] = useState(false);
-
-    // useEffect(() => {
-    //     if(currentUser){
-    //         const user =  login_response.data.user;
-    //             localStorage.setItem('thisUser', JSON.stringify(user));
-    //             const thisUser = JSON.parse(localStorage.getItem('thisUser'));
-    //             console.log("this user inside login: ", thisUser);
-    //     }
-    // }, [currentUser])
+    const [loading, setLoading] = useState<boolean>(false);
     
-    const emailValid = (email_text) => {
+    const emailValid = (email_text:string) => {
         const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
         return regex.test(email_text);
     }
 
     function handleValidation(){
-        let newErrors = {};
+        let newErrors:ErrorsProps = {email:'', password:'', general:''};
         if(!email){
             newErrors.email="Email field is empty!"
         }
@@ -45,12 +54,15 @@ const Login = () => {
         return newErrors
     }
 
-    const handleSubmit = async (e) => {
+    const handleSubmit = async (e:(React.MouseEvent<HTMLButtonElement>)) => {
         e.preventDefault();
         
         const validationErrors = handleValidation();
-        if(Object.keys(validationErrors).length > 0){
-            console.log("Got validation errors ")
+ Object.values(validationErrors).forEach(err => console.log("forEach: ", err));
+
+        console.log(" validation Filter ", Object.values(validationErrors).some(err => err.length > 0))
+        if(Object.values(validationErrors).some(err => err.length>0)){
+            console.log("Got validation errors ", validationErrors)
             setErrors(validationErrors);
             return; 
         }
@@ -89,11 +101,16 @@ const Login = () => {
             setLoggedIn(true);
             
         }
-        catch(err){
-            const errorMsg =
-            err.response?.data?.message || "An error occurred. Please try again.";
-            setErrors({ general: errorMsg });
-            } 
+        catch(err:unknown){
+            if(err && typeof(err) === 'object' && 'response' in err){
+                const errorMsg:string =
+                (err as ErrorHandle).response?.data?.message || "An error occurred. Please try again.";
+                setErrors({...errors, general: errorMsg});
+                }
+            else {
+                setErrors({...errors, general: "An unexpected error occurred." });
+                }
+            }
             finally{
                 setLoading(false)
             }  
@@ -117,7 +134,7 @@ const Login = () => {
                             <input type="email" id="email" placeholder="Enter Your Email"
                             className="border rounded-lg border-gray-300 px-4 py-2 focus-pink focus-ring-400"
                             onChange={(e) => {setEmail(e.target.value)
-                                setErrors('')
+                                setErrors({email:'', password:'', general:''})
                             }}
                             aria-label="Email"
                             value={email}
@@ -131,7 +148,7 @@ const Login = () => {
                             aria-label="Password" 
                             value={password}
                             onChange={(e) => {setPassword(e.target.value)
-                                setErrors('')
+                                setErrors({email:'', password:'', general:''})
                             }}
                             />
                                 {errors.password && <p className="text-sm text-red-500"> {errors.password}!</p>}
@@ -141,7 +158,7 @@ const Login = () => {
                             className="border transition-colors duration-300 text-lg border-gray-300 p-4 m-5 bg-red-400 rounded-2xl">
                                 Login
                             </button>
-                            {message && <p> {message} </p>}
+                            {/* {message && <p> {message} </p>} */}
                         </div>
                     </form>
                     <div className="text-center ">

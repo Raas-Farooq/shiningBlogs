@@ -15,8 +15,8 @@ interface Image {
 }
 interface TextContentProps{
   content:ContentItem[],
-  isFullView:boolean,
-  contentImages:Image[] | null
+  isFullView?:boolean,
+  contentImages?:Image[] | null
 }
 
 interface CombinedContent {
@@ -41,7 +41,6 @@ const TextContent: React.FC<TextContentProps> = ({
     const smallText = sliced.join(" ");
     return smallText;
   };
-
   useEffect(() => {
     const textItem = content.find((item) => item.type === "text");
     const textContent = textItem?.value || "";
@@ -95,8 +94,6 @@ const TextContent: React.FC<TextContentProps> = ({
         </p>
       ) : (
         <div>
-          <>
-          </>
           {transformedText.map((item, index) =>  
             item.type === "text" ? (
               <div key={index} className="text-black"> 

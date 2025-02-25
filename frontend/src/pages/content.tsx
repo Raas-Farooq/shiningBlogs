@@ -7,11 +7,22 @@ import TextContent from "../Components/contentSection/textContent.tsx";
 import TitleImage from '../Components/contentSection/titleImage.tsx'
 import { FaSpinner } from "react-icons/fa";
 
+interface PostContent { 
+    _id:string,
+    userId:string,
+    title:string,
+    titleImage:string,
+    content:[],
+    contentImages:[],
+    createdAt:string,
+    updatedAt:string
+    
+}
 
 export default function Content() {
     const {setInHomePage} = useUIContext();
     const [loading, setLoading] = useState(true);
-    const [yourContent, setYourContent] = useState([]);
+    const [yourContent, setYourContent] = useState<PostContent[]>([]);
     const user_id = localStorage.getItem('userId');
     const moveTo= useNavigate();
 
@@ -48,24 +59,12 @@ export default function Content() {
             setLoading(false)
         }
         finally{
-            console.log('Finally Runs')
             setLoading(false)
         }
         
     }
-interface PostClick {
-    post:{
-        _id:string,
-        userId:string,
-        title:string,
-        titleImage:string,
-        content:[],
-        contentImages:[],
-        createdAt:string,
-        updatedAt:string
-    }
-}
-    const handlePostClick:PostClick = (post) => {
+
+    const handlePostClick= (post:PostContent) => {
         moveTo(`/BlogPost/${post._id}`)
     }
     return(
@@ -85,7 +84,7 @@ interface PostClick {
                             id={blog._id}
                             className="flex flex-col shadow-lg p-4 cursor-pointer text-center hover:shadow-3xl hover:scale-110 transition-all duration-300 " 
                             
-                            onMouseDown={(e) => handlePostClick(e,blog)}
+                            onMouseDown={() => handlePostClick(blog)}
                             >
                                 <h2 className="text-center xs:text-xs sm:text-sm font-medium"> <Title title={blog.title}  /></h2>
                                 <TitleImage postImg={blog.titleImage} title={blog.title} />

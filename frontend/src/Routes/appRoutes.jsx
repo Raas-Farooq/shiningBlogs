@@ -9,11 +9,11 @@ import { CSSTransition, Transition, TransitionGroup } from "react-transition-gro
 import UserAccount from "../Components/userAccount/userAccout"
 import UpdateProfile from "../pages/updateProfile"
 import Register from "../pages/register"
-import Login from "../pages/login";
+import Login from "../pages/login.tsx";
 import { useRef } from "react";
 import { useAuthenContext } from "../globalContext/globalContext";
 import BlogPost from "../pages/post";
-import EditPost from '../pages/editPost';
+import EditPost from '../EditPost/editPost.jsx';
 import NotFound from '../pages/notFound.tsx';
 
 const PageTransition = () => {
