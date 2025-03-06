@@ -1,7 +1,6 @@
-import { useCallback } from "react";
 
 
-const fetchImageAsBase64 = (async (image) => {
+const fetchImageAsBase64 = (async (image:string) => {
     try {
       const response = await fetch(`http://localhost:4100/${image}`);
       console.log("response fetchImageAsBase64 :", response)
@@ -9,8 +8,14 @@ const fetchImageAsBase64 = (async (image) => {
       return new Promise((resolve) => {
         const reader = new FileReader();
         reader.onloadend = () => {
-          localStorage.setItem("titleImagePreview", reader.result);
-          resolve(reader.result);
+          if(typeof reader.result === 'string'){
+            localStorage.setItem("titleImagePreview", reader.result);
+            resolve(reader.result);
+          }else{
+            console.error("Failed to convert Image to base64");
+            return null
+          }
+          
         };
         reader.readAsDataURL(blob);
       });

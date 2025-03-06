@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import useFetchPost from './fetchingResources/fetchBlogPost.js'
+import useFetchPost from './fetchingResources/fetchBlogPost.ts'
 import { Navigate, useLocation, useNavigate } from "react-router-dom";
 import Image from "../Components/contentSection/titleImage.tsx";
 import TextContent from "../Components/contentSection/textContent.tsx";
@@ -8,8 +8,8 @@ import axios from "axios";
 import { debounce } from "lodash";
 import { useAuthenContext } from "../globalContext/globalContext.tsx";
 import { Copy } from "lucide-react";
-import fetchImageAsBase64 from "./fetchingResources/fetchImageBase64.js";
-import useFetchLocalData from "./fetchingResources/useFetchLocalData.js";
+// import fetchImageAsBase64 from "./fetchingResources/fetchImageBase64.js";
+import useFetchLocalData from "./fetchingResources/useFetchLocalData.ts";
 
 
 const EditPost = () => {
@@ -19,6 +19,7 @@ const EditPost = () => {
   const [removedImages, setRemovedImages] = useState([]);
   const [editedSomething, setEditedSomething] = useState(false);
   const [fetchedPost, setFetchedPost] = useState({});
+  const [contentImages, setContentImages] = useState([]);
   // const [localLoading, setLocalLoading] = useState(true);
   const moveTo = useNavigate();
   const isNavigatingBack = useRef(false);
@@ -41,16 +42,15 @@ const EditPost = () => {
     imagePreview: "",
   });
 
-  const [contentImages, setContentImages] = useState([]);
   const currentArea = useRef(null);
   // const moveTo = useNavigate();
   const getState = useLocation();
 
   const postId = getState.state?.postId;
-  const{post, errors} = useFetchPost(postId);
+  const {post, errors} = useFetchPost(postId);
 
-  const {localPostData} = useFetchLocalData(post);
-
+  const {postLoading, localPostData,receiveLocalImages} = useFetchLocalData(post);
+  
   const selectCurrentSelection = () => {
     setCursorPosition(currentArea.current.selectionStart);
   };
@@ -112,18 +112,22 @@ const EditPost = () => {
 
   // Convert and Store image as base 64
   
-  // useEffect(() => {
-  //   console.log("localPostData: ",localPostData);
-  //   setEditPostData(prev => ({
-  //     ...prev,
-  //     title:localPostData.title || '',
-  //     titleImage:localPostData.titleImage || '',
-  //     contentText:localPostData.contentText || '',
-  //     imagePreview: localPostData.imagePreview || '',
-      
-  //   })
-  // )
-  // },[localPostData])
+  useEffect(() => {
+    if(receiveLocalImages?.length && receiveLocalImages !== contentImages){
+      console.log("receiveLocalImages: ", receiveLocalImages);
+      setContentImages(receiveLocalImages);
+    }
+    if(localPostData?.title.length && localPostData !== editPostData){
+      setEditPostData(prev => ({
+        ...prev,
+        title:localPostData.title || '',
+        titleImage:localPostData.titleImage || '',
+        contentText:localPostData.contentText || '',
+        imagePreview: localPostData.imagePreview || '',
+        })
+      )
+    }
+  },[localPostData, contentImages])
 
   
   // store image as base64
@@ -350,15 +354,15 @@ const EditPost = () => {
     // console.log("contentImages after reposting: ", contentImages);
   };
 
-  if (loading) {
+  if (loading || postLoading) {
     return <h1>Loading the Post..</h1>;
   }
   if (errors.message) {
     return <h2>{errors.message}</h2>;
   }
   return (
-    <div className="bg-gray-50 min-h-screen py-10">
-      <div className="lg:max-w-5xl max-w-4xl bg-white rounded-lg shadow-lg mx-auto w-full p-5">
+    <div className="bg-gray-200 min-h-screen py-10">
+      <div className="lg:max-w-5xl max-w-4xl bg-gray-800 rounded-lg shadow-lg mx-auto w-full p-5">
         <form method="post" className="space-y-2 flex my-5 flex-col">
           <label htmlFor="title" className="text-pink-600">
             Edit Title

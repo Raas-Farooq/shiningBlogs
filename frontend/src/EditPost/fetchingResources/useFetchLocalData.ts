@@ -1,10 +1,20 @@
 import { useEffect, useState } from "react";
-import fetchImageAsBase64 from "./fetchImageBase64";
-import { useAuthenContext } from "../../globalContext/globalContext";
+import fetchImageAsBase64 from "./fetchImageBase64.ts";
+// import { useAuthenContext } from "../../globalContext/globalContext.tsx";
+
+interface PostData{
+  _id:string,
+  userId:string,
+  title:string,
+  titleImage:string,
+  content:[],
+  contentImages:[],
+  
+}
 
 
-const useFetchLocalData = (post) => {
-const {loading, setLoading} = useAuthenContext();
+const useFetchLocalData = (post:PostData) => {
+const [postLoading, setPostLoading] = useState<boolean>(false);
 const [savedTitleImage, setSavedTitleImage] = useState('');
 const [localPostData, setLocalPostData] = useState(
     {
@@ -14,26 +24,29 @@ const [localPostData, setLocalPostData] = useState(
         imagePreview:'',
     }
 )
-console.log("post inside fetching local: ", post)
-const [contentImages, setContentImages] = useState([])
+const [receiveLocalImages, setReceiveLocalImages] = useState([])
 
     useEffect(() => {
-        // if(!post) return;
-        console.log("post inside fetching local: ", post)
+        if(!post) return;
         let newImagePreview = '';
+        console.log("Post inside UseEffect of fetchLocalData: ", post);
             const loadTitleImage = async() => {
-              const titleImage = localStorage.getItem("titleImagePreview");
-              setSavedTitleImage(titleImage);
+              const titleImage = localStorage.getItem("titleImagePreview") || '53vff  1q6]''
+              ;
+              if(titleImage){
+                setSavedTitleImage(titleImage);
+              }
+
               if (post?.titleImage && !titleImage) {
-                newImagePreview = await fetchImageAsBase64(post.titleImage);
+                newImagePreview = await fetchImageAsBase64(post.titleImage) || '';
                 localStorage.setItem('titleImagePreview', newImagePreview);
                 setSavedTitleImage(newImagePreview)
               }
+              // console.log("newImage Preview outside if: ",newImagePreview);
               localStorage.setItem("titleImage", post?.titleImage);
               // setSavedTitleImage(newImagePreview);
             }
             loadTitleImage();
-            console.log("savedTitleImage after loadTitleImage; ", savedTitleImage)
       },[post?.titleImage])
 
 
@@ -41,11 +54,11 @@ const [contentImages, setContentImages] = useState([])
     useEffect(() => {
         async function loadInitialData() {
           if (!post) {
-            setLoading(true);
+            setPostLoading(true);
             return;
           }
           try {
-            const titleStored = JSON.parse(localStorage.getItem("titleStorage"));
+            const titleStored = JSON.parse(localStorage.getItem("titleStorage")) || '';
             const newTitle = post?.title && !titleStored ? post.title : titleStored;
     
             // load Save content Text (Text Data of Post)
@@ -58,8 +71,7 @@ const [contentImages, setContentImages] = useState([])
                 ? post.content.find((content) => content.type === "text")?.value ||
                   ""
                 : localContentText;
-            // console.log('New Content Text initial load: ', newContentText);
-            console.log("IF savedTitleImage on initial load: ", savedTitleImage);
+
             setLocalPostData((prev) => ({
               ...prev,
               title: newTitle || "",
@@ -83,26 +95,26 @@ const [contentImages, setContentImages] = useState([])
                     : `http://localhost:4100/${image.path}`,
                   position: image.position,
                 }));
-                setContentImages(newImages);
+                setReceiveLocalImages(newImages);
                 localStorage.setItem(
                   "localContentImages",
                   JSON.stringify(newImages)
                 );
               } else {
-                setContentImages(localContentImages);
+                setReceiveLocalImages(localContentImages);
               }
             }
           } catch (err) {
             console.error("Error while receiving post", err);
           } finally {
-            setLoading(false);
+            setPostLoading(false);
           }
         }
     
         loadInitialData();
-      }, [post]);
+      }, [post,savedTitleImage]);
 
-      return localPostData
+      return {postLoading, localPostData, receiveLocalImages}
 }
 
 export default useFetchLocalData;
