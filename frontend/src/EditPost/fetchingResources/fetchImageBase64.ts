@@ -1,6 +1,6 @@
 
 
-const fetchImageAsBase64 = (async (image:string) => {
+const fetchImageAsBase64 = (async (image:string):Promise<string | null> => {
     try {
       const response = await fetch(`http://localhost:4100/${image}`);
       console.log("response fetchImageAsBase64 :", response)

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import {FaBars, FaTimes, FaFacebook, FaPinterest, FaTwitter, FaWhatsapp, FaRegUser} from 'react-icons/fa';
 import { useAuthenContext, useBlogContext,useUIContext } from '../../globalContext/globalContext';
-import WindowSize from '../../windowSize';
+import WindowSize from '../../windowSize.ts';
 import { Link, useNavigate } from 'react-router-dom';
 import clsx from 'clsx';
 

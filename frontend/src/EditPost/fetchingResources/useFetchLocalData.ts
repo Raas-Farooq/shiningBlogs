@@ -7,10 +7,51 @@ interface PostData{
   userId:string,
   title:string,
   titleImage:string,
-  content:[],
-  contentImages:[],
+  content:[{
+    type:string,
+    value:string
+  }],
+  contentImages:[{
+    path:string,
+    position:number,
+    fileName:string,
+    _id:string
+  }],
   
 }
+
+interface ContentImage{
+    path?:string,
+    position:number,
+    fileName:string,
+    preview?:string,
+    _id:string,
+    id:number
+}
+
+const getLocalContentImages = (): ContentImage[] => {
+  const localData = localStorage.getItem("localContentImages");
+  if (!localData) return []; // Return empty array if no data exists
+
+  try {
+    const parsedData = JSON.parse(localData);
+    // Validate that parsedData is an array and matches the ContentImage structure
+    if (Array.isArray(parsedData) && parsedData.every(item => (
+      typeof item._id === 'string' &&
+      typeof item.id === 'number' &&
+      typeof item.fileName === 'string' &&
+      typeof item.preview === 'string' &&
+      typeof item.position === 'number'
+    ))) {
+      return parsedData;
+    }
+    return []; // Return empty array if validation fails
+  } catch (error) {
+    console.error("Error parsing localContentImages:", error);
+    return []; // Return empty array if parsing fails
+  }
+};
+
 
 
 const useFetchLocalData = (post:PostData) => {
@@ -24,21 +65,20 @@ const [localPostData, setLocalPostData] = useState(
         imagePreview:'',
     }
 )
-const [receiveLocalImages, setReceiveLocalImages] = useState([])
+const [receiveLocalImages, setReceiveLocalImages] = useState<ContentImage[]>([])
 
     useEffect(() => {
         if(!post) return;
-        let newImagePreview = '';
+        let newImagePreview:string = '';
         console.log("Post inside UseEffect of fetchLocalData: ", post);
             const loadTitleImage = async() => {
-              const titleImage = localStorage.getItem("titleImagePreview") || '53vff  1q6]''
-              ;
+              const titleImage = localStorage.getItem("titleImagePreview") || '';
               if(titleImage){
                 setSavedTitleImage(titleImage);
               }
 
               if (post?.titleImage && !titleImage) {
-                newImagePreview = await fetchImageAsBase64(post.titleImage) || '';
+                newImagePreview = (await fetchImageAsBase64(post.titleImage) || '""') ;
                 localStorage.setItem('titleImagePreview', newImagePreview);
                 setSavedTitleImage(newImagePreview)
               }
@@ -58,18 +98,18 @@ const [receiveLocalImages, setReceiveLocalImages] = useState([])
             return;
           }
           try {
-            const titleStored = JSON.parse(localStorage.getItem("titleStorage")) || '';
+            const titleStored = JSON.parse(localStorage.getItem("titleStorage") || '""');
             const newTitle = post?.title && !titleStored ? post.title : titleStored;
     
             // load Save content Text (Text Data of Post)
             const localContentText = JSON.parse(
-              localStorage.getItem("textContent")
+              localStorage.getItem("textContent") || '""'
             );
             // console.log('localContentText:initialLoad ',localContentText);
             const newContentText =
               post?.content && !localContentText
                 ? post.content.find((content) => content.type === "text")?.value ||
-                  ""
+                  '""'
                 : localContentText;
 
             setLocalPostData((prev) => ({
@@ -79,15 +119,18 @@ const [receiveLocalImages, setReceiveLocalImages] = useState([])
               imagePreview: savedTitleImage || "",
               contentText: newContentText || "",
             }));
-    
+             // JSON.parse(localStorage.getItem("localContentImages")) || [];
             // load content Images
             if (post?.contentImages) {
-              let localContentImages =
-                JSON.parse(localStorage.getItem("localContentImages")) || [];
+              let localContentImages:ContentImage[] = getLocalContentImages();
               // console.log("localContentImages on initial load: ", localContentImages, " post.contentImages: ", post.contentImages);
-              if (post?.contentImages && localContentImages.length === 0) {
-                // console.log("contentImages: if local is empty", post.contentImages);
-                const newImages = post.contentImages.map((image, index) => ({
+              const notLocalImages = !localContentImages.length ||
+              localContentImages.some(image => !image._id || !image.fileName || !image.position);
+
+              if (notLocalImages) {
+                console.log("contentImages: if local is empty", post.contentImages);
+                const newImages:ContentImage[] = post.contentImages.map((image, index) => ({
+                  _id:image._id,
                   id: index,
                   fileName: image.fileName,
                   preview: image.path.startsWith("http://")
@@ -101,6 +144,7 @@ const [receiveLocalImages, setReceiveLocalImages] = useState([])
                   JSON.stringify(newImages)
                 );
               } else {
+                console.log("LOCALLLLL IMAGESSSS ", localContentImages)
                 setReceiveLocalImages(localContentImages);
               }
             }
@@ -113,7 +157,7 @@ const [receiveLocalImages, setReceiveLocalImages] = useState([])
     
         loadInitialData();
       }, [post,savedTitleImage]);
-
+      // console.log("BEFORE RETURN postLoading: ", 'localPostData :', localPostData, "receiveLocalImages ",receiveLocalImages);
       return {postLoading, localPostData, receiveLocalImages}
 }
 

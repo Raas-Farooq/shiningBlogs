@@ -2,10 +2,12 @@
 import {FaTimes} from "react-icons/fa";
 
 interface ContentImagesArray{
+    _id:string,
     id:number,
     fileName:string,
-    preview:string,
-    position:string
+    preview?:string,
+    position:number,
+    path?:string,
 }
 
 interface RemoveImageFunction {

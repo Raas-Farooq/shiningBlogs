@@ -18,10 +18,29 @@ interface LocalErrors {
   message:any
 }
 
+interface MyPost{
+  _id:string,
+  userId:string,
+  title:string,
+  titleImage:string,
+  content:[{
+    type:string,
+    value:string
+  }],
+  contentImages:[{
+    path:string,
+    position:number,
+    fileName:string,
+    _id:string
+  }],
+  
+}
+
+
 const useFetchingPost = (postId:string) => {
     const {setLoading} = useAuthenContext();
     const [errors, setErrors]=useState<LocalErrors>({message:''});
-    const [post, setPost]=useState([])
+    const [post, setPost]=useState<MyPost | null>(null)
     useEffect(() => {
       // console.log("postId: TechBlog ", postId);
         async function getPost() {
@@ -67,3 +86,7 @@ const useFetchingPost = (postId:string) => {
 }
 
 export default useFetchingPost
+
+
+
+        
