@@ -68,7 +68,7 @@ interface SavedPic {
 const EditPost = () => {
   const { loggedIn,loading,errorMessage, setErrorMessage } = useAuthenContext();
   const [cursorPosition, setCursorPosition] = useState(0);
-  const [newTitleImage, setNewTitleImage] = useState(false);
+  // const [newTitleImage, setNewTitleImage] = useState(false);
   const [editedSomething, setEditedSomething] = useState(false);
   const [contentImages, setContentImages] = useState<ContentImage[]>([]);
   const moveTo = useNavigate();
@@ -118,11 +118,6 @@ const EditPost = () => {
 
   const {postLoading, localPostData,receiveLocalImages} = useFetchLocalData(post || DEFAULT_POST);
   
-  useEffect(() => {
-    // console.log("inside edit ffect ", post);
-    // console.log("localPostData edit ffect ", localPostData);
-    localPostData
-  }, [])
   const selectCurrentSelection = () => {
     if(currentArea.current){
       setCursorPosition(currentArea.current.selectionStart);
@@ -138,7 +133,7 @@ const EditPost = () => {
   }, []);
 
   const confirmNavigation = useCallback(async () => {
-    console.log("runs confirmNavigation");
+
     if (!editedSomething || isNavigatingBack.current) return true;
 
     const confirmed = window.confirm(
@@ -149,10 +144,7 @@ const EditPost = () => {
       clearLocalStorage();
       setEditedSomething(false);
     }
-    console.log(
-      "confirmed value inside confirmNavigation: ",
-      confirmNavigation
-    );
+
     return confirmed;
   }, [editedSomething, clearLocalStorage]);
 
@@ -173,8 +165,6 @@ const EditPost = () => {
 
   const windowLoads = useCallback(
     async (e:BeforeUnloadEvent) => {
-      console.log("beforeUnload Running like Cheetah");
-      // console.log("edited Something", editedSomething);
       if (editedSomething) {
         clearLocalStorage();
         e.preventDefault();
@@ -193,11 +183,11 @@ const EditPost = () => {
   // Convert and Store image as base 64
   
   useEffect(() => {
-    if(receiveLocalImages?.length && receiveLocalImages !== contentImages){
-      console.log("receiveLocalImages: ", receiveLocalImages);
+    console.log("GGGGGGGGGGGGGGo: ", receiveLocalImages, "localEditPostData: ", localPostData, 'EditPostData ', editPostData)
+    if(receiveLocalImages?.length){
       setContentImages(receiveLocalImages);
     }
-    if(localPostData?.title.length && localPostData !== editPostData){
+    if(localPostData?.title.length){
       setEditPostData(prev => ({
         ...prev,
         title:localPostData.title || '',
@@ -207,7 +197,7 @@ const EditPost = () => {
         })
       )
     }
-  },[localPostData, contentImages])
+  },[localPostData,receiveLocalImages])
 
   
   // store image as base64
@@ -241,9 +231,8 @@ const EditPost = () => {
   // Handle changes to the title input
   const handleChange = (e:React.ChangeEvent<HTMLInputElement>) => {
     const newTitle = e.target.value;
-    console.log("new Title: ", e.target.value);
     localStorage.setItem("titleStorage", JSON.stringify(newTitle));
-    setNewTitleImage(true);
+    // setNewTitleImage(true);
     setEditPostData((prev) => ({ ...prev, title: newTitle }));
     setEditedSomething(true);
   };
@@ -254,7 +243,7 @@ const EditPost = () => {
     if (!image) return;
     localStorage.setItem("titleImage", JSON.stringify(image));
     setEditPostData((prev) => ({ ...prev, titleImage: image }));
-    setNewTitleImage(true);
+    // setNewTitleImage(true);
     storeAsBase64(image);
     setEditedSomething(true);
   }
@@ -296,24 +285,29 @@ const EditPost = () => {
   // handle changes to the content images
   const handleContentImages = (e:React.ChangeEvent<HTMLInputElement>) => {
     const newImage = e.target.files?.[0];
+    console.log("newImage inside handlecontentiamges; ", newImage)
     if(!newImage) return ;
     const imageMark = `[image-${contentImages.length}]`;
     const beforeImage = editPostData.contentText.substring(0, cursorPosition);
     const afterImage = editPostData.contentText.substring(cursorPosition);
     const newContentText = beforeImage + imageMark + afterImage;
 
+    console.log("new Content: ", newContentText);
     setEditPostData((prev) => ({ ...prev, contentText: newContentText }));
     localStorage.setItem("textContent", JSON.stringify(newContentText));
     saveContentImages(newImage, (base64Result) => {
       const localImage = {
         _id:`tempId${contentImages.length}`,
         id: contentImages?.length,
-        fileName: newImage.name,
+        fileName: newImage.name, 
         file: newImage,
         preview: base64Result,
         position: cursorPosition,
       };
+      console.log("contentImages before locaImag: ",contentImages);
+      console.log("localImage newly created: ", localImage);
       const allImages = [...contentImages, localImage];
+      console.log("allImages after update: ", allImages);
       localStorage.setItem("localContentImages", JSON.stringify(allImages));
       setContentImages(allImages);
       setEditedSomething(true);
@@ -321,24 +315,14 @@ const EditPost = () => {
   };
   // removing the content Image
   const removeImage = (id:number, text:string) => {
-    console.log("id received inside removeImage: ", typeof(id));
     const newContentImages = contentImages.filter((image) => image.id !== id);
-    console.log(
-      "newContentImages after filter inside removeImage: ",
-      newContentImages
-    );
-    console.log("newContentImages enteries: ", newContentImages.entries());
     let updatedText = text;
     if (!newContentImages.length) {
       updatedText = updatedText.split("[image-0]").join("");
-      console.log("updated Text if no contentImages: ", updatedText);
       localStorage.setItem("textContent", JSON.stringify(updatedText));
       setEditPostData((prev) => ({ ...prev, contentText: updatedText }));
     }
     for (const [index, image] of newContentImages.entries()) {
-      console.log("did i run: ");
-      console.log("entery index: ", index);
-      console.log("entry image: ", image);
       updatedText = updatedText
         .split(`[image-${image.id}]`)
         .join(`[image-${index}]`);
@@ -352,7 +336,6 @@ const EditPost = () => {
       fileName: image.fileName,
       position: image.position,
     }));
-    console.log("contenet Images: ", contentImages);
     setContentImages(updateImages);
     localStorage.setItem("localContentImages", JSON.stringify(updateImages));
     setEditedSomething(true);
@@ -361,16 +344,16 @@ const EditPost = () => {
   // handle Reposting
   const handleReposting = async (e:React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    console.log("Reposting run ", post);
+    if(!editedSomething){
+      alert("You didn't Make any Change to Document");
+      return;
+    }
     const formData = new FormData();
-    console.log("newTitleImage true or false ", newTitleImage);
-    console.log("titleimage checking: ", editPostData.titleImage);
     if (editPostData.titleImage instanceof File) {
       formData.append("titleImage", editPostData.titleImage);
     }
     formData.append("title", editPostData.title);
     if (editPostData.contentText) {
-      console.log("before submitting contentText: ", editPostData.contentText);
       const contentArray = [
         {
           type: "text",
@@ -385,18 +368,15 @@ const EditPost = () => {
       fileName:''
     }];
     if (contentImages) {
-      console.log("contentImages before accessing savedPics: ", contentImages);
       let savedPics:SavedPic[] = contentImages.filter((image) => !image.file)
       .map((pic) => ({
         path: pic.preview?.substring(22),
         position: pic.position,
         fileName: pic.fileName,
       }));
-    
-      console.log("savedPics before appending to the form: ", savedPics);
       formData.append("savedImages", JSON.stringify(savedPics));
       contentImages.forEach((image) => {
-        // console.log("positions inside true: ", positions);
+
         if (image.file) {
           positions.push({
             position: image.position,
@@ -406,11 +386,9 @@ const EditPost = () => {
         }
       });
     }
-    // console.log(" combined positions: ", positions);
+
     formData.append("positions", JSON.stringify(positions));
     formData.append("titleImage", editPostData.titleImage);
-
-    console.log("formData: ", formData);
     try {
       const response = await axios.put(
         `http://localhost:4100/weblog/updatedBlog/${post?._id}`,
@@ -422,11 +400,11 @@ const EditPost = () => {
           },
         }
       );
-      console.log("repsonse from put request :", response);
       if (response?.data.success) {
-        console.log("new blog data after success message", response.data.blog);
-        console.log("new Title", response.data.blog.title);
-        console.log("new titleImage ", response.data.blog.titleImage);
+        // console.log("new blog data after success message", response.data.blog);
+        // console.log("new Title", response.data.blog.title);
+        // console.log("new titleImage ", response.data.blog.titleImage);
+        setEditedSomething(false);
         localStorage.setItem(
           "titleImage",
           JSON.stringify(response.data.blog.titleImage)
@@ -436,7 +414,10 @@ const EditPost = () => {
           JSON.stringify(response.data.blog.title)
         );
       }
-      setNewTitleImage(false);
+      window.alert("Successfully Updated the Post");
+      moveTo(-1)
+      
+      // setNewTitleImage(false);
     } catch (err:unknown) {
       if(isErrorCaught(err)){
         if (
@@ -459,8 +440,6 @@ const EditPost = () => {
       }
       
     }
-    console.log("editPost data DRWE REPOSTING: ", editPostData.titleImage);
-    // console.log("contentImages after reposting: ", contentImages);
   };
 
   if (loading || postLoading) {

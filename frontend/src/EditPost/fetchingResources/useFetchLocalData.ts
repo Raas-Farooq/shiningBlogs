@@ -34,6 +34,7 @@ const getLocalContentImages = (): ContentImage[] => {
   if (!localData) return []; // Return empty array if no data exists
 
   try {
+    console.log("localDAta (contentImages) inside hook ", localData);
     const parsedData = JSON.parse(localData);
     // Validate that parsedData is an array and matches the ContentImage structure
     if (Array.isArray(parsedData) && parsedData.every(item => (
@@ -156,8 +157,8 @@ const [receiveLocalImages, setReceiveLocalImages] = useState<ContentImage[]>([])
         }
     
         loadInitialData();
-      }, [post,savedTitleImage]);
-      // console.log("BEFORE RETURN postLoading: ", 'localPostData :', localPostData, "receiveLocalImages ",receiveLocalImages);
+      }, [post]);
+      console.log("BEFORE RETURN postLoading: ", 'localPostData :', localPostData, "receiveLocalImages ",receiveLocalImages);
       return {postLoading, localPostData, receiveLocalImages}
 }
 

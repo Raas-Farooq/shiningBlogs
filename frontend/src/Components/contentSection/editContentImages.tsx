@@ -1,4 +1,5 @@
 
+import { useEffect } from "react";
 import {FaTimes} from "react-icons/fa";
 
 interface ContentImagesArray{
@@ -34,6 +35,9 @@ const EditContentImages:React.FC<EditContentImagesProps> = ({contentImages, remo
         }
         
     }
+    useEffect(() => {
+        console.log("contentImages received EDITCONTENTIMAGES ", contentImages);
+    },[])
 
     return (
         <div className="flex flex-wrap gap-2">
