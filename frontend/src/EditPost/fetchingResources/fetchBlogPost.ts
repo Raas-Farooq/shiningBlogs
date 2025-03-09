@@ -1,6 +1,7 @@
 import { useState,useEffect } from "react";
 import { useAuthenContext } from "../../globalContext/globalContext";
 import axios from 'axios'; 
+import { VITE_API_URL } from "../../config";
 
 interface ErrorInterface {
   response : {
@@ -38,6 +39,7 @@ interface MyPost{
 
 
 const useFetchingPost = (postId:string) => {
+
     const {setLoading} = useAuthenContext();
     const [errors, setErrors]=useState<LocalErrors>({message:''});
     const [post, setPost]=useState<MyPost | null>(null)
@@ -51,7 +53,7 @@ const useFetchingPost = (postId:string) => {
           setLoading(true);
           try {
             const response = await axios.get(
-              `http://localhost:4100/weblog/getBlogPost/${postId}`
+              `${VITE_API_URL}/weblog/getBlogPost/${postId}`
             );
             setPost(response.data.blogPost);
           } catch (err:unknown) {

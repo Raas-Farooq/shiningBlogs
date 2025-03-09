@@ -3,6 +3,7 @@ import { useAuthenContext } from "../globalContext/globalContext";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { FaSpinner } from "react-icons/fa";
+import { VITE_API_URL } from "../config";
 
 interface ErrorsProps{
     email:string,
@@ -72,7 +73,7 @@ const Login = () => {
                 email,
                 password
             }
-            const login_response = await axios.post(`http://localhost:4100/weblog/userLogin`,
+            const login_response = await axios.post(`${VITE_API_URL}/weblog/userLogin`,
             loginData,
             {
                 withCredentials:true

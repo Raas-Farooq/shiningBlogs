@@ -4,6 +4,7 @@ import axios from "axios";
 import ContentImages from "../Components/contentSection/editContentImages.tsx";
 import { useAuthenContext } from "../globalContext/globalContext";
 import { Upload } from "lucide-react";
+import { VITE_API_URL } from "../config.ts";
 
 export default function Write() {
   const [blogTitle, setBlogTitle] = useState({
@@ -187,7 +188,7 @@ export default function Write() {
 
       try {
         const response = await axios.post(
-          "http://localhost:4100/weblog/addBlog",
+          `${VITE_API_URL}/weblog/addBlog`,
           blogData,
 
           {

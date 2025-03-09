@@ -3,6 +3,7 @@ import { useAuthenContext, useUIContext } from "../globalContext/globalContext.t
 import { Link, useNavigate, useNavigation} from "react-router-dom";
 import { FaImage } from "react-icons/fa";
 import axios from 'axios';
+import { VITE_API_URL } from "../config.ts";
 
 
 const UpdateProfile = () => {
@@ -39,13 +40,13 @@ const UpdateProfile = () => {
         
         const get_current_user = async () => {
             try{
-                const response = await axios.get('http://localhost:4100/weblog/getUser', {withCredentials:true});
+                const response = await axios.get(`${VITE_API_URL}/weblog/getUser`, {withCredentials:true});
                 const user =  response.data.user;
                 setUserReceived(user);
                 
                 let realImage = '';
                 console.log("response.image; ", response.data.user.profileImg);
-                realImage = `http://localhost:4100/${response.data.user.profileImg}`;
+                realImage = `${VITE_API_URL}/${response.data.user.profileImg}`;
                 setImagePreview(realImage);
                 let imgPreview = '';
                 setFormData((prev) => ({
@@ -151,7 +152,7 @@ const UpdateProfile = () => {
         console.log("before submitting: form Info", formInfo);
         try{
             const response = await axios.put(
-                `http://localhost:4100/weblog/updateUserProfile`,
+                `${VITE_API_URL}/weblog/updateUserProfile`,
                  formInfo,
                 {
                 headers:{

@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useState, ReactNode } from "react"
 import axios from 'axios';
 import { jwtDecode } from "jwt-decode";
+import { VITE_API_URL } from "../config";
 
 // import { BiLogoMailchimp } from "react-icons/bi";
 // import UserAccount from "../Components/userAccount/userAccout";
@@ -87,7 +88,7 @@ export const AuthenContextProvider = ({children} : {children:ReactNode}) => {
     }
     const userAuthentication = async () => {
         try {
-            const response = await axios.get('http://localhost:4100/weblog/checkAuthen', {withCredentials: true});
+            const response = await axios.get(`${VITE_API_URL}/weblog/checkAuthen`, {withCredentials: true});
             console.log("USer AUTHENTICATIION GLobal Context :", response);
             const token = response.data.token;
             if(isTokenExpired(token)){
@@ -102,7 +103,7 @@ export const AuthenContextProvider = ({children} : {children:ReactNode}) => {
                 setLoggedIn(true);
                 const user = response.data.user;
                 setCurrentUser(user);
-                let imgLink=`http://localhost:4100/${user.profileImg}`;
+                let imgLink=`${VITE_API_URL}/${user.profileImg}`;
     
                 setImagePreview(imgLink)
                 

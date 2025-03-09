@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useAuthenContext, useUIContext } from "../../globalContext/globalContext";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
+import { VITE_API_URL } from "../../config";
 
 interface Response{
   isAuthenticated:boolean,
@@ -10,6 +11,8 @@ interface Response{
 }
 
 const UserAccount = () => {
+
+  
   const { setIsAuthenticated,setLoggedIn, imagePreview,currentUser} = useAuthenContext();
   const {openUserAccount, setOpenUserAccount, setEditProfile} = useUIContext();
   console.log("inside user Account: openUser ",openUserAccount);
@@ -22,7 +25,7 @@ const UserAccount = () => {
         console.log("useEffect inside user Account Runs  CURRENT USER:", currentUser, "USERID: ", userId)
         if(userId){
           try{
-            const response:Response = await axios.get('http://localhost:4100/weblog/checkAuthen');
+            const response:Response = await axios.get(`${VITE_API_URL}/weblog/checkAuthen`);
            console.log('response inside userAccount', response);
            if(response.isAuthenticated){
             setAccountLoading(false)
@@ -44,7 +47,7 @@ const UserAccount = () => {
     const handleLogout= async(e:React.MouseEvent<HTMLButtonElement>) => {
       e.preventDefault();
       try{
-        const response = await axios.post('http://localhost:4100/weblog/logout', {}, {withCredentials:true});
+        const response = await axios.post(`${VITE_API_URL}/weblog/logout`, {}, {withCredentials:true});
         console.log("logout Response inside user Account: ", response);
         localStorage.removeItem('userId');
         setLoggedIn(false)

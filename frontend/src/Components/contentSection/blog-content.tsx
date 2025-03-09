@@ -13,6 +13,7 @@ import {
     useAuthenContext,
     useBlogContext,
 } from "../../globalContext/globalContext.jsx";
+import { VITE_API_URL } from "../../config.ts";
 // import ContentImages from "./ContentImage.jsx";
 
 interface PresentUser{
@@ -139,6 +140,7 @@ export default function BlogContent() {
     setAllBlogsGlobally,
   } = useBlogContext();
 
+  
   const { loggedIn, currentUser} = useAuthenContext();
   
   const [loading, setLoading] = useState<boolean>(true);
@@ -146,7 +148,7 @@ export default function BlogContent() {
   const navigateTo = useNavigate();
   useEffect(() => {
     if (currentUser?.profileImg) {
-      const myImage = `http://localhost:4100/${currentUser.profileImg}`;
+      const myImage = `${VITE_API_URL}/${currentUser.profileImg}`;
       setProfileImage(myImage);
       
     }
@@ -170,7 +172,7 @@ export default function BlogContent() {
     if(allBlogsGlobally.length === 0){
       setLoading(true);
       axios.get(
-          "http://localhost:4100/weblog/allBlogs"
+          `${VITE_API_URL}/weblog/allBlogs`
         ).then(response => {
           setAllBlogsGlobally(response.data.blogs);
         })

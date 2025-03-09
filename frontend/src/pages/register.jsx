@@ -3,6 +3,7 @@ import { useAuthenContext } from "../globalContext/globalContext";
 import { Link, Navigate, useNavigate } from "react-router-dom";
 import { FaImage } from "react-icons/fa";
 import axios from "axios";
+import { VITE_API_URL } from "../config";
 
 const Register = () => {
     const {setLoggedIn, setRegisterData, loggedIn} = useAuthenContext();
@@ -87,7 +88,7 @@ const Register = () => {
                 password
             }
             try{
-                const registerResponse = await axios.post(`http://localhost:4100/weblog/registerUser`, 
+                const registerResponse = await axios.post(`${VITE_API_URL}/weblog/registerUser`, 
                 registrationData
                 )
                 console.log("successfully got response during registration: ", registerResponse.data);

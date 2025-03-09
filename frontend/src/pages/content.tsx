@@ -6,6 +6,7 @@ import Title from '../Components/contentSection/Title.tsx';
 import TextContent from "../Components/contentSection/textContent.tsx";
 import TitleImage from '../Components/contentSection/titleImage.tsx'
 import { FaSpinner } from "react-icons/fa";
+import { VITE_API_URL } from "../config.ts";
 
 interface PostContent { 
     _id:string,
@@ -47,7 +48,7 @@ export default function Content() {
     async function getYourPosts(){
 
         try{
-            const response = await axios.get(`http://localhost:4100/weblog/getMyContent/${user_id}`,{
+            const response = await axios.get(`${VITE_API_URL}/weblog/getMyContent/${user_id}`,{
             withCredentials:true
             })
 

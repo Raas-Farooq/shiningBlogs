@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import fetchImageAsBase64 from "./fetchImageBase64.ts";
+import { VITE_API_URL } from "../../config.ts";
 // import { useAuthenContext } from "../../globalContext/globalContext.tsx";
 
 interface PostData{
@@ -136,7 +137,7 @@ const [receiveLocalImages, setReceiveLocalImages] = useState<ContentImage[]>([])
                   fileName: image.fileName,
                   preview: image.path.startsWith("http://")
                     ? image.path
-                    : `http://localhost:4100/${image.path}`,
+                    : `${VITE_API_URL}/${image.path}`,
                   position: image.position,
                 }));
                 setReceiveLocalImages(newImages);

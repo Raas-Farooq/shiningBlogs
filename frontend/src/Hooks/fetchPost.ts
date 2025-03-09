@@ -2,6 +2,7 @@ import {useState, useEffect} from 'react';
 // import axios from 'axios';
 import { useAuthenContext } from '../globalContext/globalContext';
 import MakeApiCall from '../pages/makeApiCall';
+import { VITE_API_URL } from '../config';
 
 interface Post {
     _id:string,
@@ -52,7 +53,7 @@ const useFetchPost = (id:string | undefined) => {
         if(!id) return;
         const getPost = async() => {
        
-            const url = `http://localhost:4100/weblog/getBlogPost/${id}`;
+            const url = `${VITE_API_URL}/weblog/getBlogPost/${id}`;
 
             const onSuccess = (response:ApiResponse) => {
                 setPost(response.data.blogPost)

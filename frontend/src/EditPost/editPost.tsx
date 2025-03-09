@@ -5,6 +5,7 @@ import EditContentImages from "../Components/contentSection/editContentImages.ts
 import axios from "axios";
 import { useAuthenContext } from "../globalContext/globalContext.tsx";
 import useFetchLocalData from "./fetchingResources/useFetchLocalData.ts";
+import { VITE_API_URL } from "../config.ts";
 
 interface PostData{
   _id:string,
@@ -66,6 +67,7 @@ interface SavedPic {
   fileName:string
 }
 const EditPost = () => {
+  
   const { loggedIn,loading,errorMessage, setErrorMessage } = useAuthenContext();
   const [cursorPosition, setCursorPosition] = useState(0);
   // const [newTitleImage, setNewTitleImage] = useState(false);
@@ -391,7 +393,7 @@ const EditPost = () => {
     formData.append("titleImage", editPostData.titleImage);
     try {
       const response = await axios.put(
-        `http://localhost:4100/weblog/updatedBlog/${post?._id}`,
+        `${VITE_API_URL}/weblog/updatedBlog/${post?._id}`,
         formData,
         {
           withCredentials: true,

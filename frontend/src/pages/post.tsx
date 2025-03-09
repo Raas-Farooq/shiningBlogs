@@ -9,6 +9,7 @@ import Navbar from "../Components/Navbar/navbar.tsx";
 import useUserPrivileges from "../Hooks/ownerPrivileges.tsx";
 import makeApiCall from "./makeApiCall.ts";
 import clsx from "clsx";
+import { VITE_API_URL } from "../config.ts";
 
 
 
@@ -73,7 +74,7 @@ const BlogPost:React.FC = () => {
    
     const deletingPost = async () => {
       setBlogOwner(false);
-      const url = `http://localhost:4100/weblog/deleteBlog/${id}`;
+      const url = `${VITE_API_URL}/weblog/deleteBlog/${id}`;
       const onSuccess=(response:RespReceived<{success:boolean}>)=> {
         if(response.data.success){
           alert("Successfully Deleted the Blog");
