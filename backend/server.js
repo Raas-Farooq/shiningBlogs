@@ -8,7 +8,7 @@ const app = express();
 
 app.use(express.json());
 
-const allowedOrigins = ['http://localhost:5173', 'http://localhost:5174'];
+const allowedOrigins = ['http://localhost:5173', 'http://localhost:5174', 'https://shiningblogs-frontend.onrender.com'];
 
 app.use(cors({
     origin:function (origin, callback){
