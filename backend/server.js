@@ -7,7 +7,7 @@ import cookieParser from 'cookie-parser';
 const app = express();
 
 app.use(express.json());
-
+app.options('/weblog/allBlogs', cors()); 
 const allowedOrigins = ['http://localhost:5173', 'http://localhost:5174', 'https://shiningblogs-frontend.onrender.com'];
 
 app.use(cors({
