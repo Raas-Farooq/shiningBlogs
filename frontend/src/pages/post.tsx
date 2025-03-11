@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useAuthenContext, useUIContext } from "../globalContext/globalContext.tsx";
+import { useAuthenContext, useBlogContext, useUIContext } from "../globalContext/globalContext.tsx";
 import Image from "../Components/contentSection/titleImage.tsx";
 import { useNavigate, useParams } from "react-router-dom";
 import TextContent from "../Components/contentSection/textContent.jsx";
@@ -49,6 +49,7 @@ interface RespReceived<T>{
 
 const BlogPost:React.FC = () => {
   const { setInHomePage } = useUIContext();
+  const {setAllBlogsGlobally, allBlogsGlobally} = useBlogContext();
   const { currentUser, loggedIn,setErrorMessage,errorMessage, setLoading } = useAuthenContext();
   let { id } = useParams();
   const [isDeletingPost, setIsDeletingPost] = useState<boolean>(false);
@@ -71,25 +72,34 @@ const BlogPost:React.FC = () => {
     const confirm = window.confirm(
       "Are You sure to delete this Post. You won't be able to recover it!"
     );
-   
+   const oldBolgsCopy = allBlogsGlobally;
+
+   setAllBlogsGlobally(prevBlogs => prevBlogs.filter(blog => blog._id !== id));
+   console.log("allBlogs after filtering remove ", allBlogsGlobally);
     const deletingPost = async () => {
       setBlogOwner(false);
+      setIsDeletingPost(true)
+      console.log("id: ",id);
       const url = `${VITE_API_URL}/weblog/deleteBlog/${id}`;
       const onSuccess=(response:RespReceived<{success:boolean}>)=> {
         if(response.data.success){
           alert("Successfully Deleted the Blog");
+          setIsDeletingPost(false);
+          console.log("allBlogsGlobally: ", allBlogsGlobally)
           setBlogOwner(true);
-          setIsDeletingPost(true)
           moveTo('/');
         }
       }
 
       function onError(err:ErrorResponse){
+        setAllBlogsGlobally(oldBolgsCopy);
         if(err.response?.data?.error === 'jwt expired'){
           setErrorMessage('JWT Expired! Login Again');
 
         }
         else if(err.response?.data?.message){
+          alert('else if runs');
+          console.log("err.resopsne.data else if ", err.response?.data?.message);
           setErrorMessage(err.response.data.message);
         }
         else if(err.request){
@@ -102,7 +112,7 @@ const BlogPost:React.FC = () => {
 
       makeApiCall(setLoading, url, {method:'DELETE'}, onSuccess, onError);
       setBlogOwner(true);
-      setIsDeletingPost(false);
+      
   
     };
     if(confirm){
@@ -111,8 +121,9 @@ const BlogPost:React.FC = () => {
     
   }
   useEffect(() => {
-    // console.log("postLoading: ", postLoading, "post title", post.title);
+    console.log("postLoading: ", postLoading, "post title", post.title);
     if(!postLoading && !post._id){
+      // console.log("!postLoading value "postLoading, "post._id ", post._id)
       console.log("!loading & post.title has run")
       moveTo('/notFound')
     }

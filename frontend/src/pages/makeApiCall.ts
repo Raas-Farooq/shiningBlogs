@@ -4,7 +4,7 @@ import axios, { AxiosResponse } from "axios"
 type loadingState = (loading:boolean)=>void
 
 
-interface methodRoute {
+interface MethodRoute {
     method: 'GET'|'POST'|'PUT'|'DELETE',
     data?:any,
     // header:Record<string, string>
@@ -31,13 +31,23 @@ interface ErrReceived {
 const MakeApiCall = async<T>(
     setLoading:loadingState,
     url:string,
-    method:methodRoute,
+    method:MethodRoute,
     onSuccess:(response:RespReceived<T>)=>void,
     onError:(err:ErrReceived)=>void
 ) => {
 
     try{
-        const fetchResult:AxiosResponse<T> = await axios(url, {...method});
+        setLoading(true);
+        const {method:httpMethod, data} = method;
+        console.log("method before destruct: ", method);
+        const fetchResult:AxiosResponse<T> = await axios(
+           { 
+            url, 
+            method:httpMethod,
+            data: data || undefined,
+            withCredentials:true
+        });
+        // console.log("below axios ");
         if(onSuccess){
             onSuccess(fetchResult)
         }

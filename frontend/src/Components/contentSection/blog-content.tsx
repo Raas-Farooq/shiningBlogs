@@ -152,7 +152,7 @@ export default function BlogContent() {
       setProfileImage(myImage);
       
     }
-    if (!allBlogsGlobally) {
+    if (!allBlogsGlobally.length) {
       setLoading(true);
     }
   }, [currentUser?.profileImg, allBlogsGlobally]);
@@ -186,6 +186,8 @@ export default function BlogContent() {
 
   function handleRefresh(e:React.MouseEvent) {
     e.preventDefault();
+    console.log("handleREfresh Runs");
+    setAllBlogsGlobally([]);
     if(!loading){
       setSearching(false);
       setFilteredBlogs([]);
