@@ -38,5 +38,10 @@
     "typescript": "^5.7.3",
     "vite": "^6.0.11",
     "vite-tsconfig-paths": "^5.1.4"
-  }
+  },
+  "description": "This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.",
+  "main": "eslint.config.js",
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
 }
