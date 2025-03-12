@@ -1,4 +1,6 @@
 // import React, { useEffect, useState } from "react";
+import axios from "axios";
+import { useEffect } from "react";
 import {
   FaFacebook,
   FaTwitter,
@@ -9,7 +11,12 @@ import {
 
 const About = () => {
  
-
+  useEffect(() => {
+    axios.get('/weblog/allBlogs')
+        .then(response => console.log(response.data))
+        .catch(error => console.error(error));
+  },[])
+  
   return (
     <div className="page-content bg-gray-50 min-h-screen">
       <h1 className="text-4xl font-bold text-pink-600 text-center py-5">
