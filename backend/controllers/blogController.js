@@ -342,11 +342,13 @@ const addBlog = async (req,res) => {
                 success:false,
                 message:"Unable to Create Blog. Try again Later",
                 
+                
             })
         }
         return res.status(201).json({
             success:true,
-            message:"BlogPost Created successfuly"
+            message:"BlogPost Created successfuly",
+            newBlog
         })
     }
     catch(err){

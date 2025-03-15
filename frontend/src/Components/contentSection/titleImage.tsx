@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { VITE_API_URL } from "../../config";
 
 
 interface ImageProps {
@@ -16,10 +17,12 @@ const Image:React.FC<ImageProps> = ({postImg, title, isFullView}) => {
         const relUrl = postImg.startsWith('uploads/');
         
         if(absUrl){
+            console.log("postImg: ", postImg);
             setImageSrc(postImg);
         }
         else if(relUrl){
-            setImageSrc(`http://localhost:4100/${postImg}`);
+            console.log("relUrl :", relUrl)
+            setImageSrc(`${VITE_API_URL}/${postImg}`);
             
         }else{
             // setImageSrc('../public/Venice Blue.png')

@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import ContentImages from "../Components/contentSection/editContentImages.tsx";
-import { useAuthenContext } from "../globalContext/globalContext";
+import { BlogContextProvider, useAuthenContext, useBlogContext } from "../globalContext/globalContext";
 import { Upload } from "lucide-react";
 import { VITE_API_URL } from "../config.ts";
 
@@ -14,7 +14,8 @@ export default function Write() {
   });
   const moveTo = useNavigate();
   const currentTextArea = useRef(null);
-  const { loggedIn } = useAuthenContext();
+  const { loggedIn, setErrorMessage, errorMessage } = useAuthenContext();
+  const {setAllBlogsGlobally} = useBlogContext();
   const [cursorPosition, setCursorPosition] = useState(0);
   // const [titleErr, setTitleErr] = useState('');
   const [loadingErr, setLoadingErr] = useState(false);
@@ -198,9 +199,8 @@ export default function Write() {
             },
           }
         );
-        console.log("response after sending new Blog: ", response);
+      
         if (response.data.success) {
-          console.log("response.data.success: ", response.data.success);
           blogTitle.title = "";
           blogTitle.imgPreview = "";
           setBlogTitle((prev) => ({
@@ -212,24 +212,40 @@ export default function Write() {
           setContentImages([]);
           setContentText("");
           setImagesShortNames([]);
+          
+          setAllBlogsGlobally(earlierBlogs => 
+          (
+            [...earlierBlogs, response.data.newBlog]
+          )
+          )
           alert("Blog Created Successfully");
           moveTo("/");
         }
       } catch (err) {
-        console.log("error while posting new Blog ", err.response.data);
+        console.log("only Error: ", err)
+        console.log("error while posting new Blog ", err?.response);
         if (
-          err.response.data.error === "jwt expired" ||
-          err.response.data.message === "Unable to get Token Bearer"
+          err.response?.data?.error === "jwt expired" ||
+          err.response?.data?.message === "Unable to get Token Bearer"
         ) {
           // alert("You are logged Out! Please Login In First");
           const confirmMovingLogin = window.confirm(
             "you Are Logged Out! please login and Come Again."
           );
-
+          setErrorMessage(err?.response?.data.error);
           console.log("confirmMOving : ", confirmMovingLogin);
           if (confirmMovingLogin) {
             moveTo("/login");
           }
+        }
+        if(err?.request){
+          setErrorMessage("Server Error got while creating new Blog")
+        }
+        else if(err?.message){
+          setErrorMessage(err.message)
+        }
+        else{
+          setErrorMessage(err);
         }
       } finally {
         setLoadingErr(false);
@@ -239,11 +255,12 @@ export default function Write() {
 
   if (loadingErr) return <h1> Processing </h1>;
   // also ask about 'max-w-md mx-auto'
-
+  
   return (
     <div className="bg-gray-50 min-h-screen py-10">
       <div className="bg-white shadow-md rounded:lg px-6 py-8 w-full mx-auto max-w-3xl">
         <h2 className="text-3xl font-bold text-center text-purple-600"> Your Shinning Post</h2>
+        {errorMessage && <h2> {errorMessage} </h2>} 
         <form method="post" className="space-y-3 flex flex-col">
           <label htmlFor="title" className="text-pink-600">
             {" "}

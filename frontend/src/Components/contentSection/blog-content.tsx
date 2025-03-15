@@ -14,6 +14,7 @@ import {
     useBlogContext,
 } from "../../globalContext/globalContext.jsx";
 import { VITE_API_URL } from "../../config.ts";
+import { clsx } from "clsx";
 // import ContentImages from "./ContentImage.jsx";
 
 interface PresentUser{
@@ -101,7 +102,10 @@ interface BlogCardProps{
   filtering:boolean
 }
 const BlogCard:React.FC<BlogCardProps> = ({ blog, handlePostClick }) => {
-  
+  const {allBlogsGlobally} = useBlogContext();
+  useEffect(() => {
+    console.log("allBlogs inside the useeffect of BlogConte: " ,allBlogsGlobally)
+  }, [])
   return (
     <article
       className="flex flex-col items-center p-4 rounded-lg transition-all duration-300 hover:scale-105
@@ -182,11 +186,10 @@ export default function BlogContent() {
           setLoading(false);
         })
     }
-  }, [allBlogsGlobally.length]);
+  }, [allBlogsGlobally?.length]);
 
   function handleRefresh(e:React.MouseEvent) {
     e.preventDefault();
-    console.log("handleREfresh Runs");
     setAllBlogsGlobally([]);
     if(!loading){
       setSearching(false);
@@ -211,6 +214,7 @@ export default function BlogContent() {
         </div>
       )}
       <div className="blogsContainer xs:w-[95vw] w-[70vw] text-center m-10">
+      
         <button
           onClick={handleRefresh}
           className="bg-transparent text-gray-600 hover:text-blue-600 hover:underline"
@@ -221,14 +225,19 @@ export default function BlogContent() {
           data-component="bottomBlogsContainer"
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 text-center justify-center"
         >
-          {BlogsToShow.map((blog, index) => (
-            <BlogCard
-              key={index}
-              blog={blog}
-              handlePostClick={handlePostClick}
-              filtering={false}
-            />
-          ))}
+          {BlogsToShow.map((blog, index) => 
+            {
+              console.log("BlogsTo show insidie map: ", BlogsToShow);
+              return (
+                <BlogCard
+                key={index}
+                blog={blog}
+                handlePostClick={handlePostClick}
+                filtering={false}
+              />
+              )
+            }
+          )}
         </div>
       </div>
 
@@ -242,7 +251,7 @@ export default function BlogContent() {
         className="flex justify-center"
         onClick={() => navigateTo("/userAccount")}
       >
-        <button className="xs:block sm:hidden border bg-green-400 text-center p-3 hover:bg-green-200">
+        <button className={clsx('sm:hidden border bg-green-400 text-center p-3 hover:bg-green-200', !loggedIn ? 'xs:hidden' : 'block')}>
           About Me
         </button>
       </div>

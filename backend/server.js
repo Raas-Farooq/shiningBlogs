@@ -39,7 +39,10 @@ app.use((err, req,res, next) => {
     console.error(err.stack);
     res.status(500).send("Something went wrong")
 })
-
+app.get('/wake-up', (req, res) => {
+    res.send("Waking up...");
+  });
+  
 const port = process.env.PORT || 4100;
 databaseConnection()
 
