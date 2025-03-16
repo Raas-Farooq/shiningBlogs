@@ -277,9 +277,9 @@ const logging =  async(req,res) => {
                 }
                 res.cookie('token', token, {
                     httpOnly:true,
-                    secure:process.env.NODE_ENV="production",
+                    secure:true,
                     maxAge:3600000,
-                    sameSite:'Strict'
+                    sameSite:'None'
                 })
 
                 return res.status(201).json({

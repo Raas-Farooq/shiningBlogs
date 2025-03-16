@@ -1,6 +1,8 @@
 import jwt, {decode} from 'jsonwebtoken';
 
 const authMiddleware = async(req,res, next) => {
+    console.log("Auth middleware called");
+    console.log("Cookies received:", req.cookies);
     const token = req.cookies.token;
 
     if(!token) return res.status(404).json({success:false, message:"Unable to get Token Bearer"});

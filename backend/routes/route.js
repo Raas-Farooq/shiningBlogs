@@ -34,9 +34,7 @@ const loginLimiter = rateLimit({
 router.post('/userLogin',loginLimiter, [
     body('email').isEmail().normalizeEmail(),
     body('password').notEmpty()
-], logging), async(req,res) => {
-    console.log("req. email: ", req.body.email)
-}
+], logging);
 
 const newBlogLimiter = rateLimit({
     windowMs:15 * 60 * 1000,

@@ -88,8 +88,9 @@ export const AuthenContextProvider = ({children} : {children:ReactNode}) => {
     }
     const userAuthentication = async () => {
         try {
+            console.log("Calling checkAuthen at:", `${import.meta.env.VITE_API_URL}/weblog/checkAuthen`);
             const response = await axios.get(`${VITE_API_URL}/weblog/checkAuthen`, {withCredentials: true});
-            console.log("USer AUTHENTICATIION GLobal Context :", response);
+            console.log("USer AUTHENTICATIION GLobal Context :", response?.data);
             const token = response.data.token;
             if(isTokenExpired(token)){
                 alert("Token expred.. logging OUt from userAuthentication fetch globalContext");
