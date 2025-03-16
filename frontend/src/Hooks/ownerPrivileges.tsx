@@ -1,6 +1,7 @@
 import {useState,useEffect} from 'react';
 import axios from 'axios';
 import { useAuthenContext } from '../globalContext/globalContext';
+import { VITE_API_URL } from '../config';
 
 
 const useUserPrivileges= (blogId:string) => {
@@ -12,7 +13,7 @@ const useUserPrivileges= (blogId:string) => {
         async function userPrivileges(){
                 try{
                     if(blogId){
-                        const response = await axios.get(`http://localhost:4100/weblog/canEditBlog/${blogId}`
+                        const response = await axios.get(`${VITE_API_URL}/weblog/canEditBlog/${blogId}`
                             ,{withCredentials:true}
                         );
                         if(response.data.success){

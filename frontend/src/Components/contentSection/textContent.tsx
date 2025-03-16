@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react"
 import Image from "./titleImage";
+import { VITE_API_URL } from "../../config";
 
 
 interface ContentItem {
@@ -102,7 +103,7 @@ const TextContent: React.FC<TextContentProps> = ({
             ) : (
               <img
                 key={index}
-                src={item.imageUrl?.startsWith("http://") ? item.imageUrl : `http://localhost:4100/${item.imageUrl}`}
+                src={item.imageUrl?.startsWith("http://") ? item.imageUrl : `${VITE_API_URL}/${item.imageUrl}`}
                 alt="Image"
                 className="block w-56 h-52 rounded-t-lg max-w-full my-4"
               />
