@@ -123,8 +123,6 @@ const BlogPost:React.FC = () => {
   useEffect(() => {
     console.log("postLoading: ", postLoading, "post title", post.title);
     if(!postLoading && !post._id){
-      // console.log("!postLoading value "postLoading, "post._id ", post._id)
-      console.log("!loading & post.title has run")
       moveTo('/notFound')
     }
   }, [postLoading, post, moveTo])
@@ -270,7 +268,7 @@ const BlogPost:React.FC = () => {
                   <h5 key={index}>{interest} </h5>
                 ))
               ) : (
-                <h3> interests are not Added</h3>
+                <h3> You should add Interests</h3>
               )}
             </>
           ) : (

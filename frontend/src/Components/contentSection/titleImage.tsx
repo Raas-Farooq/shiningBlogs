@@ -21,7 +21,6 @@ const Image:React.FC<ImageProps> = ({postImg, title, isFullView}) => {
             setImageSrc(postImg);
         }
         else if(relUrl){
-            console.log("relUrl :", relUrl)
             setImageSrc(`${VITE_API_URL}/${postImg}`);
             
         }else{

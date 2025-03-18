@@ -13,12 +13,17 @@ interface Response{
 const UserAccount = () => {
 
   
-  const { setIsAuthenticated,setLoggedIn, imagePreview,currentUser} = useAuthenContext();
+  const { setIsAuthenticated,setLoggedIn, imagePreview,currentUser,setImagePreview} = useAuthenContext();
   const {openUserAccount, setOpenUserAccount, setEditProfile} = useUIContext();
   console.log("inside user Account: openUser ",openUserAccount);
     const [accountLoading, setAccountLoading] = useState(false); 
     const navigate = useNavigate();
     useEffect(() => {
+      {console.log("currentUser: userAccot", currentUser)}
+      if(currentUser?.profileImg){
+        const myImage = `${VITE_API_URL}/${currentUser.profileImg}`;
+        setImagePreview(myImage);
+      }
       async function fetchingCurrentUser(){
         setAccountLoading(true);
         const userId = localStorage.getItem('userId');

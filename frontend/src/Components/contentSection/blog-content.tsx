@@ -36,6 +36,10 @@ interface userProfileProps {
 
 
 function UserProfile( {currentUser, profileImage}:userProfileProps) {
+
+  useEffect(() => {
+    console.log('currentUser blogCon ', currentUser);
+  },[])
   
   return (
     <aside
@@ -102,10 +106,11 @@ interface BlogCardProps{
   filtering:boolean
 }
 const BlogCard:React.FC<BlogCardProps> = ({ blog, handlePostClick }) => {
-  const {allBlogsGlobally} = useBlogContext();
-  useEffect(() => {
-    console.log("allBlogs inside the useeffect of BlogConte: " ,allBlogsGlobally)
-  }, [])
+  // eslint-disable-next-line no-unused-vars
+  const { allBlogsGlobally } = useBlogContext();
+useEffect(() => {
+  console.log("BlogsCount: ", allBlogsGlobally.length)
+},[])
   return (
     <article
       className="flex flex-col items-center p-4 rounded-lg transition-all duration-300 hover:scale-105
@@ -201,8 +206,12 @@ export default function BlogContent() {
     e.stopPropagation();
     navigateTo(`/BlogPost/${post._id}`, { state: { post } });
   };
-  const BlogsToShow =
-    searchValue || filteredBlogs.length ? filteredBlogs : allBlogsGlobally;
+
+    const getBlogsToShow = () => {
+      return searchValue || filteredBlogs.length ? filteredBlogs : allBlogsGlobally;
+    };
+    
+    const BlogsToShow = getBlogsToShow();
   return (
     <div
       data-component="AllBlogsParent"
@@ -221,24 +230,25 @@ export default function BlogContent() {
         >
           Refresh
         </button>
+        {allBlogsGlobally?.length > 0 && 
         <div
-          data-component="bottomBlogsContainer"
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 text-center justify-center"
-        >
-          {BlogsToShow.map((blog, index) => 
-            {
-              console.log("BlogsTo show insidie map: ", BlogsToShow);
-              return (
-                <BlogCard
-                key={index}
-                blog={blog}
-                handlePostClick={handlePostClick}
-                filtering={false}
-              />
-              )
-            }
-          )}
-        </div>
+        data-component="bottomBlogsContainer"
+        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 text-center justify-center"
+      >
+        {BlogsToShow.map((blog, index) => 
+          {
+            return (
+              <BlogCard
+              key={index}
+              blog={blog}
+              handlePostClick={handlePostClick}
+              filtering={false}
+            />
+            )
+          }
+        )}
+      </div>}
+        
       </div>
 
       <div className={`hidden md:block`}>
@@ -263,3 +273,11 @@ export default function BlogContent() {
 // suppose i dont destrcture them and used it like this then why doesn't it work 'function UserProfile( currentUser:PresentUser, profileImage:string) {'
 
 
+// img.onload = () => {
+//   setImageLoading(false);
+// };
+// img.onerror = () => {
+//   setImageLoading(false);
+// };
+
+// are onload and onerror builtIN methods

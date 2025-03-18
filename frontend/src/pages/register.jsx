@@ -6,44 +6,24 @@ import axios from "axios";
 import { VITE_API_URL } from "../config";
 
 const Register = () => {
-    const {setLoggedIn, setRegisterData, loggedIn} = useAuthenContext();
+    const {setLoggedIn, setRegisterData, loggedIn, setCurrentUser} = useAuthenContext();
 
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [errors, setErrors] = useState({});
     const [confirmMessage, setConfirmMessage] = useState('');
-
+    const moveTo = useNavigate();
     const navigateTo = useNavigate();
     
     const validEmail = (email_text) => {
         const emailTest = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
         return emailTest.test(email_text);
     } 
-    function outer() {
-        let count = 0; // Outer variable
-      
-        function inner() {
-          count++; // Accesses outer variable
-          console.log(count);
-        }
-      
-        return inner;
-      }
-      
-    const counter = outer();
-    
-    counter();
-    counter();
-    counter();
-    counter();
     useEffect(() => {
         if(loggedIn){
             navigateTo("/")
         };
-        // if(errors){
-        //     console.log("server Errors: ", errors);
-        // }
         
     }, [loggedIn])
     const validateRegistration = () => {
@@ -94,13 +74,15 @@ const Register = () => {
                 console.log("successfully got response during registration: ", registerResponse.data);
                 setRegisterData(registerResponse.data);
                 alert("Success! You will find an Confirmation Email Soon")
-                
+                const registeredUser = registerResponse.data.newUser
                 setEmail('');
                 setUsername('');
                 setPassword('');
-                
+                localStorage.setItem('userId', registeredUser._id);
+                setLoggedIn(true);
+                setCurrentUser(registeredUser)
                 setConfirmMessage("Your Information Submitted Successfully");
-    
+                moveTo('/');
                 setTimeout(() => {
                     setConfirmMessage("");
                 }, 3000)     
@@ -123,9 +105,11 @@ const Register = () => {
                         setErrors({ general: "An error occurred. Please try again." });
                     }
                 } else if (err.request) {
+                    
                     // The request was made but no response was received
                     setErrors({ general: "No response from server. Please try again." });
                 } else {
+                    console.log("err ", err)
                     // Something happened in setting up the request that triggered an Error
                     setErrors({ general: "An error occurred. Please try again." });
                 }

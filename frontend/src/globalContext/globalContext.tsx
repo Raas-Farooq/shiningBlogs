@@ -64,6 +64,10 @@ export const AuthenContextProvider = ({children} : {children:ReactNode}) => {
             setLoading(false);
         }
     }, []);
+
+    useEffect(() => {
+
+    },[imagePreview])
     useEffect(() => {
         const interval = setInterval(() => {
             userAuthentication();
@@ -88,7 +92,6 @@ export const AuthenContextProvider = ({children} : {children:ReactNode}) => {
     }
     const userAuthentication = async () => {
         try {
-            console.log("Calling checkAuthen at:", `${import.meta.env.VITE_API_URL}/weblog/checkAuthen`);
             const response = await axios.get(`${VITE_API_URL}/weblog/checkAuthen`, {withCredentials: true});
             console.log("USer AUTHENTICATIION GLobal Context :", response?.data);
             const token = response.data.token;
@@ -104,10 +107,11 @@ export const AuthenContextProvider = ({children} : {children:ReactNode}) => {
                 setLoggedIn(true);
                 const user = response.data.user;
                 setCurrentUser(user);
-                let imgLink=`${VITE_API_URL}/${user.profileImg}`;
-    
-                setImagePreview(imgLink)
-                
+
+                if(user.profileImg){
+                    let imgLink=`${VITE_API_URL}/${user.profileImg}`;
+                    setImagePreview(imgLink)
+                }
                 localStorage.setItem('userId', response.data.user._id);
             } else {
                 setLoggedIn(false);
@@ -218,12 +222,6 @@ export const UIContextProvider = ({children}:{children:ReactNode}) => {
     const [showMenu, setShowMenu] = useState<boolean>(false);  
     const [inHomePage, setInHomePage] = useState<boolean>(true);
     
-
-    
-    // useEffect(() => {
-    //     console.log("Navbar runs: ")
-    // }, [currentUser,loggedIn]);
-
     
     return (
         <UIContext.Provider value={{

@@ -60,9 +60,9 @@ const registerUser = async (req,res) => {
 
                 res.cookie('token', token, {
                     httpOnly:true,
-                    secure:process.env.NODE_ENV === 'production',
+                    secure:true,
                     maxAge:3600000,
-                    sameSite:'Strict'
+                    sameSite:'None'
 
                 })
                 res.status(201).json({
@@ -87,6 +87,105 @@ const registerUser = async (req,res) => {
     }
     
 }
+
+// user Login Function
+
+/**Handles user login by validating input, checking credentials, and generating a JWT token.
+ * 
+ * @param {Object} req - request Object : it have the user requests/data   
+ * @param {Object} res - response Object:  it is used to send the responses back to user
+ * @returns {Object} it shows the result of user responses after login attempt
+ * 
+ * @param {String} req.body.username - username of the user
+ * @param {String} req.body.email - user email address
+ * @param {String} req.body.password - user's password
+ * 
+ * @returns {Object} - JSON response with a status and message indicating the result of the login attempt.
+ * @returns {Object} res.success - Indicates whether the login was successful.
+ * @returns {string} res.message - Provides additional information on the result (e.g., errors or success messages).
+ * 
+ * @description This function This function uses bcrypt for password comparison and jwt for token generation.
+ *              Also checks whether the user is valid who is trying to login and
+ *              and it returns different responses like 200 for (Ok), 400 for (bad request), 
+ *              404 for (Not Found) and 500 for (Server Error) 
+ */
+
+
+const logging =  async(req,res) => {
+    //checking Result of Validation
+    const {email, password}= req.body;
+    const loginErrors = validationResult(req);
+    if(!loginErrors.isEmpty()){
+        return res.status(400).json({
+            success:false,
+            message:"email or password not Valid",
+            errors:loginErrors.array()
+        })
+    }
+    
+    try{
+
+        // accessing User
+        const user = await User.findOne({email}).lean();
+        console.log("user: inside login ", user);
+        // if user didn't exist
+        if(!user) {
+            return res.status(404).json({
+                success:false,
+                message:"user didn't exist"
+            })
+        }
+        // Match the provided password with the stored password
+        const isPasswordMatched = await bcrypt.compare(password, user.password);
+        if(!isPasswordMatched){
+            return res.status(404).json(
+                {
+                    success:false,
+                    message:"password didn't Match. Try again please",
+                    
+                }
+            )
+        }
+        // Create a JWT token for the user
+        console.log("user._id: ", user._id);
+        jwt.sign(
+            ({user:{userId:user._id}}), 
+            process.env.JWT_SECRET,
+             {expiresIn: '1h'}
+             , (err, token) => {
+                if(err){
+                    return res.status(500).json({
+                        success:false,
+                        message:"Got Error, Didn't able to sign the token!"
+                    })
+                }
+                res.cookie('token', token, {
+                    httpOnly:true,
+                    secure:true,
+                    maxAge:3600000,
+                    sameSite:'None'
+                })
+
+                return res.status(201).json({
+                    success:true, 
+                    message:"logged in and Successfully created the token",
+                    token,
+                    user
+                })
+
+             }
+            )
+    }
+    // Handle server errors
+    catch(err){
+        res.status(500).json({
+            success:false,
+            message:`server Error Occured while logging`,
+            err:err.message
+        })
+    }
+}
+
 
 // Update User name
 
@@ -202,103 +301,6 @@ const updateUserProfile = async (req, res) => {
         })
     }
 
-}
-
-// user Login Function
-
-/**Handles user login by validating input, checking credentials, and generating a JWT token.
- * 
- * @param {Object} req - request Object : it have the user requests/data   
- * @param {Object} res - response Object:  it is used to send the responses back to user
- * @returns {Object} it shows the result of user responses after login attempt
- * 
- * @param {String} req.body.username - username of the user
- * @param {String} req.body.email - user email address
- * @param {String} req.body.password - user's password
- * 
- * @returns {Object} - JSON response with a status and message indicating the result of the login attempt.
- * @returns {Object} res.success - Indicates whether the login was successful.
- * @returns {string} res.message - Provides additional information on the result (e.g., errors or success messages).
- * 
- * @description This function This function uses bcrypt for password comparison and jwt for token generation.
- *              Also checks whether the user is valid who is trying to login and
- *              and it returns different responses like 200 for (Ok), 400 for (bad request), 
- *              404 for (Not Found) and 500 for (Server Error) 
- */
-
-
-const logging =  async(req,res) => {
-    //checking Result of Validation
-    const {email, password}= req.body;
-    const loginErrors = validationResult(req);
-    if(!loginErrors.isEmpty()){
-        return res.status(400).json({
-            success:false,
-            message:"email or password not Valid",
-            errors:loginErrors.array()
-        })
-    }
-    
-    try{
-
-        // accessing User
-        const user = await User.findOne({email}).lean();
-        console.log("user: inside login ", user);
-        // if user didn't exist
-        if(!user) {
-            return res.status(404).json({
-                success:false,
-                message:"user didn't exist"
-            })
-        }
-        // Match the provided password with the stored password
-        const isPasswordMatched = await bcrypt.compare(password, user.password);
-        if(!isPasswordMatched){
-            return res.status(404).json(
-                {
-                    success:false,
-                    message:"password didn't Match. Try again please",
-                    
-                }
-            )
-        }
-        // Create a JWT token for the user
-        console.log("user._id: ", user._id);
-        jwt.sign(
-            ({user:{userId:user._id}}), 
-            process.env.JWT_SECRET,
-             {expiresIn: '1h'}
-             , (err, token) => {
-                if(err){
-                    return res.status(500).json({
-                        success:false,
-                        message:"Got Error, Didn't able to sign the token!"
-                    })
-                }
-                res.cookie('token', token, {
-                    httpOnly:true,
-                    secure:true,
-                    maxAge:3600000,
-                    sameSite:'None'
-                })
-
-                return res.status(201).json({
-                    success:true, 
-                    message:"logged in and Successfully created the token",
-                    user
-                })
-
-             }
-            )
-    }
-    // Handle server errors
-    catch(err){
-        res.status(500).json({
-            success:false,
-            message:`server Error Occured while logging`,
-            err:err.message
-        })
-    }
 }
 
 
