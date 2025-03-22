@@ -6,7 +6,7 @@ import axios from "axios";
 import { VITE_API_URL } from "../config";
 
 const Register = () => {
-    const {setLoggedIn, setRegisterData, loggedIn, setCurrentUser} = useAuthenContext();
+    const {setLoggedIn, setIsAuthenticated, setRegisterData, loggedIn, setCurrentUser} = useAuthenContext();
 
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
@@ -58,8 +58,6 @@ const Register = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         const validationResult = validateRegistration();
-        console.log(Object.keys(validationResult).length === 0);
-
         if(Object.keys(validationResult).length === 0){
             setErrors({});
             const registrationData = {
@@ -69,28 +67,30 @@ const Register = () => {
             }
             try{
                 const registerResponse = await axios.post(`${VITE_API_URL}/weblog/registerUser`, 
-                registrationData
+                registrationData,
+                {
+                    withCredentials:true
+                }
                 )
-                console.log("successfully got response during registration: ", registerResponse.data);
                 setRegisterData(registerResponse.data);
-                alert("Success! You will find an Confirmation Email Soon")
-                const registeredUser = registerResponse.data.newUser
+                alert("Success! You will find an Confirmation Email Soon");
+                const registeredUser = registerResponse.data.newUser;
                 setEmail('');
                 setUsername('');
                 setPassword('');
                 localStorage.setItem('userId', registeredUser._id);
                 setLoggedIn(true);
-                setCurrentUser(registeredUser)
+                setCurrentUser(registeredUser);
+                setIsAuthenticated(true);
                 setConfirmMessage("Your Information Submitted Successfully");
                 moveTo('/');
                 setTimeout(() => {
                     setConfirmMessage("");
                 }, 3000)     
             }catch (err) {
-                // console.log("err.: ", err.response.data.message);
+     
                 if (err.response) {
-                    // The request was made and the server responded with a status code
-                    // that falls out of the range of 2xx
+
                     if (err.response.data && err.response.data.error) {
                         // If the server sent validation errors
                         const serverErrors = err.response.data.error.reduce((acc, curr) => {
@@ -109,7 +109,6 @@ const Register = () => {
                     // The request was made but no response was received
                     setErrors({ general: "No response from server. Please try again." });
                 } else {
-                    console.log("err ", err)
                     // Something happened in setting up the request that triggered an Error
                     setErrors({ general: "An error occurred. Please try again." });
                 }
@@ -118,7 +117,6 @@ const Register = () => {
         }else
         {
             setErrors(validationResult);
-            console.log("actual Errors: ", errors)
         }
 
         

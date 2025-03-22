@@ -12,7 +12,6 @@ import authMiddleware from '../middleAuthentication/authMiddleware.js';
 const registerUser = async (req,res) => {
     
     const errors = validationResult(req);
-    console.log("validation Result if Err: ", errors);
     if(!errors.isEmpty()){
         return res.status(404).json({
             success:false,
@@ -44,8 +43,6 @@ const registerUser = async (req,res) => {
             await newUser.save();
 
            const newUserObject = newUser.toObject();
-           console.log("newUserObject", newUserObject);
-
            delete newUserObject.password;
             jwt.sign({user: {userId:newUserObject._id}}, 
             process.env.JWT_SECRET, 
@@ -127,7 +124,6 @@ const logging =  async(req,res) => {
 
         // accessing User
         const user = await User.findOne({email}).lean();
-        console.log("user: inside login ", user);
         // if user didn't exist
         if(!user) {
             return res.status(404).json({
@@ -147,7 +143,6 @@ const logging =  async(req,res) => {
             )
         }
         // Create a JWT token for the user
-        console.log("user._id: ", user._id);
         jwt.sign(
             ({user:{userId:user._id}}), 
             process.env.JWT_SECRET,
@@ -236,9 +231,6 @@ const updateUserProfile = async (req, res) => {
 
     const errors = validationResult(req);
     const userId = req.user.userId;
-  
-    // console.log("req.file inside UpdateUsr ", req.file);
-    console.log("req.body", req.body);
     if(!errors.isEmpty()){
         return res.status(400).json({
             success:false,
@@ -337,7 +329,6 @@ const addBlog = async (req,res) => {
             contentImages:contentImages
             
         });
-        console.log("newBlog created: ", newBlog);
         const blogCreated = await newBlog.save();
         if(!blogCreated){
             return res.status(404).json({
@@ -379,7 +370,7 @@ const addBlog = async (req,res) => {
  */
 const updateBlogPost = async(req,res) => {
 
-    console.log("Update Blog Post on its waysxz")
+
     // checking the validation Result
     const errs = validationResult(req);
 
@@ -393,18 +384,12 @@ const updateBlogPost = async(req,res) => {
     }
 
     const user_id = req.user.userId;
-    // console.log("req. body: ", req.body);
+
     const {title, newContent, positions, savedImages} = req.body;
     const useSavedImages = JSON.parse(savedImages) || [];
     const newPositions = JSON.parse(positions) || [];
-    useSavedImages.forEach(image => {
-        console.log("useSaved Image before combining; ", image);
-    })
 
     const id = req.params.id; 
-    // newPositions.forEach(position => {
-    //     console.log("position: ", position)
-    // })
  
     const parsedContent = JSON.parse(newContent);
    
@@ -417,11 +402,9 @@ const updateBlogPost = async(req,res) => {
     });
     
     const newTitleImage = req.files['titleImage'] ? req.files['titleImage'][0].path : ''
-    console.log("newTitleImage ", newTitleImage);
     try{
         //updating a blog
         const blogPost = await Blog.findById(id);
-        // console.log("blogPost inside backen: ", blogPost);
         if(!blogPost){
             return res.status(404).json({
                 success:false,
@@ -472,19 +455,16 @@ const updateBlogPost = async(req,res) => {
 const deleteBlog = async(req, res) => {
     const delId = req.params.id;
     const userId = req.user.userId;
-    console.log("delId: ", delId , " userId Authorization: ", userId);
 
     try{
     
         const delBlog = await Blog.findById(delId);
-        console.log("delBlog after using findById: ", delBlog);
         if(delBlog.userId.toString() !== userId){
             return res.status(403).json({
                 success:false,
                 message:"Not an Authorized User to delete a Blog"
             })
         }
-        console.log("delBlog after using findById: ", delBlog);
         if(!delBlog) {
             return res.status(404).json({
                 success:false,
@@ -508,9 +488,7 @@ const deleteBlog = async(req, res) => {
 }
 
 const allUsers = async(req,res) => {
-    console.log("Alhamdulila, backend is running");
     const users = await User.find({});
-    // console.log("myBlogs: ", myBlogs);
     try{
         if(!users.length){
             return res.status(400).json({
@@ -535,10 +513,6 @@ const allUsers = async(req,res) => {
 
 const getUser = async(req,res) => {
     const userId = req.user.userId;
-    console.log("getUser Runs")
-    console.log("userId : ", userId);
-
-
     try{
         const user = await User.findById(userId);
 
@@ -566,9 +540,7 @@ const getUser = async(req,res) => {
 const getBlogPost = async(req,res) => {
 
     let blogId = req.params.id;
-    console.log("GET BLOGPOST RUNNING BACKEND: ", blogId);
     if(!mongoose.Types.ObjectId.isValid(blogId)){
-        console.log("not a valid blog Id");
         return res.status(400).json({
             success:false,
             message:"Blog Id is invalid"
@@ -583,7 +555,6 @@ const getBlogPost = async(req,res) => {
                 message:"Blog doesn't found"
             })
         }
-        console.log("blog result before return: ", blog);
         return res.status(200).json({
             success:true,
             message:"Blog Found successfully",
@@ -591,7 +562,6 @@ const getBlogPost = async(req,res) => {
         })
     }
     catch(err){
-        console.error("error occured", err)
         return res.status(500).json({
             success:false,
             message: "Something went wrong while fetching the blog post. Please try later."
@@ -625,7 +595,6 @@ const allBlogs = async(req, res) => {
 
 const canEditBlog = async(req,res) => {
     const userIdReceived = req.user.userId.toString();
-    console.log("BlogId received from frontEnd", req.params.id);
     const blogId = req.params.id;
     try{
         const blog = await Blog.findById(blogId);
@@ -635,7 +604,6 @@ const canEditBlog = async(req,res) => {
                 message:"Blog not fuond",
             })
         }
-        console.log("creator ID: ", blog.userId.toString());
         if(blog.userId.toString() === userIdReceived){
             return res.status(200).json({
                 success:true,
@@ -663,11 +631,9 @@ const canEditBlog = async(req,res) => {
 
 }
 const getMyContent = async(req,res) => {
-    console.log("get My Content is Catching Pace MiddleWare userId", req.user.userId)
     const id = req.params.id;
     try{
         const yourBlogs = await Blog.find({userId:id});
-        console.log("your Blogs: ", yourBlogs);
         if(!yourBlogs || yourBlogs.length === 0){
             return res.status(404).json({
                 success:false,

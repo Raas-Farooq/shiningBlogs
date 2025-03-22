@@ -1,4 +1,5 @@
 import { useEffect, useState} from "react"
+import { useAuthenContext } from "../../globalContext/globalContext"
 
 interface TitleProps{
     title:string
@@ -9,10 +10,12 @@ interface SlicedTitle{
 }
 
 const Title:React.FC<TitleProps> = ({title}) => {
+    const {loggedIn} = useAuthenContext();
     const [slicedTitle, setSlicedTitle] = useState<SlicedTitle>({initialWords:'', lastWords:''});
 
     useEffect(() => {
         if(title.length > 35){
+            console.log("title: ", title);
             const words = title.split(" ");
             const initialWords = words.slice(0,6).join(" ");
             const lastWords = words.slice(6).join(' ');
@@ -28,16 +31,16 @@ const Title:React.FC<TitleProps> = ({title}) => {
             (<>
                 {slicedTitle.lastWords ? (
                     <>
-                        <p className={`text-center xs:text-xs sm:text-sm font-semibold text-gray-800`}>
+                        <p className={`text-center xs:text-xs md:text-xs font-semibold text-gray-800 `}>
                             {slicedTitle?.initialWords}
                         </p>
-                        <p className="text-center xs:text-xs sm:text-sm font-semibold text-gray-800">
+                        <p className={`text-center xs:text-xs md:text-xs font-semibold text-gray-800 `}>
                             {slicedTitle?.lastWords}
                         </p>
                     </>
                 ):
                 
-                <p className="text-center xs:text-xs sm:text-sm font-semibold pb-5 text-gray-800"> {slicedTitle?.initialWords} </p>
+                <p className="text-center xs:text-xs sm:text-sm font-semibold pb-4 text-gray-800"> {slicedTitle?.initialWords} </p>
                 }
             </>)
             }

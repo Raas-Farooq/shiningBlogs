@@ -24,7 +24,7 @@ interface ErrorHandle{
 
 const Login = () => {
 
-    const {setIsAuthenticated,setCurrentUser, setLoggedIn, imagePreview, setImagePreview} = useAuthenContext();
+    const {setIsAuthenticated,setCurrentUser, setLoggedIn, setImagePreview} = useAuthenContext();
     const [email, setEmail] = useState<string>('');
     // const [message, setMessage] = useState<string>('');
     const [password, setPassword] = useState<string>('');
@@ -59,11 +59,7 @@ const Login = () => {
         e.preventDefault();
         
         const validationErrors = handleValidation();
- Object.values(validationErrors).forEach(err => console.log("forEach: ", err));
-
-        console.log(" validation Filter ", Object.values(validationErrors).some(err => err.length > 0))
         if(Object.values(validationErrors).some(err => err.length>0)){
-            console.log("Got validation errors ", validationErrors)
             setErrors(validationErrors);
             return; 
         }
@@ -93,8 +89,6 @@ const Login = () => {
             }
             setImagePreview(imgPreview);
             setCurrentUser(login_response.data.user);
-            console.log("img Preview inside login: ", imagePreview);
-            
             setIsAuthenticated(true);
             setEmail('');
             setPassword('');

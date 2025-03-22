@@ -9,16 +9,30 @@ const CheckAuthen = async(req, res) => {
         })
     }
     try{
-        jwt.verify(token, process.env.JWT_SECRET, {expiresIn:'1h'},
+        jwt.verify(token, process.env.JWT_SECRET,
             async (err, decoded) => {
                 if(err){
                     return res.status(401).json({
                         isAuthenticated:false
                     })
                 }
-                console.log("succESS")
-                const user = await User.findById(req.user.userId).select('-password');
-                res.status(200).json({isAuthenticated:true, user,token});
+                try{
+                    const userId = decoded.user.userId;
+                    const user = await User.findById(userId).select('-password');
+                    if(!user){
+                        return res.status(404).json({
+                            success:false,
+                            message:'User not found'
+                        })
+                    }
+                    return res.status(200).json({isAuthenticated:true, user,token});
+                }
+                catch(err){
+                    return res.status(500).json({
+                        success:false,
+                        message:'Got server err while varifying authentication'
+                    })
+                }
             }
         )
     }catch(err){
