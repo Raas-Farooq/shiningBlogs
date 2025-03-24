@@ -43,7 +43,7 @@ function UserProfile( {currentUser, profileImage}:userProfileProps) {
   
   return (
     <aside
-      className={`py-8 p-4 w-[20vw] text-center bg-gray-50 shadow:sm rounded:lg text-gray-700`}
+      className={`py-8 p-4 w-[25vw] text-center bg-gray-50 shadow:sm rounded:lg text-gray-700`}
     >
       <h2 className="font-bold text:xl mb-6">
         {" "}
@@ -215,7 +215,7 @@ export default function BlogContent() {
   return (
     <div
       data-component="AllBlogsParent"
-      className=" flex xs:flex-col sm:flex-row"
+      className="flex justify-center xs:flex-col md:flex-row gap-2"
     >
       {!allBlogsGlobally?.length && loading && (
         <div className="text-center my-5">

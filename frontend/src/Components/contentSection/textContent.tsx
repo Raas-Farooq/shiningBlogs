@@ -90,7 +90,7 @@ const TextContent: React.FC<TextContentProps> = ({
   return (
     <div className={`${isFullView ? "w-4/5" : "w-60"}`}>
       {!isFullView ? (
-        <p className="text-gray-600 text-sm mt-2 h-12 overflow-hidden text-ellipsis">
+        <p className="text-gray-600 text-xs mt-2 h-12 overflow-hidden text-ellipsis">
           {makeWords(text)}..
         </p>
       ) : (
