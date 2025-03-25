@@ -72,7 +72,7 @@ const [receiveLocalImages, setReceiveLocalImages] = useState<ContentImage[]>([])
     useEffect(() => {
         if(!post) return;
         let newImagePreview:string = '';
-        console.log("Post inside UseEffect of fetchLocalData: ", post);
+        // console.log("Post inside UseEffect of fetchLocalData: ", post);
             const loadTitleImage = async() => {
               const titleImage = localStorage.getItem("titleImagePreview") || '';
               if(titleImage){
@@ -123,32 +123,39 @@ const [receiveLocalImages, setReceiveLocalImages] = useState<ContentImage[]>([])
             }));
              // JSON.parse(localStorage.getItem("localContentImages")) || [];
             // load content Images
-            if (post?.contentImages) {
-              let localContentImages:ContentImage[] = getLocalContentImages();
+            if (post?.contentImages.length) {
+              const isContentImagesValid = post.contentImages.every(
+                (image) => image.path && image.fileName && image._id
+              );
+              if(isContentImagesValid){
+                let localContentImages:ContentImage[] = getLocalContentImages();
               // console.log("localContentImages on initial load: ", localContentImages, " post.contentImages: ", post.contentImages);
-              const notLocalImages = !localContentImages.length ||
-              localContentImages.some(image => !image._id || !image.fileName || !image.position);
+                const notLocalImages = !localContentImages.length ||
+                localContentImages.some(image => !image._id || !image.fileName || !image.position);
 
-              if (notLocalImages) {
-                console.log("contentImages: if local is empty", post.contentImages);
-                const newImages:ContentImage[] = post.contentImages.map((image, index) => ({
-                  _id:image._id,
-                  id: index,
-                  fileName: image.fileName,
-                  preview: image.path.startsWith("http://")
-                    ? image.path
-                    : `${VITE_API_URL}/${image.path}`,
-                  position: image.position,
-                }));
-                setReceiveLocalImages(newImages);
-                localStorage.setItem(
-                  "localContentImages",
-                  JSON.stringify(newImages)
-                );
-              } else {
-                console.log("LOCALLLLL IMAGESSSS ", localContentImages)
-                setReceiveLocalImages(localContentImages);
-              }
+                if (notLocalImages) {
+                  const newImages:ContentImage[] = post.contentImages.map((image, index) => ({
+                    _id:image._id,
+                    id: index,
+                    fileName: image.fileName,
+                    preview: image.path.startsWith("http://")
+                      ? image.path
+                      : `${VITE_API_URL}/${image.path}`,
+                    position: image.position,
+                  }));
+                  setReceiveLocalImages(newImages);
+                  localStorage.setItem(
+                    "localContentImages",
+                    JSON.stringify(newImages)
+                  );
+                }
+                else {
+                  // console.log("LOCALLLLL IMAGESSSS ", localContentImages)
+                  setReceiveLocalImages(localContentImages);
+                }
+              } 
+            }else{
+              setReceiveLocalImages([]);
             }
           } catch (err) {
             console.error("Error while receiving post", err);
@@ -159,7 +166,7 @@ const [receiveLocalImages, setReceiveLocalImages] = useState<ContentImage[]>([])
     
         loadInitialData();
       }, [post]);
-      console.log("BEFORE RETURN postLoading: ", 'localPostData :', localPostData, "receiveLocalImages ",receiveLocalImages);
+      // console.log("BEFORE RETURN postLoading: ", 'localPostData :', localPostData, "receiveLocalImages ",receiveLocalImages);
       return {postLoading, localPostData, receiveLocalImages}
 }
 

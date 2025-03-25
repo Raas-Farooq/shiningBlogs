@@ -185,7 +185,7 @@ const EditPost = () => {
   // Convert and Store image as base 64
   
   useEffect(() => {
-    console.log("GGGGGGGGGGGGGGo: ", receiveLocalImages, "localEditPostData: ", localPostData, 'EditPostData ', editPostData)
+    // console.log("GGGGGGGGGGGGGGo: ", receiveLocalImages, "localEditPostData: ", localPostData, 'EditPostData ', editPostData)
     if(receiveLocalImages?.length){
       setContentImages(receiveLocalImages);
     }
@@ -287,7 +287,7 @@ const EditPost = () => {
   // handle changes to the content images
   const handleContentImages = (e:React.ChangeEvent<HTMLInputElement>) => {
     const newImage = e.target.files?.[0];
-    console.log("newImage inside handlecontentiamges; ", newImage)
+    // console.log("newImage inside handlecontentiamges; ", newImage)
     if(!newImage) return ;
     const imageMark = `[image-${contentImages.length}]`;
     const beforeImage = editPostData.contentText.substring(0, cursorPosition);
@@ -301,20 +301,23 @@ const EditPost = () => {
       const localImage = {
         _id:`tempId${contentImages.length}`,
         id: contentImages?.length,
-        fileName: newImage.name, 
+        fileName: newImage.name,
         file: newImage,
         preview: base64Result,
         position: cursorPosition,
       };
-      console.log("contentImages before locaImag: ",contentImages);
-      console.log("localImage newly created: ", localImage);
       const allImages = [...contentImages, localImage];
       console.log("allImages after update: ", allImages);
       localStorage.setItem("localContentImages", JSON.stringify(allImages));
+      console.log("contentImages before locaImag: ",contentImages);
+      console.log("contentImages : before", contentImages);
+      console.log("localImage newly created: ", localImage);
       setContentImages(allImages);
+      console.log("contentImages : after", contentImages);
       setEditedSomething(true);
     });
   };
+  
   // removing the content Image
   const removeImage = (id:number, text:string) => {
     const newContentImages = contentImages.filter((image) => image.id !== id);
