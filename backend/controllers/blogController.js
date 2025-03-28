@@ -7,6 +7,7 @@ import { body, validationResult } from 'express-validator';
 import jwt from 'jsonwebtoken';
 import authMiddleware from '../middleAuthentication/authMiddleware.js';
 import he from 'he';
+import { isConstructorDeclaration } from 'typescript';
 // import { RestartProcess } from 'concurrently';
 
 
@@ -310,7 +311,7 @@ const addBlog = async (req,res) => {
         })
     }
     const {title, content, positions} = req.body;
-    console.log("req.body .title: ", req.body.title);
+    // console.log("req.body .title: ", req.body.title);
     const titleCorrected = he.decode(req.body.title);
     const user_id = req.user.userId;
     const myPositions = JSON.parse(positions) || [];
@@ -377,31 +378,35 @@ const updateBlogPost = async(req,res) => {
     const errs = validationResult(req);
 
     if(!errs.isEmpty()){
+        console.log("validation errors msg :", errs);
         return res.status(400).json({
             success:false,
-            message:"Validation Error during EditPost",
-            name:"super Dooper",
+            message:errs.array()[0]?.msg || 'Validation failed',
+            name:'validationError',
             error:errs.array()
         })
     }
 
     const user_id = req.user.userId;
-
+    // console.log("updateBlog runs: ", req.body)
     const {title, newContent, positions, savedImages} = req.body;
     const useSavedImages = JSON.parse(savedImages) || [];
     const newPositions = JSON.parse(positions) || [];
-
     const id = req.params.id; 
  
     const parsedContent = JSON.parse(newContent);
-   
-    req.files['contentImages']?.forEach((image,ind) => {
-        useSavedImages.push({
-            path:image.path,
-            position:newPositions[ind].position,
-            fileName:newPositions[ind].fileName
-        })
-    });
+    if(req.files['contentImages']){
+        // console.log("saved Images: ", useSavedImages, "Req Files: contentImages :", req.files['contentImages'])
+        req.files['contentImages']?.forEach((image,ind) => {
+            useSavedImages.push({
+                path:image.path,
+                position:newPositions[ind].position,
+                fileName:newPositions[ind].fileName
+            })
+        });
+        // console.log("useSaved Images after new PUsh", useSavedImages)
+    }
+    
     
     const newTitleImage = req.files['titleImage'] ? req.files['titleImage'][0].path : ''
     try{
