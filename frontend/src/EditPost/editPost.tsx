@@ -185,11 +185,11 @@ const EditPost = () => {
   // Convert and Store image as base 64
   
   useEffect(() => {
-    // console.log("GGGGGGGGGGGGGGo: ", receiveLocalImages, "localEditPostData: ", localPostData, 'EditPostData ', editPostData)
+    console.log("receiveLocalImages: ", receiveLocalImages, "localPostData: ", localPostData, 'EditPostData ', editPostData)
     if(receiveLocalImages?.length){
       setContentImages(receiveLocalImages);
     }
-    if(localPostData?.title.length){
+    if(localPostData?.title || localPostData.contentText){
       setEditPostData(prev => ({
         ...prev,
         title:localPostData.title || '',
@@ -199,8 +199,12 @@ const EditPost = () => {
         })
       )
     }
-  },[localPostData,receiveLocalImages])
+  },[localPostData?.title, 
+    localPostData?.titleImage, 
+    localPostData?.contentText, 
+    localPostData?.imagePreview])
 
+  // localPostData, receivedLocalImages
   
   // store image as base64
   function storeAsBase64(file:File) {
@@ -289,6 +293,7 @@ const EditPost = () => {
     const newImage = e.target.files?.[0];
     // console.log("newImage inside handlecontentiamges; ", newImage)
     if(!newImage) return ;
+    console.log("cursor position while entering newIMaege ", cursorPosition);
     const imageMark = `[image-${contentImages.length}]`;
     const beforeImage = editPostData.contentText.substring(0, cursorPosition);
     const afterImage = editPostData.contentText.substring(cursorPosition);
@@ -309,7 +314,6 @@ const EditPost = () => {
       const allImages = [...contentImages, localImage];
       console.log("allImages after update: ", allImages);
       localStorage.setItem("localContentImages", JSON.stringify(allImages));
-      console.log("contentImages before locaImag: ",contentImages);
       console.log("contentImages : before", contentImages);
       console.log("localImage newly created: ", localImage);
       setContentImages(allImages);

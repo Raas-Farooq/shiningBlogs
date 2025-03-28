@@ -31,12 +31,7 @@ export default function Write() {
     return short;
   }
 
-  // useEffect(() => {
-  //     if(!loggedIn){
-  //         alert("You are not Logged In! You should login in order to Write Blog");
-  //         moveTo('/login');
-  //     }
-  // })
+
   useEffect(() => {
     if (!loggedIn) {
       const moveToLoginPage = window.confirm(
@@ -54,7 +49,6 @@ export default function Write() {
     // const errors = checkValidation();
     setBlogTitle((prev) => ({ ...prev, [e.target.name]: e.target.value }));
     if (errors.titleError) {
-      console.log("Yes");
       errors.titleError = "";
 
       setErrors(errors);
@@ -65,7 +59,7 @@ export default function Write() {
   }
   const handleTitleImage = (e) => {
     const image = e.target.files[0];
-    console.log("image when submitting: files[0]", image);
+    // console.log("image when submitting: files[0]", image);
     setBlogTitle((prev) => ({
       ...prev,
       titleImg: image,
@@ -82,7 +76,7 @@ export default function Write() {
     const placeholders = currentContent.match(/\[image-\d+\]/g) || [];
     if (originalPlaceholders.length !== placeholders.length) {
       alert("you can't remove the image placeholders manualy");
-      console.log("you deleted the placeholder");
+      // console.log("you deleted the placeholder");
       return;
     }
     if (errors.textContentError) {
@@ -132,7 +126,7 @@ export default function Write() {
       updatedText = updatedText.split(oldMark).join(newMark);
     });
 
-    console.log("updateImages: ", updateImages);
+    // console.log("updateImages: ", updateImages);
     setContentText(updatedText);
   };
 
@@ -163,7 +157,7 @@ export default function Write() {
       return;
     } else {
       setErrors({});
-      setLoadingErr(true);
+      // setLoadingErr(true);
       let contentArray = [
         {
           type: "text",
@@ -171,6 +165,7 @@ export default function Write() {
         },
       ];
       const blogData = new FormData();
+      console.log("blogTitle before appending: ", blogTitle.title);
       blogData.append("title", blogTitle.title);
       blogData.append("titleImage", blogTitle.titleImg);
       blogData.append("content", JSON.stringify(contentArray));
@@ -201,6 +196,8 @@ export default function Write() {
         );
       
         if (response.data.success) {
+          // alert("response is successfull ");
+          console.log("response.data.newBlog: ", response.data.newBlog);
           blogTitle.title = "";
           blogTitle.imgPreview = "";
           setBlogTitle((prev) => ({
@@ -223,17 +220,14 @@ export default function Write() {
         }
       } catch (err) {
         console.log("only Error: ", err)
-        console.log("error while posting new Blog ", err?.response);
         if (
           err.response?.data?.error === "jwt expired" ||
           err.response?.data?.message === "Unable to get Token Bearer"
         ) {
-          // alert("You are logged Out! Please Login In First");
           const confirmMovingLogin = window.confirm(
             "you Are Logged Out! please login and Come Again."
           );
           setErrorMessage(err?.response?.data.error);
-          console.log("confirmMOving : ", confirmMovingLogin);
           if (confirmMovingLogin) {
             moveTo("/login");
           }

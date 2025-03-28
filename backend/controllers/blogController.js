@@ -1,3 +1,4 @@
+// import {decode} from 'he';
 import bcrypt from 'bcrypt';
 import {Blog, User} from '../models/model.js';
 import mongoose from 'mongoose';
@@ -5,6 +6,7 @@ import rateLimit from 'express-rate-limit';
 import { body, validationResult } from 'express-validator';
 import jwt from 'jsonwebtoken';
 import authMiddleware from '../middleAuthentication/authMiddleware.js';
+import he from 'he';
 // import { RestartProcess } from 'concurrently';
 
 
@@ -308,6 +310,8 @@ const addBlog = async (req,res) => {
         })
     }
     const {title, content, positions} = req.body;
+    console.log("req.body .title: ", req.body.title);
+    const titleCorrected = he.decode(req.body.title);
     const user_id = req.user.userId;
     const myPositions = JSON.parse(positions) || [];
     const titleImage = req.files['titleImage'] ? req.files['titleImage'][0].path : null;
@@ -323,7 +327,7 @@ const addBlog = async (req,res) => {
             [];
         const newBlog = new Blog({
             userId:user_id,
-            title:title,
+            title:titleCorrected,
             titleImage,
             content:JSON.parse(content),
             contentImages:contentImages
@@ -333,9 +337,7 @@ const addBlog = async (req,res) => {
         if(!blogCreated){
             return res.status(404).json({
                 success:false,
-                message:"Unable to Create Blog. Try again Later",
-                
-                
+                message:"Unable to Create Blog. Try again Later",   
             })
         }
         return res.status(201).json({

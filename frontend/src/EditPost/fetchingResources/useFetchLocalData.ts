@@ -1,6 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import fetchImageAsBase64 from "./fetchImageBase64.ts";
 import { VITE_API_URL } from "../../config.ts";
+import { GiConsoleController } from "react-icons/gi";
 // import { useAuthenContext } from "../../globalContext/globalContext.tsx";
 
 interface PostData{
@@ -57,8 +58,10 @@ const getLocalContentImages = (): ContentImage[] => {
 
 
 const useFetchLocalData = (post:PostData) => {
+
+const [loadingTitleImage, setLoadingTitleImage] = useState<boolean>(false);
 const [postLoading, setPostLoading] = useState<boolean>(false);
-const [savedTitleImage, setSavedTitleImage] = useState('');
+
 const [localPostData, setLocalPostData] = useState(
     {
         title:'',
@@ -71,26 +74,41 @@ const [receiveLocalImages, setReceiveLocalImages] = useState<ContentImage[]>([])
 
     useEffect(() => {
         if(!post) return;
-        let newImagePreview:string = '';
-        // console.log("Post inside UseEffect of fetchLocalData: ", post);
-            const loadTitleImage = async() => {
+        
+        const loadTitleImage = async() => {
+          try{
+            setLoadingTitleImage(true);
+            let newImagePreview:string = '';
               const titleImage = localStorage.getItem("titleImagePreview") || '';
               if(titleImage){
-                setSavedTitleImage(titleImage);
+                setLocalPostData(prev => ({...prev, 
+                  imagePreview:titleImage
+                }))
               }
 
               if (post?.titleImage && !titleImage) {
+
                 newImagePreview = (await fetchImageAsBase64(post.titleImage) || '""') ;
                 localStorage.setItem('titleImagePreview', newImagePreview);
-                setSavedTitleImage(newImagePreview)
+                setLocalPostData(prev => ({...prev, 
+                  imagePreview:newImagePreview
+                }))
               }
               // console.log("newImage Preview outside if: ",newImagePreview);
               localStorage.setItem("titleImage", post?.titleImage);
-              // setSavedTitleImage(newImagePreview);
-            }
-            loadTitleImage();
-      },[post?.titleImage])
 
+            
+           
+          }
+          catch(err){
+            console.error("Got error while accessing image: ", err);
+          }
+          finally{
+            setLoadingTitleImage(false)
+          }
+        }
+        loadTitleImage();
+      },[post?.titleImage, setLoadingTitleImage])
 
 
     useEffect(() => {
@@ -100,63 +118,66 @@ const [receiveLocalImages, setReceiveLocalImages] = useState<ContentImage[]>([])
             return;
           }
           try {
-            const titleStored = JSON.parse(localStorage.getItem("titleStorage") || '""');
-            const newTitle = post?.title && !titleStored ? post.title : titleStored;
-    
-            // load Save content Text (Text Data of Post)
-            const localContentText = JSON.parse(
-              localStorage.getItem("textContent") || '""'
-            );
-            // console.log('localContentText:initialLoad ',localContentText);
-            const newContentText =
-              post?.content && !localContentText
-                ? post.content.find((content) => content.type === "text")?.value ||
-                  '""'
-                : localContentText;
-
-            setLocalPostData((prev) => ({
-              ...prev,
-              title: newTitle || "",
-              titleImage: post.titleImage || "",
-              imagePreview: savedTitleImage || "",
-              contentText: newContentText || "",
-            }));
-             // JSON.parse(localStorage.getItem("localContentImages")) || [];
-            // load content Images
-            if (post?.contentImages.length) {
-              const isContentImagesValid = post.contentImages.every(
-                (image) => image.path && image.fileName && image._id
+              const titleStored = JSON.parse(localStorage.getItem("titleStorage") || '""');
+              const newTitle = post?.title && !titleStored ? post.title : titleStored;
+      
+              // load Save content Text (Text Data of Post)
+              const localContentText = JSON.parse(
+                localStorage.getItem("textContent") || '""'
               );
-              if(isContentImagesValid){
-                let localContentImages:ContentImage[] = getLocalContentImages();
-              // console.log("localContentImages on initial load: ", localContentImages, " post.contentImages: ", post.contentImages);
-                const notLocalImages = !localContentImages.length ||
-                localContentImages.some(image => !image._id || !image.fileName || !image.position);
+              
+              const newContentText =
+                post?.content && !localContentText
+                  ? post.content.find((content) => content.type === "text")?.value ||
+                    '""'
+                  : localContentText;
+              
+              setLocalPostData((prev) => ({
+                ...prev,
+                title: newTitle || "",
+                titleImage: post.titleImage || "",
+                contentText: newContentText || "",
+              }));
+              // JSON.parse(localStorage.getItem("localContentImages")) || [];
+              // load content Images
+              if (post?.contentImages.length) {
+                console.log("post contentImages after alert: ", post?.contentImages);
+                const isContentImagesValid = post.contentImages.every(
+                  (image) => image.path && image.fileName && image._id
+                );
+                if(isContentImagesValid){
+                  alert("isContentImagesValid true and if runs")
+                  console.log("contentImages before running separate funcitno ", post?.contentImages);
+                  let localContentImages:ContentImage[] = getLocalContentImages();
+                  console.log("localContentImages after fetching from separate func: ", localContentImages, " post.contentImages: older version", post.contentImages);
+                  const notLocalImages = !localContentImages.length ||
+                  localContentImages.some(image => !image._id || !image.fileName || !image.position);
 
-                if (notLocalImages) {
-                  const newImages:ContentImage[] = post.contentImages.map((image, index) => ({
-                    _id:image._id,
-                    id: index,
-                    fileName: image.fileName,
-                    preview: image.path.startsWith("http://")
-                      ? image.path
-                      : `${VITE_API_URL}/${image.path}`,
-                    position: image.position,
-                  }));
-                  setReceiveLocalImages(newImages);
-                  localStorage.setItem(
-                    "localContentImages",
-                    JSON.stringify(newImages)
-                  );
-                }
-                else {
-                  // console.log("LOCALLLLL IMAGESSSS ", localContentImages)
-                  setReceiveLocalImages(localContentImages);
-                }
-              } 
-            }else{
-              setReceiveLocalImages([]);
-            }
+                  if (notLocalImages) {
+                    const newImages:ContentImage[] = post.contentImages.map((image, index) => ({
+                      _id:image._id,
+                      id: index,
+                      fileName: image.fileName,
+                      preview: image.path.startsWith("http://")
+                        ? image.path
+                        : `${VITE_API_URL}/${image.path}`,
+                      position: image.position,
+                    }));
+                    setReceiveLocalImages(newImages);
+                    localStorage.setItem(
+                      "localContentImages",
+                      JSON.stringify(newImages)
+                    );
+                  }
+                  else {
+                    // console.log("LOCALLLLL IMAGESSSS ", localContentImages)
+                    setReceiveLocalImages(localContentImages);
+                  }
+                } 
+              }else{
+                setReceiveLocalImages([]);
+              }
+
           } catch (err) {
             console.error("Error while receiving post", err);
           } finally {
@@ -165,7 +186,7 @@ const [receiveLocalImages, setReceiveLocalImages] = useState<ContentImage[]>([])
         }
     
         loadInitialData();
-      }, [post]);
+      }, [post?._id]);
       // console.log("BEFORE RETURN postLoading: ", 'localPostData :', localPostData, "receiveLocalImages ",receiveLocalImages);
       return {postLoading, localPostData, receiveLocalImages}
 }
