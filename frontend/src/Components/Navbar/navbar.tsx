@@ -4,13 +4,15 @@ import { useAuthenContext, useBlogContext,useUIContext } from '../../globalConte
 import WindowSize from '../../windowSize.ts';
 import { Link, useNavigate } from 'react-router-dom';
 import clsx from 'clsx';
+import axios from 'axios';
+import { VITE_API_URL } from '../../config.ts';
 
 export default function Navbar({showSearch=true}){
 
     const {inHomePage, setInHomePage, setOpenUserAccount, openUserAccount, setShowMenu, showMenu} = useUIContext();
     const {searchValue,setSearchValue, searching, setSearching, setFilteredBlogs, allBlogsGlobally} = useBlogContext();
-    const {loggedIn} = useAuthenContext();
-    
+    const {loggedIn,currentUser} = useAuthenContext();
+    const [userProfileImage, setUserProfileImage] = useState('');
     // console.log("openUserAccount: ", openUserAccount);
     // console.log("showMenu: ", showMenu);
     const [searchClicked, setSearchClicked] = useState(false);
@@ -27,6 +29,19 @@ export default function Navbar({showSearch=true}){
             setShowMenu(false)
         }
     }, [showSearch]);
+
+    useEffect(() => {
+        console.log("currentUser in Navbar: ", currentUser);
+        const gettingProfileImage = async() => {
+            if(currentUser?.profileImg){
+                const userImage = await axios.get(`${VITE_API_URL}/${currentUser.profileImg}`);
+                console.log("userImage: navbar ", userImage);
+    
+            }
+        }
+        gettingProfileImage();
+    }, []);
+
 
     useEffect(() => {
         if(size.width > 768){
@@ -58,7 +73,9 @@ export default function Navbar({showSearch=true}){
         const blogSearch = e.target.value;
         setSearchValue(blogSearch);
         setSearching(true);
-        
+        if(!blogSearch){
+            setSearching(false);
+        }
         const filtered = allBlogsGlobally?.filter(blog => {
             if(blog.title.toString().toLowerCase().includes(blogSearch?.toString().toLowerCase())){
                 return blog;
@@ -126,7 +143,7 @@ export default function Navbar({showSearch=true}){
                         value={searchValue}
                         onChange={handleSearchChange}
                         onFocus={() => setSearching(true)} 
-                        onBlur={() => setSearching(false)} 
+                        // onBlur={() => setSearching(false)} 
                         placeholder='Search Dream Blog' 
                         className='text-black pb-1 bg-white border border-green-300 rounded'/>
                 </div>

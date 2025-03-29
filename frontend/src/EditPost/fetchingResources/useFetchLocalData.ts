@@ -1,7 +1,7 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect,useState } from "react";
 import fetchImageAsBase64 from "./fetchImageBase64.ts";
 import { VITE_API_URL } from "../../config.ts";
-import { GiConsoleController } from "react-icons/gi";
+
 // import { useAuthenContext } from "../../globalContext/globalContext.tsx";
 
 interface PostData{
@@ -96,8 +96,6 @@ const [receiveLocalImages, setReceiveLocalImages] = useState<ContentImage[]>([])
               }
               // console.log("newImage Preview outside if: ",newImagePreview);
               localStorage.setItem("titleImage", post?.titleImage);
-
-            
            
           }
           catch(err){
@@ -141,17 +139,16 @@ const [receiveLocalImages, setReceiveLocalImages] = useState<ContentImage[]>([])
               // JSON.parse(localStorage.getItem("localContentImages")) || [];
               // load content Images
               if (post?.contentImages.length) {
-                console.log("post contentImages after alert: ", post?.contentImages);
-                const isContentImagesValid = post.contentImages.every(
+                const isContentImagesValid = post?.contentImages.every(
                   (image) => image.path && image.fileName && image._id
                 );
                 if(isContentImagesValid){
-                  alert("isContentImagesValid true and if runs")
+                  // alert("isContentImagesValid true and if runs")
                   console.log("contentImages before running separate funcitno ", post?.contentImages);
                   let localContentImages:ContentImage[] = getLocalContentImages();
                   console.log("localContentImages after fetching from separate func: ", localContentImages, " post.contentImages: older version", post.contentImages);
                   const notLocalImages = !localContentImages.length ||
-                  localContentImages.some(image => !image._id || !image.fileName || !image.position);
+                  localContentImages.some(image => !image._id || image.fileName || !image.position);
 
                   if (notLocalImages) {
                     const newImages:ContentImage[] = post.contentImages.map((image, index) => ({
@@ -163,6 +160,7 @@ const [receiveLocalImages, setReceiveLocalImages] = useState<ContentImage[]>([])
                         : `${VITE_API_URL}/${image.path}`,
                       position: image.position,
                     }));
+                    console.log("if Not localImages & newImages created: ", newImages)
                     setReceiveLocalImages(newImages);
                     localStorage.setItem(
                       "localContentImages",
@@ -173,7 +171,9 @@ const [receiveLocalImages, setReceiveLocalImages] = useState<ContentImage[]>([])
                     // console.log("LOCALLLLL IMAGESSSS ", localContentImages)
                     setReceiveLocalImages(localContentImages);
                   }
-                } 
+                } else{
+                  console.log("isContentImage invalid contentImages", post?.contentImages)
+                }
               }else{
                 setReceiveLocalImages([]);
               }
@@ -187,6 +187,7 @@ const [receiveLocalImages, setReceiveLocalImages] = useState<ContentImage[]>([])
     
         loadInitialData();
       }, [post?._id]);
+      console.log('loading: ', loadingTitleImage)
       // console.log("BEFORE RETURN postLoading: ", 'localPostData :', localPostData, "receiveLocalImages ",receiveLocalImages);
       return {postLoading, localPostData, receiveLocalImages}
 }

@@ -26,17 +26,7 @@ const UpdateProfile = () => {
     // const [password, setPassword] = useState('');
     
     const [localLoading, setLocalLoading] = useState(true)
-
-    // useEffect(() => {
-    //     console.log("isAuthenticated: ", isAuthenticated);
-        
-    //     if(!isAuthenticated){
-    //         alert("you are Not Logged In. Sign In or Create new Account")
-    //         // moveTo('/');
-    //     }
-    // }, [isAuthenticated])
     useEffect(() => {
-        console.log("isAuthenticated inside updateProfile: ", isAuthenticated);
         
         const get_current_user = async () => {
             try{
@@ -45,7 +35,6 @@ const UpdateProfile = () => {
                 setUserReceived(user);
                 
                 let realImage = '';
-                console.log("response.image; ", response.data.user.profileImg);
                 realImage = `${VITE_API_URL}/${response.data.user.profileImg}`;
                 setImagePreview(realImage);
                 let imgPreview = '';
@@ -58,10 +47,8 @@ const UpdateProfile = () => {
                     imgPreview:imgPreview
                    }))
                    setAddInterest(user.TopicsInterested ? user.TopicsInterested.join('\n'): '');
-                //    console.log("formData inside axios: ", formData)
                 setLocalLoading(false)
             }catch(err){
-                console.log("got this error while working with getUser: ", err);
                 setLocalLoading(false)
             }
         }
@@ -70,23 +57,6 @@ const UpdateProfile = () => {
       
     },[])
 
-    useEffect(() => {
-        // console.log("formData.userImage inside update Profile",formData.imgPreview);
-        // setImagePreview(formData.imgPreview);
-        console.log("global image inside update profile: ", imagePreview)
-    }, [imagePreview])
-    // useEffect(() => {3
-    //     console.log("UserReceived Inside Newly Created useEffect: ", userReceived)
-    //     if(Object.keys(userReceived).length > 0 ){
-            
-
-               
-    //             console.log("username UseEffect: ", formData.username);
-    //         }
-        
-    
-    // }, [userReceived])
-
     const handleChange = (e) => {
         const {name, value} = e.target;
 
@@ -94,25 +64,17 @@ const UpdateProfile = () => {
             ...prev,
             [name]:value
         }))
-        console.log('e.target: ', formData);
-        
     }
 
     const handleImageSubmit = (e) => {
         e.preventDefault();
         const imgFile =  e.target.files[0];
-        // setUserImage(e.target.files[0]);
-        // console.log("imgFile: ",imgFile);
         setImagePreview(URL.createObjectURL(imgFile));
         setFormData((prevState) => ({
             ...prevState,
             userImage:imgFile,
             imgPreview:URL.createObjectURL(imgFile)
         }))
-        
-        // const preview = URL.createObjectURL(userImage);
-        // setImagePreview(preview);
-        // console.log("image Preview: ", imagePreview.length)
     }
     const handleInterests = (e) => {
         setAddInterest(e.target.value);
@@ -120,9 +82,6 @@ const UpdateProfile = () => {
         .split(/[\n,]+/)
         .map(interest => interest.trim())
         .filter(interest => interest.length > 0);
-
-        console.log("newInterests: ", newInterest);
-        console.log("formData: ", formData);
         setFormData((prev) => ({
             ...prev,
             interests:newInterest
@@ -130,26 +89,20 @@ const UpdateProfile = () => {
     }
     const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log("handle Submit is running: ", formData);
 
         const formInfo = new FormData();
         if(formData.username) formInfo.append('username', formData.username);
         if(userReceived.email) formInfo.append('email', userReceived.email);
         if(userReceived.password) formInfo.append('password', userReceived.password);
         if(formData.userImage instanceof File){
-            console.log(` formData.userImage ${formData.userImage} , name iamge ${formData.userImage.name}`)
             formInfo.append('profileImg', formData.userImage, formData.userImage.name )
         }
-        // if(formData.userImage) formInfo.append('profileImg', formData.imgPreview);
-        // if(password) formInfo.append('password',password)
         if(formData.goal) formInfo.append('goal', formData.goal);
         
         if(formData.interests && formData.interests.length > 0){
-            console.log("interestes before parsing:", formData.interests);
             formInfo.append('interests', JSON.stringify(formData.interests));
         } 
         setLocalLoading(true);
-        console.log("before submitting: form Info", formInfo);
         try{
             const response = await axios.put(
                 `${VITE_API_URL}/weblog/updateUserProfile`,
@@ -178,7 +131,6 @@ const UpdateProfile = () => {
                
                 <>
                     <h1> UPDATE Your Profile</h1>
-                    {console.log("DOM image inside update profile: ", imagePreview)}
                     <form className="flex flex-col p-5" method="post" >
                         <label className="mb-3 text-blue-600"> Select the Profile Image</label>
                         <input type="file" accept="image/*" className="w-fit" onChange={handleImageSubmit}
@@ -191,15 +143,7 @@ const UpdateProfile = () => {
                             </>
                             
         
-                        )
-                        // : 
-                        // (   <div  className="p-2 m-5">
-                        //         <label> Upload Profile Picture</label>
-                        //         <div><FaImage /></div>
-                        //     </div>
-                        
-                        //     )
-                        }
+                        )}
 
                         <input type="input" 
                         name="username" 
@@ -208,15 +152,6 @@ const UpdateProfile = () => {
                         onChange={handleChange}
                         value={formData.username}
                         />
-
-            
-                        {/* <input type="password" 
-                        name="password" 
-                        className="border border-gray-300 w-[25vw] p-2 m-5" 
-                        placeholder="Enter New Password" 
-                        onChange={(e) => setPassword(e.target.value)}
-                        /> */}
-
                         <label className="text-blue-600" > What is Your Goal </label>
                         <textarea id="goal"
                             name="goal"

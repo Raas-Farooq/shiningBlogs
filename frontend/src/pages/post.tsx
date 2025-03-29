@@ -59,7 +59,7 @@ const BlogPost:React.FC = () => {
   // const apiLink = import.meta.env.Vite_API_URL;
   useEffect(() => {
     setInHomePage(false);
-    
+    setErrorMessage('');
   }, []);
 
   const handleEdit:EditHandle = (e, post) => {
@@ -87,7 +87,7 @@ const BlogPost:React.FC = () => {
           setIsDeletingPost(false);
           console.log("allBlogsGlobally: ", allBlogsGlobally)
           setBlogOwner(true);
-          moveTo('/');
+          moveTo(-1);
         }
       }
 

@@ -37,10 +37,6 @@ interface userProfileProps {
 
 function UserProfile( {currentUser, profileImage}:userProfileProps) {
 
-  useEffect(() => {
-    console.log('currentUser blogCon ', currentUser);
-  },[])
-  
   return (
     <aside
       className={`py-8 p-4 w-[25vw] text-center bg-gray-50 shadow:sm rounded:lg text-gray-700`}
@@ -102,17 +98,26 @@ interface Blog{
 
 interface BlogCardProps{
   blog:Blog,
-  handlePostClick:(e:React.MouseEvent<HTMLButtonElement>, post:Blog) => void,
+  handlePostClick:(e:React.MouseEvent<HTMLElement>, post:Blog) => void,
   filtering:boolean
 }
 const BlogCard:React.FC<BlogCardProps> = ({ blog, handlePostClick }) => {
   // eslint-disable-next-line no-unused-vars
-  const { allBlogsGlobally } = useBlogContext();
+  const { allBlogsGlobally, searching } = useBlogContext();
+
+
 useEffect(() => {
   console.log("BlogsCount: ", allBlogsGlobally.length)
 },[])
+
+
   return (
     <article
+      onClick={(e) => {
+        if(searching){
+          handlePostClick(e, blog)
+        }
+      }}
       className="flex flex-col items-center p-4 rounded-lg transition-all duration-300 hover:scale-105
       shadow-md hover:shadow-xl bg-white
       max-w-sm w-full"
@@ -137,7 +142,7 @@ useEffect(() => {
 export default function BlogContent() {
 
   interface PostClick{
-    (e:React.MouseEvent<HTMLButtonElement>, post:Blog):void;
+    (e:React.MouseEvent<HTMLElement>, post:Blog):void;
   }
   const {
     searchValue,
@@ -195,6 +200,7 @@ export default function BlogContent() {
 
   function handleRefresh(e:React.MouseEvent) {
     e.preventDefault();
+    e.stopPropagation();
     setAllBlogsGlobally([]);
     if(!loading){
       setSearching(false);
@@ -217,16 +223,17 @@ export default function BlogContent() {
       data-component="AllBlogsParent"
       className="flex justify-center xs:flex-col md:flex-row gap-2"
     >
-      {!allBlogsGlobally?.length && loading && (
-        <div className="text-center my-5">
+      {!allBlogsGlobally.length && loading && (
+        <div className="my-5 absolute">    
           <FaSpinner className="animate-spin text-lg" /> Loading Blogs
         </div>
       )}
-      <div className="blogsContainer xs:w-[95vw] w-[70vw] text-center m-10">
+      <div className="blogsContainer xs:w-[95vw] w-[70vw] text-center m-10 min-h-[30rem]">
       
         <button
+          type="button"
           onClick={handleRefresh}
-          className="bg-transparent text-gray-600 hover:text-blue-600 hover:underline"
+          className={`bg-transparent text-gray-600 hover:text-blue-600 hover:underline w-full ${loading && 'mt-10'}`}
         >
           Refresh
         </button>
@@ -234,7 +241,7 @@ export default function BlogContent() {
         <div
         data-component="bottomBlogsContainer"
         className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 text-center justify-center"
-      >
+        >
         {BlogsToShow.map((blog, index) => 
           {
             return (
@@ -268,16 +275,3 @@ export default function BlogContent() {
     </div>
   );
 }
-
-
-// suppose i dont destrcture them and used it like this then why doesn't it work 'function UserProfile( currentUser:PresentUser, profileImage:string) {'
-
-
-// img.onload = () => {
-//   setImageLoading(false);
-// };
-// img.onerror = () => {
-//   setImageLoading(false);
-// };
-
-// are onload and onerror builtIN methods

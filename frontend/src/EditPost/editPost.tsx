@@ -28,11 +28,17 @@ interface PostData{
 interface LocalErrors {
   message:any
 }
+interface ErrorWithMsg{
+  msg:string
+}
 interface ErrorCaught {
   response:{
+    status?:number,
     data:{
-      error?:string,
-      message?:string
+      error?:string | ErrorWithMsg[],
+      message?:string,
+      name?:string,
+      errors?:string | ErrorWithMsg
     }
     error?:string
   }
@@ -150,6 +156,14 @@ const EditPost = () => {
     return confirmed;
   }, [editedSomething, clearLocalStorage]);
 
+  useEffect(() => {
+    if(errorMessage || errors.message){
+      window.scrollTo({
+        top:0,
+        behavior:'smooth'
+      })
+    }
+  }, [errorMessage, errors.message])
   const handleNavigation = useCallback(
     async (link:string | number) => {
       console.log("runs handle Navigation");
@@ -185,7 +199,7 @@ const EditPost = () => {
   // Convert and Store image as base 64
   
   useEffect(() => {
-    console.log("receiveLocalImages: ", receiveLocalImages, "localPostData: ", localPostData, 'EditPostData ', editPostData)
+    // console.log("receiveLocalImages: ", receiveLocalImages, "localPostData: ", localPostData, 'EditPostData ', editPostData)
     if(receiveLocalImages?.length){
       setContentImages(receiveLocalImages);
     }
@@ -291,20 +305,17 @@ const EditPost = () => {
   // handle changes to the content images
   const handleContentImages = (e:React.ChangeEvent<HTMLInputElement>) => {
     const newImage = e.target.files?.[0];
-    // console.log("newImage inside handlecontentiamges; ", newImage)
+
     if(!newImage) return ;
-    console.log("cursor position while entering newIMaege ", cursorPosition);
     const imageMark = `[image-${contentImages.length}]`;
     const beforeImage = editPostData.contentText.substring(0, cursorPosition);
     const afterImage = editPostData.contentText.substring(cursorPosition);
     const newContentText = beforeImage + imageMark + afterImage;
-
-    console.log("new Content: ", newContentText);
     setEditPostData((prev) => ({ ...prev, contentText: newContentText }));
     localStorage.setItem("textContent", JSON.stringify(newContentText));
     saveContentImages(newImage, (base64Result) => {
       const localImage = {
-        _id:`tempId${contentImages.length}`,
+        _id:`tempId${Date.now()}`,
         id: contentImages?.length,
         fileName: newImage.name,
         file: newImage,
@@ -312,12 +323,9 @@ const EditPost = () => {
         position: cursorPosition,
       };
       const allImages = [...contentImages, localImage];
-      console.log("allImages after update: ", allImages);
+
       localStorage.setItem("localContentImages", JSON.stringify(allImages));
-      console.log("contentImages : before", contentImages);
-      console.log("localImage newly created: ", localImage);
       setContentImages(allImages);
-      console.log("contentImages : after", contentImages);
       setEditedSomething(true);
     });
   };
@@ -371,11 +379,8 @@ const EditPost = () => {
       ];
       formData.append("newContent", JSON.stringify(contentArray));
     }
-    let positions:ImagePositions[]= [
-     { 
-      position:0,
-      fileName:''
-    }];
+    let positions:ImagePositions[]=[];
+
     if (contentImages) {
       let savedPics:SavedPic[] = contentImages.filter((image) => !image.file)
       .map((pic) => ({
@@ -395,7 +400,6 @@ const EditPost = () => {
         }
       });
     }
-
     formData.append("positions", JSON.stringify(positions));
     formData.append("titleImage", editPostData.titleImage);
     try {
@@ -410,9 +414,6 @@ const EditPost = () => {
         }
       );
       if (response?.data.success) {
-        // console.log("new blog data after success message", response.data.blog);
-        // console.log("new Title", response.data.blog.title);
-        // console.log("new titleImage ", response.data.blog.titleImage);
         setEditedSomething(false);
         localStorage.setItem(
           "titleImage",
@@ -429,9 +430,39 @@ const EditPost = () => {
       // setNewTitleImage(false);
     } catch (err:unknown) {
       if(isErrorCaught(err)){
+        console.log("err received while updating: ", err);
+        if(err.response?.status === 400){
+          if(err.response?.data?.name === 'validationError'){
+            if(Array.isArray(err.response?.data?.error)){
+              const firstError = err.response.data.error[0];
+              if(firstError && 'msg' in firstError){
+                setErrorMessage(firstError.msg)
+              }
+            }
+          }
+          // Case 2: Single error message string
+          if (typeof err.response?.data?.error === 'string') {
+            setErrorMessage(err.response.data.error);
+            return;
+          }
+          
+          // Case 3: Error in data.message
+          if (err.response?.data?.message) {
+            setErrorMessage(err.response.data.message);
+            return;
+          }
+          
+          // Case 4: Generic error format
+          if (err.response?.data?.errors) {
+            const firstErrorKey = Object.keys(err.response.data.errors)[0];
+            setErrorMessage(firstErrorKey);
+            // setErrorMessage(err.response.data.errors[firstErrorKey].message);
+            return;
+          }
+        }
         if (
-          err.response.data.error === "jwt expired" ||
-          err.response.data.message === "Unable to get Token Bearer"
+          err.response?.data?.error === "jwt expired" ||
+          err.response?.data?.message === "Unable to get Token Bearer"
         ) {
           const confirmMovingToLogin = window.confirm(
             "Your session has Expired! You are Logged Out"
@@ -440,10 +471,11 @@ const EditPost = () => {
             moveTo("/login");
           }
         }
-        if((err as ErrorCaught).request){
+        
+        if((err as ErrorCaught)?.request){
           setErrorMessage('Server error got while Reposting')
         }
-        if((err as ErrorCaught).message){
+        if((err as ErrorCaught)?.message){
           setErrorMessage((err as ErrorCaught).message)
         }
       }
@@ -454,13 +486,6 @@ const EditPost = () => {
   if (loading || postLoading) {
     return <h1>Loading the Post..</h1>;
   }
-  if (errors.message) {
-    return <h2>{errors.message}</h2>;
-  }
-  if (errorMessage){
-    return <h2> {errorMessage} </h2>
-  }
-
   function isErrorCaught(err:unknown): err is ErrorCaught {
     return (
       typeof err === 'object' &&
@@ -472,6 +497,15 @@ const EditPost = () => {
   }
   return (
     <div className="bg-gray-200 min-h-screen py-10">
+
+    {(errors.message || errorMessage) && (
+      <div className="max-w-5xl mx-auto mb-5">
+        <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded">
+          <p className="font-bold">Error</p>
+          <p>{errorMessage || errors.message}</p>
+        </div>
+      </div>
+    )}
       <div className="lg:max-w-5xl max-w-4xl bg-gray-800 rounded-lg shadow-lg mx-auto w-full p-5">
         <form method="post" className="space-y-2 flex my-5 flex-col">
           <label htmlFor="title" className="text-pink-600">
