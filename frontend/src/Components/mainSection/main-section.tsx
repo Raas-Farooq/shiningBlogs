@@ -6,13 +6,14 @@ import { VITE_API_URL } from "../../config";
 
 const MainSection = () => {
 
-    const {openUserAccount = false, showMenu = false, editProfile = false} = useUIContext() || {};
+    const {openUserAccount = false, showMenu = false, editProfile = false, setOpenUserAccount, setEditProfile} = useUIContext() || {};
     const {searching=false} = useBlogContext() || {};
 
     useEffect(() => {
         console.log("VITE_APi url: inside Main-Section", VITE_API_URL);
-        fetch(`${VITE_API_URL}/wake-up`)
-  .catch(() => console.log("Backend might be sleeping, retrying..."));
+        fetch(`${VITE_API_URL}/wake-up`).catch(() => console.log("Backend might be sleeping, retrying..."));
+        setOpenUserAccount(false);
+        setEditProfile(false)
 
     }, [])
 

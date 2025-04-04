@@ -14,12 +14,12 @@ const UserAccount = () => {
 
   
   const { setIsAuthenticated,setLoggedIn, imagePreview,currentUser,setImagePreview} = useAuthenContext();
-  const {openUserAccount, setOpenUserAccount, setEditProfile} = useUIContext();
-  console.log("inside user Account: openUser ",openUserAccount);
+  const {setOpenUserAccount, setEditProfile} = useUIContext();
+
     const [accountLoading, setAccountLoading] = useState(false); 
     const navigate = useNavigate();
     useEffect(() => {
-      {console.log("currentUser: userAccot", currentUser)}
+
       if(currentUser?.profileImg){
         const myImage = `${VITE_API_URL}/${currentUser.profileImg}`;
         setImagePreview(myImage);
@@ -27,11 +27,9 @@ const UserAccount = () => {
       async function fetchingCurrentUser(){
         setAccountLoading(true);
         const userId = localStorage.getItem('userId');
-        console.log("useEffect inside user Account Runs  CURRENT USER:", currentUser, "USERID: ", userId)
         if(userId){
           try{
             const response:Response = await axios.get(`${VITE_API_URL}/weblog/checkAuthen`);
-           console.log('response inside userAccount', response);
            if(response.isAuthenticated){
             setAccountLoading(false)
            }
@@ -52,8 +50,7 @@ const UserAccount = () => {
     const handleLogout= async(e:React.MouseEvent<HTMLButtonElement>) => {
       e.preventDefault();
       try{
-        const response = await axios.post(`${VITE_API_URL}/weblog/logout`, {}, {withCredentials:true});
-        console.log("logout Response inside user Account: ", response);
+        await axios.post(`${VITE_API_URL}/weblog/logout`, {}, {withCredentials:true});
         localStorage.removeItem('userId');
         setLoggedIn(false)
         setIsAuthenticated(false)
@@ -102,35 +99,39 @@ const UserAccount = () => {
         </div>
 
         <div>
-          <button className="border mt-3 border-blue bg-red-400 p-2 text-white hover:bg-red-200" 
+          <button className="border mt-3 border-blue bg-red-400 p-1 text-white hover:bg-red-200" 
           onClick={handleLogout}>
           LogOut
           
           </button>
         </div>
+        <div className="mt-4">
+          <button onClick={() => 
+            {
+              setOpenUserAccount(false)
+              navigate(-1)
+            }
+            }
+            className="p-2 border bg-green-400 mr-2 hover:bg-green-300 text-white text-bolder xs:mb-4 xs:text-sm"
+            style={{lineHeight:'1.2'}}
+            >
+            Back
+          </button>
+          <button onClick={() => setOpenUserAccount(false)}>
+            <Link
+              className="p-2 border bg-green-400 mr-2 hover:bg-green-300 text-white text-bolder xs:mb-4 xs:text-sm"
+              
+              to="/"
+            >
+              Back To Home{" "}
+            </Link>
+          </button>
+        </div>
       </div>
       <div className="mt-5 xs:flex flex-col gap-5">
-      <button onClick={() => 
-        {
-          setOpenUserAccount(false)
-          navigate(-1)
-        }
-      }
-        className="p-2 border bg-green-400 mr-2 hover:bg-green-300 text-white text-bolder xs:mb-4 xs:text-sm sm:text-lg"
-        >
-      Back
-      </button>
-      <button onClick={() => setOpenUserAccount(false)}>
-        <Link
-          className="p-2 border bg-green-400 mr-2 hover:bg-green-300 text-white text-bolder xs:mb-4 xs:text-sm sm:text-lg"
-          to="/"
-        >
-          Back To Home{" "}
-        </Link>
-      </button>
+      
       <button
         onClick={() => {
-          console.log("edit Profile clicked"), setOpenUserAccount(false);
           setEditProfile(true);
         }}
       >

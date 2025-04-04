@@ -105,7 +105,6 @@ const BlogCard:React.FC<BlogCardProps> = ({ blog, handlePostClick }) => {
   // eslint-disable-next-line no-unused-vars
   const { allBlogsGlobally, searching } = useBlogContext();
 
-
 useEffect(() => {
   console.log("BlogsCount: ", allBlogsGlobally.length)
 },[])
@@ -155,7 +154,7 @@ export default function BlogContent() {
   } = useBlogContext();
 
   
-  const { loggedIn, currentUser} = useAuthenContext();
+  const { loggedIn, currentUser, setErrorMessage} = useAuthenContext();
   
   const [loading, setLoading] = useState<boolean>(true);
   const [profileImage, setProfileImage] = useState<string>("");
@@ -191,7 +190,8 @@ export default function BlogContent() {
           setAllBlogsGlobally(response.data.blogs);
         })
         .catch(err => {
-          console.log("got errors while fetching all blogs: ", err);
+          console.error("got errors while fetching all blogs: ", err);
+          setErrorMessage(err);
         }).finally(() => {
           setLoading(false);
         })
@@ -228,7 +228,7 @@ export default function BlogContent() {
           <FaSpinner className="animate-spin text-lg" /> Loading Blogs
         </div>
       )}
-      <div className="blogsContainer xs:w-[95vw] w-[70vw] text-center m-10 min-h-[30rem]">
+      <div className="blogsContainer xs:w-[95vw] w-[70vw] text-center m-6 min-h-[30rem]">
       
         <button
           type="button"

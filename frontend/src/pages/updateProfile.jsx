@@ -8,7 +8,7 @@ import { VITE_API_URL } from "../config.ts";
 
 const UpdateProfile = () => {
 
-    const {isAuthenticated,setImagePreview, imagePreview} = useAuthenContext();
+    const {isAuthenticated,setImagePreview, imagePreview, currentUser} = useAuthenContext();
     const {setEditProfile} = useUIContext();
     // const [userImage, setUserImage] = useState('');
     const [userReceived, setUserReceived] = useState({});
@@ -33,10 +33,15 @@ const UpdateProfile = () => {
                 const response = await axios.get(`${VITE_API_URL}/weblog/getUser`, {withCredentials:true});
                 const user =  response.data.user;
                 setUserReceived(user);
-                
+                console.log("user response Received inside the updateProfile: ", user)
+                console.log("currentUser: ", currentUser);
+                // console.log("response.data.user.profileImg: ", response.data.user.profileImg);
                 let realImage = '';
-                realImage = `${VITE_API_URL}/${response.data.user.profileImg}`;
-                setImagePreview(realImage);
+                if(user.profileImg){
+                    realImage = `${VITE_API_URL}/${user.profileImg}`;
+                    setImagePreview(realImage);
+                }
+                
                 let imgPreview = '';
                 setFormData((prev) => ({
                     ...prev,
@@ -47,8 +52,9 @@ const UpdateProfile = () => {
                     imgPreview:imgPreview
                    }))
                    setAddInterest(user.TopicsInterested ? user.TopicsInterested.join('\n'): '');
-                setLocalLoading(false)
-            }catch(err){
+                   setLocalLoading(false)
+                }
+            catch(err){
                 setLocalLoading(false)
             }
         }
@@ -135,14 +141,11 @@ const UpdateProfile = () => {
                         <label className="mb-3 text-blue-600"> Select the Profile Image</label>
                         <input type="file" accept="image/*" className="w-fit" onChange={handleImageSubmit}
                         />
+                        {console.log("imagePreview: inside DOM ", imagePreview)}
                         {imagePreview && (
-                            
                             <>
-                               
                                 <img src={imagePreview} alt="profile Image" className="w-[100px] h-[90px] p-2 m-5" />
                             </>
-                            
-        
                         )}
 
                         <input type="input" 

@@ -4,7 +4,6 @@ import { useAuthenContext, useBlogContext,useUIContext } from '../../globalConte
 import WindowSize from '../../windowSize.ts';
 import { Link, useNavigate } from 'react-router-dom';
 import clsx from 'clsx';
-import axios from 'axios';
 import { VITE_API_URL } from '../../config.ts';
 
 export default function Navbar({showSearch=true}){
@@ -34,9 +33,8 @@ export default function Navbar({showSearch=true}){
         console.log("currentUser in Navbar: ", currentUser);
         const gettingProfileImage = async() => {
             if(currentUser?.profileImg){
-                const userImage = await axios.get(`${VITE_API_URL}/${currentUser.profileImg}`);
-                console.log("userImage: navbar ", userImage);
-    
+                const userImage = (`${VITE_API_URL}/${currentUser.profileImg}`);
+                setUserProfileImage(userImage);
             }
         }
         gettingProfileImage();
@@ -171,7 +169,7 @@ export default function Navbar({showSearch=true}){
                 <li className="px-2 ml-3 py-2" ><a href=""><FaWhatsapp /> </a></li>
             </ul>
 
-            <ul className={`md:flex mb-4 w-1/3 md:text-sm relative ${showMenu ? 'flex': 'hidden'} ${!loggedIn && 'md:text-xl ml-12 xs:flex'}`}>
+            <ul className={`md:flex mb-4 w-1/3 md:text-sm relative ${showMenu ? 'flex': 'hidden'} ${!loggedIn ? 'md:text-xl ml-12 xs:flex' : 'lg:mt-4'}`}>
                 <div className="flex mb-2 lg:mb-0">
                     <li className={getLogClass()}><Link to={"/login"} className='px-2 py-2 hover:text-gray-300'> Login </Link></li>
                     <li className={getLogClass()} ><Link to={"/registerUser"} className='px-2 py-2 hover:text-gray-300'> Register </Link></li>
@@ -197,10 +195,16 @@ export default function Navbar({showSearch=true}){
                     setOpenUserAccount(true)
                 }
                 }>
-                    <Link className='block text-center p-2 bg-green-300'
+                    <Link className={clsx(`block text-center p-2 bg-green-300`, userProfileImage && 'bg-white' )}
                     to={'/userAccount'}
                         >
-                        <FaRegUser /> 
+                            {userProfileImage 
+                            ? 
+                            <img src={userProfileImage} className='w-14'></img> 
+                            : 
+                            <FaRegUser /> 
+                            }
+                        
                     </Link>
                 </button>
             
