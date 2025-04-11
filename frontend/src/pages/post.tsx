@@ -72,11 +72,15 @@ const BlogPost:React.FC = () => {
     const confirm = window.confirm(
       "Are You sure to delete this Post. You won't be able to recover it!"
     );
-   const oldBolgsCopy = allBlogsGlobally;
+    if(!confirm) return;
 
-   setAllBlogsGlobally(prevBlogs => prevBlogs.filter(blog => blog._id !== id));
-   console.log("allBlogs after filtering remove ", allBlogsGlobally);
+    const unblockNavigation = () => {
+      window.onbeforeunload = null;
+    }
+
+    const oldBolgsCopy = allBlogsGlobally;
     const deletingPost = async () => {
+      setAllBlogsGlobally(prevBlogs => prevBlogs.filter(blog => blog._id !== id));
       setBlogOwner(false);
       setIsDeletingPost(true)
       console.log("id: ",id);
@@ -84,6 +88,7 @@ const BlogPost:React.FC = () => {
       const onSuccess=(response:RespReceived<{success:boolean}>)=> {
         if(response.data.success){
           alert("Successfully Deleted the Blog");
+          unblockNavigation();
           setIsDeletingPost(false);
           console.log("allBlogsGlobally: ", allBlogsGlobally)
           setBlogOwner(true);
@@ -92,6 +97,7 @@ const BlogPost:React.FC = () => {
       }
 
       function onError(err:ErrorResponse){
+        unblockNavigation();
         setAllBlogsGlobally(oldBolgsCopy);
         if(err.response?.data?.error === 'jwt expired'){
           setErrorMessage('JWT Expired! Login Again');
@@ -210,6 +216,7 @@ const BlogPost:React.FC = () => {
             >
               <button
                 onClick={() => moveTo(-1)}
+                disabled={isDeletingPost}
                 className="bg-transparent text-gray-600 hover:text-blue-600 hover:underline mx-2"
               >
                 {" "}

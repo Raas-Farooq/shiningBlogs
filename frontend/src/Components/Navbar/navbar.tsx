@@ -110,10 +110,9 @@ export default function Navbar({showSearch=true}){
         }
 
         const getLogClass = () => clsx({
-            hidden: (searchClicked && !showMenu) || 
-            loggedIn || (searchValue && 
-            inHomePage),
-            'md:block':!loggedIn && searchValue
+            hidden: loggedIn || (searchValue && 
+            !inHomePage),
+            'md:block':!loggedIn && searchValue,
         })
 
         // md:absolute lg:relative lg:mt-0 
