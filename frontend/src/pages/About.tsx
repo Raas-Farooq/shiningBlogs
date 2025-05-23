@@ -11,21 +11,6 @@ import {
 
 const About = () => {
  
-  // useEffect(() => {
-  //   let word = 'acdef';
-  //   const getAschi = word[2].charCodeAt(0);
-  //   console.log("getAschi: ", getAschi);
-  //   const aschii = [...word].map(char => char.charCodeAt(0));
-  //   console.log("All characters of aschii ", aschii);
-  //   let ifAlpha=true;
-  //   for(let i=0; i < aschii.length; i++){
-  //     if(aschii[i+1] < aschii[i]){
-  //       ifAlpha = false;
-  //     }
-  //   }
-  //   console.log("word: ", word);
-  //   console.log("ifAlphabatical: ", ifAlpha);
-  // },[])
   
   return (
     <div className="page-content bg-gray-50 min-h-screen">

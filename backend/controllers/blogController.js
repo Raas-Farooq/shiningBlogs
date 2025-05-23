@@ -8,7 +8,6 @@ import jwt from 'jsonwebtoken';
 import authMiddleware from '../middleAuthentication/authMiddleware.js';
 import he from 'he';
 import { isConstructorDeclaration } from 'typescript';
-// import { RestartProcess } from 'concurrently';
 
 
 
@@ -210,7 +209,7 @@ const current = async (req,res) => {
         const user = await User.findOne({email});
 
         if(!user){
-            return res.status(401).json({
+            return res.status(400).json({
                 success:false,
                 message:"Unable to find the requested user. Try Again"
             })
@@ -241,7 +240,7 @@ const updateUserProfile = async (req, res) => {
         })
     }
     
-    const {username, email, password,goal} = req.body;
+    const {username, email,goal} = req.body;
     const interests = req.body.interests ? JSON.parse(req.body.interests) : undefined;
     const user = await User.findById(userId);
     if(user._id.toString() !== userId){
@@ -257,10 +256,6 @@ const updateUserProfile = async (req, res) => {
         let updatingUser = {};
         if(username) updatingUser.username = username;
         if(email) updatingUser.email = email;
-        // if(password){
-        //     const hashedPassword = await bcrypt.hash(password, 10);
-        //     updatingUser.password = hashedPassword;
-        // }
         if(req.file){
         
             updatingUser.profileImg=req.file.path;
@@ -268,13 +263,13 @@ const updateUserProfile = async (req, res) => {
         if(goal) updatingUser.goal = goal;
         if(interests) updatingUser.TopicsInterested = interests;
         
-        const updated = await User.findByIdAndUpdate(userId,
+        const updateUserProfile = await User.findByIdAndUpdate(userId,
             {
                 $set:updatingUser,
             },
             {new:true, runValidators:true}
         )
-        if(!updated){
+        if(!updateUserProfile){
             return res.status(401).json({
                 success:false,
                 message:"Failed to update the Profile",
