@@ -83,14 +83,13 @@ const BlogPost:React.FC = () => {
       setAllBlogsGlobally(prevBlogs => prevBlogs.filter(blog => blog._id !== id));
       setBlogOwner(false);
       setIsDeletingPost(true)
-      console.log("id: ",id);
       const url = `${VITE_API_URL}/weblog/deleteBlog/${id}`;
       const onSuccess=(response:RespReceived<{success:boolean}>)=> {
         if(response.data.success){
           alert("Successfully Deleted the Blog");
           unblockNavigation();
           setIsDeletingPost(false);
-          console.log("allBlogsGlobally: ", allBlogsGlobally)
+
           setBlogOwner(true);
           moveTo(-1);
         }

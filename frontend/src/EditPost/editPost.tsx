@@ -3,9 +3,10 @@ import useFetchPost from './fetchingResources/fetchBlogPost.ts'
 import {  useLocation, useNavigate } from "react-router-dom";
 import EditContentImages from "../Components/contentSection/editContentImages.tsx";
 import axios from "axios";
-import { useAuthenContext } from "../globalContext/globalContext.tsx";
+import { useAuthenContext, useBlogContext } from "../globalContext/globalContext.tsx";
 import useFetchLocalData from "./fetchingResources/useFetchLocalData.ts";
 import { VITE_API_URL } from "../config.ts";
+import { FaSpinner } from "react-icons/fa";
 
 interface PostData{
   _id:string,
@@ -75,10 +76,12 @@ interface SavedPic {
 const EditPost = () => {
   
   const { loggedIn,loading,errorMessage, setErrorMessage } = useAuthenContext();
+  const {allBlogsGlobally, filteredBlogs,setAllBlogsGlobally} = useBlogContext();
   const [cursorPosition, setCursorPosition] = useState(0);
   // const [newTitleImage, setNewTitleImage] = useState(false);
   const [editedSomething, setEditedSomething] = useState(false);
   const [contentImages, setContentImages] = useState<ContentImage[]>([]);
+  const [repostedPost, setRepostedPost] = useState<boolean>(false);
   const moveTo = useNavigate();
   const isNavigatingBack = useRef(false);
 
@@ -403,6 +406,7 @@ const EditPost = () => {
     formData.append("positions", JSON.stringify(positions));
     formData.append("titleImage", editPostData.titleImage);
     try {
+      setRepostedPost(true)
       const response = await axios.put(
         `${VITE_API_URL}/weblog/updatedBlog/${post?._id}`,
         formData,
@@ -414,6 +418,9 @@ const EditPost = () => {
         }
       );
       if (response?.data.success) {
+        await axios.get(`${VITE_API_URL}/weblog/allBlogs`).
+        then(response => setAllBlogsGlobally(response.data.blogs));;
+        // console.log("respone of allBlogs EDITTT", totalPosts);
         setEditedSomething(false);
         localStorage.setItem(
           "titleImage",
@@ -480,6 +487,8 @@ const EditPost = () => {
         }
       }
       
+    }finally{
+      setRepostedPost(false);
     }
   };
 
@@ -506,6 +515,15 @@ const EditPost = () => {
         </div>
       </div>
     )}
+    {repostedPost && <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white rounded-lg shadow-lg p-5 flex items-center gap-3">
+            <FaSpinner className="animate-spin text-purple-600" />
+            <span className="text-lg font-medium text-gray-700">
+              Reposting the Post, please wait...
+            </span>
+          </div>
+        </div>
+      }
       <div className="lg:max-w-5xl max-w-4xl bg-gray-800 rounded-lg shadow-lg mx-auto w-full p-5">
         <form method="post" className="space-y-2 flex my-5 flex-col">
           <label htmlFor="title" className="text-pink-600">

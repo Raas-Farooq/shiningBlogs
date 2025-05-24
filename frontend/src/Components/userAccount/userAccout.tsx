@@ -21,14 +21,19 @@ const UserAccount = () => {
     useEffect(() => {
 
       if(currentUser?.profileImg){
+        
         const myImage = `${VITE_API_URL}/${currentUser.profileImg}`;
         setImagePreview(myImage);
       }
       async function fetchingCurrentUser(){
-        setAccountLoading(true);
         const userId = localStorage.getItem('userId');
+        if(!userId){
+          navigate('/login');
+          return;
+        }
         if(userId){
           try{
+            console.log("VITE_API_URL: ",VITE_API_URL, "currentUser: ", currentUser)
             const response:Response = await axios.get(`${VITE_API_URL}/weblog/checkAuthen`);
            if(response.isAuthenticated){
             setAccountLoading(false)
@@ -149,3 +154,4 @@ const UserAccount = () => {
 };
 
 export default UserAccount;
+
