@@ -5,6 +5,7 @@ import ContentImages from "../Components/contentSection/editContentImages.tsx";
 import { BlogContextProvider, useAuthenContext, useBlogContext } from "../globalContext/globalContext";
 import { Upload } from "lucide-react";
 import { VITE_API_URL } from "../config.ts";
+import { FaSpinner } from "react-icons/fa";
 
 export default function Write() {
   const [blogTitle, setBlogTitle] = useState({
@@ -18,7 +19,7 @@ export default function Write() {
   const {setAllBlogsGlobally} = useBlogContext();
   const [cursorPosition, setCursorPosition] = useState(0);
   // const [titleErr, setTitleErr] = useState('');
-  const [loadingErr, setLoadingErr] = useState(false);
+  const [localLoading, setLocalLoading] = useState(false);
   const [errors, setErrors] = useState({});
   const [contentText, setContentText] = useState("");
   const [imagesShortNames, setImagesShortNames] = useState([]);
@@ -151,6 +152,7 @@ export default function Write() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const seeErrors = checkValidation();
+    setLocalLoading(true);
     if (Object.keys(seeErrors).length > 0) {
       setErrors(seeErrors);
       alert("Some Necessary Data is Missing");
@@ -242,19 +244,27 @@ export default function Write() {
           setErrorMessage(err);
         }
       } finally {
-        setLoadingErr(false);
+        setLocalLoading(false);
       }
     }
   };
 
-  if (loadingErr) return <h1> Processing </h1>;
-  // also ask about 'max-w-md mx-auto'
-  
+
   return (
     <div className="bg-gray-50 min-h-screen py-10">
       <div className="bg-white shadow-md rounded:lg px-6 py-8 w-full mx-auto max-w-3xl">
         <h2 className="text-3xl font-bold text-center text-purple-600"> Your Shinning Post</h2>
         {errorMessage && <h2> {errorMessage} </h2>} 
+        {localLoading && 
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+            <div className="bg-white rounded-lg shadow-lg p-5 flex items-center gap-3">
+              <FaSpinner className="animate-spin text-purple-600" />
+              <span className="text-lg font-medium text-gray-700">
+                Creating the Post, please wait...
+              </span>
+            </div>
+          </div>}
+
         <form method="post" className="space-y-3 flex flex-col">
           <label htmlFor="title" className="text-pink-600">
             {" "}
@@ -284,7 +294,7 @@ export default function Write() {
             name="titleImg"
             accept="image/*"
             onChange={handleTitleImage}
-            className="w-[88px] cursor-pointer rounded-md placeholder:text-gray-500"
+            className="w-[103px] cursor-pointer rounded-md placeholder:text-gray-500"
           />
           {blogTitle && blogTitle.imgPreview ? (
             <img src={blogTitle.imgPreview} className="w-24 h-24 " />

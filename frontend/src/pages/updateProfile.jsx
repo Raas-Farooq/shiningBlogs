@@ -33,8 +33,8 @@ const UpdateProfile = () => {
                 const response = await axios.get(`${VITE_API_URL}/weblog/getUser`, {withCredentials:true});
                 const user =  response.data.user;
                 setUserReceived(user);
-                console.log("user response Received inside the updateProfile: ", user)
-                console.log("currentUser: ", currentUser);
+                // console.log("user response Received inside the updateProfile: ", user)
+                // console.log("currentUser: ", currentUser);
                 // console.log("response.data.user.profileImg: ", response.data.user.profileImg);
                 let realImage = '';
                 if(user.profileImg){
@@ -126,6 +126,9 @@ const UpdateProfile = () => {
             }
         }catch(err){
             console.log("err: ", err);
+        }
+        finally{
+            setLocalLoading(false);
         }
         
     }

@@ -3,28 +3,26 @@ import databaseConnection from './config/db.js';
 import router from './routes/route.js';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
+import TestOrigins from './middleware/testOrigins.js';
 
 const app = express();
 
 app.use(express.json());
-const allowedOrigins = ['http://localhost:5173', 'http://localhost:5174', 'https://shiningblogs-frontend.onrender.com'];
-
-// app.use(cors({
-//     origin:function (origin, callback){
-//         if(allowedOrigins.includes(origin) || !origin){
-//             callback(null, true)
-//         }else{
-//             callback(new Error('Not allowed by Cors or Not a Valid Origin'))
-//         }
-//     },
-//     credentials:true,
-// }));
+const allowedOrigins = ['http://localhost:5173', 'http://localhost:5174','http://localhost:3000', 'https://shiningblogs-frontend.onrender.com'];
 
 app.use(cors({
-    origin:allowedOrigins,
-    credentials:true
-}))
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true
+}));
 
+// app.use(cors());
+// app.use(TestOrigins);
 app.use(express.json({strict:false}));
 app.use(express.urlencoded({extended:true}));
 
@@ -55,4 +53,4 @@ app.use('/weblog/', router)
 
 app.listen((port), () => console.log("App is running On ", port));
 
-
+// https://shiningblogs-backend-b4ye.onrender.com
