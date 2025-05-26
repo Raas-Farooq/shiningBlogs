@@ -8,6 +8,8 @@ export default defineConfig({
   }), tsconfigPaths()],
   base: '/',
   build: {
-    sourcemap: true // Helps with debugging
-  }
+    sourcemap: true, // Helps with debugging
+    outDir:'dist'
+  },
+  publicDir:'public'
 })

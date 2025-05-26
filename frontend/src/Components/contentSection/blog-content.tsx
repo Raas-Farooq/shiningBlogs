@@ -219,11 +219,12 @@ export default function BlogContent() {
     
     const BlogsToShow = getBlogsToShow();
   return (
-    <div
-      data-component="AllBlogsParent"
-      className="flex justify-center xs:flex-col md:flex-row gap-2"
-    >
-      {!allBlogsGlobally.length && loading && (
+    <>
+      <div
+        data-component="AllBlogsParent"
+        className="flex justify-center xs:flex-col md:flex-row gap-2"
+      >
+        {!allBlogsGlobally.length && loading && (
         <div className="my-5 absolute">    
           <FaSpinner className="animate-spin text-lg" /> Loading Blogs
         </div>
@@ -263,7 +264,8 @@ export default function BlogContent() {
           <UserProfile currentUser={currentUser} profileImage={profileImage} />
         )}
       </div>
-
+    </div>
+    <footer>
       <div
         className="flex justify-center"
         onClick={() => navigateTo("/userAccount")}
@@ -272,6 +274,7 @@ export default function BlogContent() {
           About Me
         </button>
       </div>
-    </div>
+    </footer>
+    </>
   );
 }
