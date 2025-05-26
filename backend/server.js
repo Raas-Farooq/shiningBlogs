@@ -8,7 +8,7 @@ import TestOrigins from './middleware/testOrigins.js';
 const app = express();
 
 app.use(express.json());
-const allowedOrigins = ['http://localhost:5173', 'http://localhost:5174','http://localhost:3000', 'https://shiningblogs-frontend.onrender.com'];
+const allowedOrigins = ['http://localhost:5173','http://127.0.0.1:8080/', 'http://localhost:5174','http://localhost:3000', 'https://shiningblogs-frontend.onrender.com'];
 
 app.use(cors({
   origin: function (origin, callback) {
