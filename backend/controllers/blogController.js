@@ -1,5 +1,6 @@
 // import {decode} from 'he';
 import bcrypt from 'bcrypt';
+import {v2 as cloudinary} from 'cloudinary';
 import {Blog, User} from '../models/model.js';
 import mongoose from 'mongoose';
 import rateLimit from 'express-rate-limit';
@@ -292,6 +293,7 @@ const updateUserProfile = async (req, res) => {
     }
 
 }
+
 
 
 const addBlog = async (req,res) => {

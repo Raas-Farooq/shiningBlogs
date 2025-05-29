@@ -6,6 +6,7 @@ import {registerUser, logging, addBlog, updateBlogPost, deleteBlog, updateUserPr
 import authMiddleware from "../middleAuthentication/authMiddleware.js";
 import CheckAuthen from "../checkUserAuthen/checkAuthen.js";
 import multer from 'multer';
+import UploadImage from "../controllers/cloudinaryUpload/uploadImage.js";
 
 const router = express.Router();
 
@@ -129,7 +130,7 @@ router.get('/current', authMiddleware,
         body('email').isEmail().normalizeEmail()
     ]
 )
-
+router.post('/uploadOnCloudinary',upload.single('titleImage'),authMiddleware, UploadImage)
 router.get('/allUsers', allUsers);
 router.get('/allBlogs', allBlogs);
 router.get('/canEditBlog/:id', authMiddleware, canEditBlog)

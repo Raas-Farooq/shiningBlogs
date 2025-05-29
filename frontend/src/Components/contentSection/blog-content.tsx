@@ -106,7 +106,7 @@ const BlogCard:React.FC<BlogCardProps> = ({ blog, handlePostClick }) => {
   const { allBlogsGlobally, searching } = useBlogContext();
 
 useEffect(() => {
-  console.log("BlogsCount: ", allBlogsGlobally.length)
+  console.log("BlogsCount: ", allBlogsGlobally)
 },[])
 
 

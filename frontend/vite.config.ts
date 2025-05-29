@@ -9,8 +9,7 @@ export default defineConfig({
   base: '/',
   build: {
     sourcemap: true, // Helps with debugging
-    outDir:'./dist',
-    emptyOutDir:true
+    outDir:'./dist'
   },
   publicDir:'public'
 })

@@ -23,6 +23,7 @@ export default function Write() {
   const [errors, setErrors] = useState({});
   const [contentText, setContentText] = useState("");
   const [imagesShortNames, setImagesShortNames] = useState([]);
+  const [loadingCloudinaryUpload, setLoadingCloudinaryUpload] = useState(false);
   const [contentImages, setContentImages] = useState([]);
 
   function smallText(text) {
@@ -58,7 +59,7 @@ export default function Write() {
   function handleAreaSelect() {
     setCursorPosition(currentTextArea.current.selectionStart);
   }
-  const handleTitleImage = (e) => {
+  const handleTitleImage = async (e) => {
     const image = e.target.files[0];
     // console.log("image when submitting: files[0]", image);
     setBlogTitle((prev) => ({
@@ -66,6 +67,29 @@ export default function Write() {
       titleImg: image,
       imgPreview: URL.createObjectURL(image),
     }));
+    const formData = new FormData();
+    formData.append('titleImage', image);
+    setLoadingCloudinaryUpload(true);
+    setTimeout(() => {
+      setLoadingCloudinaryUpload(false);
+    },2000)
+    // try{
+    //   setLoadingCloudinaryUpload(true);
+    //   const uploadOnCloudinary= await axios.post(`${VITE_API_URL}/weblog/uploadOnCloudinary`, formData,
+    //   {
+    //     withCredentials:true,
+    //     headers:{
+    //       "Content-Type":"multipart/form-data"
+    //     }
+    //   });
+    //   console.log("frontend response of uploadOnCloudinary: ", uploadOnCloudinary);
+    // }catch(err){
+    //   console.log("frontend error while uploading on Cloudinary: ", err.message);
+    // }
+    // finally{
+    //   setLoadingCloudinaryUpload(false);
+    // }
+    
     if (errors.titleImageError) {
       errors.titleImageError = "";
       setErrors(errors);
@@ -152,12 +176,13 @@ export default function Write() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const seeErrors = checkValidation();
-    setLocalLoading(true);
     if (Object.keys(seeErrors).length > 0) {
+      // setLocalLoading(false);
       setErrors(seeErrors);
       alert("Some Necessary Data is Missing");
       return;
     } else {
+      setLocalLoading(true);
       setErrors({});
       // setLoadingErr(true);
       let contentArray = [
@@ -254,6 +279,16 @@ export default function Write() {
     <div className="bg-gray-50 min-h-screen py-10">
       <div className="bg-white shadow-md rounded:lg px-6 py-8 w-full mx-auto max-w-3xl">
         <h2 className="text-3xl font-bold text-center text-purple-600"> Your Shinning Post</h2>
+        {loadingCloudinaryUpload && 
+          <div className="fixed inset-0 z-50 flex justify-center bg-black items-center bg-opacity-50">
+            <div className="bg-white text-black shadow-lg flex items-center p-5 rounded-lg ">
+              <FaSpinner className="animate-spin text-purple-600" />
+              <span className="text-black font-lg">
+                UPloading Image on Cloudinary
+              </span>
+              </div>
+          </div>
+          }
         {errorMessage && <h2> {errorMessage} </h2>} 
         {localLoading && 
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
