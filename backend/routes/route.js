@@ -56,7 +56,7 @@ const storage = multer.diskStorage({
 
 const upload = multer({storage:storage})
 
-router.post('/addBlog', upload.fields([{name:'titleImage', maxCount:1}, {name:"contentImages", maxCount:10}]), newBlogLimiter, authMiddleware, [
+router.post('/addBlog',newBlogLimiter, authMiddleware, [
     body('title').isLength({min:1, max:60}).trim().escape().withMessage("title should be btween 1 and 200 characters"),
     body('content').isJSON().withMessage("content should be in JSON format"),
     body('content').custom((value) => {
@@ -130,7 +130,7 @@ router.get('/current', authMiddleware,
         body('email').isEmail().normalizeEmail()
     ]
 )
-router.post('/uploadOnCloudinary',upload.single('titleImage'),authMiddleware, UploadImage)
+router.post('/uploadOnCloudinary',upload.single('image'),authMiddleware, UploadImage)
 router.get('/allUsers', allUsers);
 router.get('/allBlogs', allBlogs);
 router.get('/canEditBlog/:id', authMiddleware, canEditBlog)

@@ -297,7 +297,7 @@ const updateUserProfile = async (req, res) => {
 
 
 const addBlog = async (req,res) => {
-
+    console.log("Add Blog Run: Title", req.body);
     const errors = validationResult(req);
 
     if(!errors.isEmpty()){
@@ -307,28 +307,21 @@ const addBlog = async (req,res) => {
             error: errors.array()
         })
     }
-    const {title, content, positions} = req.body;
-    // console.log("req.body .title: ", req.body.title);
+    const {content,contentImages} = req.body;
+    console.log("Add Blog Run: Title", req.body);
     const titleCorrected = he.decode(req.body.title);
     const user_id = req.user.userId;
-    const myPositions = JSON.parse(positions) || [];
-    const titleImage = req.files['titleImage'] ? req.files['titleImage'][0].path : null;
+    const titleImage = req.body.titleImage;
+    
+    // console.log("contentImages from req.body: ", JSON.parse(contentImages), "titleImage: ", titleImage,'title ', title, "Content ", JSON.parse(content));
 
     try{
-        const contentImages = req.files['contentImages'] ? 
-        req.files['contentImages'].map((file, ind) => 
-            ({ 
-                path:file.path,
-                ...myPositions[ind]
-            })) 
-            : 
-            [];
         const newBlog = new Blog({
             userId:user_id,
             title:titleCorrected,
             titleImage,
             content:JSON.parse(content),
-            contentImages:contentImages
+            contentImages:JSON.parse(contentImages)
             
         });
         const blogCreated = await newBlog.save();

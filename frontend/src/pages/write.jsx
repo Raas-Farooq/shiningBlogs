@@ -64,31 +64,32 @@ export default function Write() {
     // console.log("image when submitting: files[0]", image);
     setBlogTitle((prev) => ({
       ...prev,
-      titleImg: image,
-      imgPreview: URL.createObjectURL(image),
+      imgPreview: URL.createObjectURL(image)
     }));
     const formData = new FormData();
-    formData.append('titleImage', image);
-    setLoadingCloudinaryUpload(true);
-    setTimeout(() => {
+    formData.append('image', image);
+    try{
+      setLoadingCloudinaryUpload(true);
+      const uploadOnCloudinary= await axios.post(`${VITE_API_URL}/weblog/uploadOnCloudinary`, formData,
+      {
+        withCredentials:true,
+        headers:{
+          "Content-Type":"multipart/form-data"
+        }
+      });
+      console.log("frontend response of uploadOnCloudinary: ", uploadOnCloudinary);
+      const imageLink = uploadOnCloudinary.data.cloudinary_link;
+      setBlogTitle((prev) => ({
+      ...prev,
+      titleImg: imageLink,
+      imgPreview: imageLink
+    }));
+    }catch(err){
+      console.log("frontend error while uploading on Cloudinary: ", err.message);
+    }
+    finally{
       setLoadingCloudinaryUpload(false);
-    },2000)
-    // try{
-    //   setLoadingCloudinaryUpload(true);
-    //   const uploadOnCloudinary= await axios.post(`${VITE_API_URL}/weblog/uploadOnCloudinary`, formData,
-    //   {
-    //     withCredentials:true,
-    //     headers:{
-    //       "Content-Type":"multipart/form-data"
-    //     }
-    //   });
-    //   console.log("frontend response of uploadOnCloudinary: ", uploadOnCloudinary);
-    // }catch(err){
-    //   console.log("frontend error while uploading on Cloudinary: ", err.message);
-    // }
-    // finally{
-    //   setLoadingCloudinaryUpload(false);
-    // }
+    }
     
     if (errors.titleImageError) {
       errors.titleImageError = "";
@@ -111,7 +112,7 @@ export default function Write() {
     setContentText(e.target.value);
   };
 
-  const handleContentImage = (e) => {
+  const handleContentImage = async (e) => {
     const image = e.target.files[0];
     const shortName = smallText(image.name);
 
@@ -120,12 +121,34 @@ export default function Write() {
     const afterImage = contentText.substring(cursorPosition);
     const newContent = beforeImage + imageName + afterImage;
 
+    const imageData = new FormData();
+    imageData.append('image', image);
+    let cloudinaryUrl;
+    let image_public_id;
+    try{
+        setLoadingCloudinaryUpload(true);
+        const uploadingOnCloudinary= await axios.post(`${VITE_API_URL}/weblog/uploadOnCloudinary`, imageData,{
+        withCredentials:true,
+        headers:{
+          "Content-Type":"multipart/form-data"
+        }
+       })
+      if(uploadingOnCloudinary.data.success){
+        cloudinaryUrl = uploadingOnCloudinary.data.cloudinary_link;
+        image_public_id = uploadingOnCloudinary.data.public_id;
+      }
+    }catch(err){
+      console.log("this is the err: ", err);
+    }finally{
+      setLoadingCloudinaryUpload(false);
+    }
     setContentImages([
       ...contentImages,
       {
         id: contentImages.length,
-        type: "image",
-        file: image,
+        type: "ContentImage",
+        path: cloudinaryUrl,
+        public_id:image_public_id,
         fileName: shortName,
         preview: URL.createObjectURL(image),
         position: cursorPosition,
@@ -192,21 +215,23 @@ export default function Write() {
         },
       ];
       const blogData = new FormData();
-      console.log("blogTitle before appending: ", blogTitle.title);
+      console.log("blogTitle before appending: ", blogTitle.title.length, "type: ", typeof(blogTitle.title));
       blogData.append("title", blogTitle.title);
       blogData.append("titleImage", blogTitle.titleImg);
       blogData.append("content", JSON.stringify(contentArray));
-
+// why not we Stringifying the titleImage whereas we are doing on others?
       if (contentImages) {
-        const positions = contentImages.map((img, index) => ({
+        const imagesWithPositions = contentImages.map((img, index) => ({
           position: img.position,
-          fileName: img.fileName,
+          path: img.path,
+          public_id:img.public_id,
+          fileName:img.fileName
         }));
-        blogData.append("positions", JSON.stringify(positions));
-        contentImages.forEach((image, index) => {
-          blogData.append(`contentImages`, image.file);
-        });
-        console.log("blogData: before sending", blogData);
+        blogData.append("contentImages", JSON.stringify(imagesWithPositions));
+        blogData.forEach(function(value,key){
+          console.log("key ", key, " value; typeof", (value));
+        })
+        
       }
 
       try {
@@ -217,7 +242,8 @@ export default function Write() {
           {
             withCredentials: true,
             headers: {
-              "Content-Type": "multipart/form-data",
+              "Content-Type": "application/json",
+              "Accept":"application/json"
             },
           }
         );

@@ -7,6 +7,7 @@ import { useAuthenContext, useBlogContext } from "../globalContext/globalContext
 import useFetchLocalData from "./fetchingResources/useFetchLocalData.ts";
 import { VITE_API_URL } from "../config.ts";
 import { FaSpinner } from "react-icons/fa";
+import { ImagePlay } from "lucide-react";
 
 interface PostData{
   _id:string,
@@ -63,7 +64,7 @@ interface ContentImage{
 
 interface EditPostData {
   title: string;
-  titleImage: string | File; // Can be a string (URL) or a File object
+  titleImage: string; // Can be a string (URL) or a File object
   contentText: string;
   imagePreview: string;
 }
@@ -224,32 +225,32 @@ const EditPost = () => {
   // localPostData, receivedLocalImages
   
   // store image as base64
-  function storeAsBase64(file:File) {
-    const Max_FileSize = 5 * 1024 * 1024;
-    if(file.size > Max_FileSize){
-      console.error("Image File is Too Large");
-      return;
-    }
-    const reader = new FileReader();
-    reader.onloadend = function () {
-      if(typeof reader.result === 'string')
-      {
-        localStorage.setItem("titleImagePreview", reader.result);
-        setEditPostData((prev)=>{
-          return {
-            ...prev,
-            imagePreview: reader.result as string,
-          };
-        });
-      }else{
-        console.error("failed to Read file as base64")
-      }
-    };
-    reader.onerror = function () {
-      console.error("Error reading file:", reader.error);
-    };
-    reader.readAsDataURL(file);
-  }
+  // function storeAsBase64(file:File) {
+  //   const Max_FileSize = 5 * 1024 * 1024;
+  //   if(file.size > Max_FileSize){
+  //     console.error("Image File is Too Large");
+  //     return;
+  //   }
+  //   const reader = new FileReader();
+  //   reader.onloadend = function () {
+  //     if(typeof reader.result === 'string')
+  //     {
+  //       localStorage.setItem("titleImagePreview", reader.result);
+  //       setEditPostData((prev)=>{
+  //         return {
+  //           ...prev,
+  //           imagePreview: reader.result as string,
+  //         };
+  //       });
+  //     }else{
+  //       console.error("failed to Read file as base64")
+  //     }
+  //   };
+  //   reader.onerror = function () {
+  //     console.error("Error reading file:", reader.error);
+  //   };
+  //   reader.readAsDataURL(file);
+  // }
 
   // Handle changes to the title input
   const handleChange = (e:React.ChangeEvent<HTMLInputElement>) => {
@@ -261,13 +262,40 @@ const EditPost = () => {
   };
 
   // Handle changes to the title Image
-  const handleImageChange = (e:React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = async (e:React.ChangeEvent<HTMLInputElement>) => {
     const image = e.target.files?.[0];
     if (!image) return;
     localStorage.setItem("titleImage", JSON.stringify(image));
-    setEditPostData((prev) => ({ ...prev, titleImage: image }));
-    // setNewTitleImage(true);
-    storeAsBase64(image);
+    const imageLink = URL.createObjectURL(image);
+    localStorage.setItem('titleImagePreview', imageLink);
+    setEditPostData(prev => {
+        return {
+      ...prev,
+      imagePreview:imageLink
+    }
+  })
+
+  try{
+    const formData = new FormData();
+    formData.append("image", image);
+      const response = await axios.post(`${VITE_API_URL}/weblog/uploadOnCloudinary`, formData, {
+        withCredentials:true,
+        headers:{
+          "Content-Type":"multipart/form-data"
+        }
+      })
+      if(response?.data.success){
+          setEditPostData((prev) => ({ ...prev, titleImage: response.data.cloudinary_link }));
+          // setNewTitleImage(true);
+        }
+    }
+    catch(err){
+      console.error("cloudinary upload error: ", err);
+    }finally{
+      
+    }
+
+      
     setEditedSomething(true);
   }
 
@@ -308,7 +336,6 @@ const EditPost = () => {
   // handle changes to the content images
   const handleContentImages = (e:React.ChangeEvent<HTMLInputElement>) => {
     const newImage = e.target.files?.[0];
-
     if(!newImage) return ;
     const imageMark = `[image-${contentImages.length}]`;
     const beforeImage = editPostData.contentText.substring(0, cursorPosition);
@@ -369,15 +396,16 @@ const EditPost = () => {
       return;
     }
     const formData = new FormData();
-    if (editPostData.titleImage instanceof File) {
-      formData.append("titleImage", editPostData.titleImage);
-    }
+    // if (editPostData.titleImage instanceof File) {
+    //   formData.append("titleImage", editPostData.titleImage);
+    // }
+    // formData.append('titleImage', editPostData.titleImage);
     formData.append("title", editPostData.title);
     if (editPostData.contentText) {
       const contentArray = [
         {
           type: "text",
-          value: editPostData.contentText,
+          value: editPostData.contentText
         },
       ];
       formData.append("newContent", JSON.stringify(contentArray));
@@ -524,6 +552,7 @@ const EditPost = () => {
           </div>
         </div>
       }
+      {console.log("editPostData ", editPostData)}
       <div className="lg:max-w-5xl max-w-4xl bg-gray-800 rounded-lg shadow-lg mx-auto w-full p-5">
         <form method="post" className="space-y-2 flex my-5 flex-col">
           <label htmlFor="title" className="text-pink-600">
@@ -549,9 +578,9 @@ const EditPost = () => {
               onChange={handleImageChange}
               className="w-[82px] my-2"
             />
-            {editPostData.imagePreview && (
+            {editPostData.titleImage && (
               <img
-                src={editPostData.imagePreview}
+                src={editPostData.titleImage}
                 alt={editPostData.title}
                 className="h-52 w-56"
               />

@@ -72,7 +72,8 @@ const blogSchema = new mongoose.Schema({
     contentImages:[{
         path:String,
         position:Number,
-        fileName:String
+        fileName:String,
+        public_id:String
     }]
 ,
     createdAt:{

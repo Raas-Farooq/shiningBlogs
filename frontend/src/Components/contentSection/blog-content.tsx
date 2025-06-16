@@ -36,7 +36,7 @@ interface userProfileProps {
 
 
 function UserProfile( {currentUser, profileImage}:userProfileProps) {
-
+  
   return (
     <aside
       className={`py-8 p-4 w-[25vw] text-center bg-gray-50 shadow:sm rounded:lg text-gray-700`}
@@ -106,8 +106,9 @@ const BlogCard:React.FC<BlogCardProps> = ({ blog, handlePostClick }) => {
   const { allBlogsGlobally, searching } = useBlogContext();
 
 useEffect(() => {
-  console.log("BlogsCount: ", allBlogsGlobally)
-},[])
+     console.log("BlogsCount: ", allBlogsGlobally)
+  }
+ ,[])
 
 
   return (

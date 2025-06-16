@@ -78,8 +78,7 @@ const [receiveLocalImages, setReceiveLocalImages] = useState<ContentImage[]>([])
         const loadTitleImage = async() => {
           try{
             setLoadingTitleImage(true);
-            let newImagePreview:string = '';
-              const titleImage = localStorage.getItem("titleImagePreview") || '';
+              const titleImage = localStorage.getItem("titleImage") || '';
               if(titleImage){
                 setLocalPostData(prev => ({...prev, 
                   imagePreview:titleImage
@@ -87,11 +86,10 @@ const [receiveLocalImages, setReceiveLocalImages] = useState<ContentImage[]>([])
               }
 
               if (post?.titleImage && !titleImage) {
-
-                newImagePreview = (await fetchImageAsBase64(post.titleImage) || '""') ;
-                localStorage.setItem('titleImagePreview', newImagePreview);
+                console.log("IF post.titleImage ", post.titleImage ," titleImage got grom localStorage: ", titleImage);
+                localStorage.setItem('titleImagePreview', titleImage);
                 setLocalPostData(prev => ({...prev, 
-                  imagePreview:newImagePreview
+                  imagePreview:titleImage
                 }))
               }
               // console.log("newImage Preview outside if: ",newImagePreview);
