@@ -14,6 +14,7 @@ interface PostData{
     value:string
   }],
   contentImages:[{
+    id:number,
     path:string,
     position:number,
     fileName:string,
@@ -23,7 +24,7 @@ interface PostData{
 }
 
 interface ContentImage{
-    path?:string,
+    path:string,
     position:number,
     fileName:string,
     preview?:string,
@@ -153,9 +154,7 @@ const [receiveLocalImages, setReceiveLocalImages] = useState<ContentImage[]>([])
                       _id:image._id,
                       id: index,
                       fileName: image.fileName,
-                      preview: image.path.startsWith("http://")
-                        ? image.path
-                        : `${VITE_API_URL}/${image.path}`,
+                      path: image.path,
                       position: image.position,
                     }));
                     console.log("if Not localImages & newImages created: ", newImages)

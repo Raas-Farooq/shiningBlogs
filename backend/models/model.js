@@ -60,7 +60,9 @@ const blogSchema = new mongoose.Schema({
         type:String,
         required:true
     },
-    
+    titleImagePublicId:{
+        type:String
+    },
     content:[{
         type:{
             type:String,
@@ -70,6 +72,7 @@ const blogSchema = new mongoose.Schema({
     }]
 ,
     contentImages:[{
+        id:Number,
         path:String,
         position:Number,
         fileName:String,

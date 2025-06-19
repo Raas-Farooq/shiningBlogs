@@ -7,7 +7,6 @@ import { useAuthenContext, useBlogContext } from "../globalContext/globalContext
 import useFetchLocalData from "./fetchingResources/useFetchLocalData.ts";
 import { VITE_API_URL } from "../config.ts";
 import { FaSpinner } from "react-icons/fa";
-import { ImagePlay } from "lucide-react";
 
 interface PostData{
   _id:string,
@@ -19,6 +18,7 @@ interface PostData{
     value:string
   }],
   contentImages:[{
+    id:number,
     path:string,
     position:number,
     fileName:string,
@@ -53,10 +53,10 @@ interface ImagePositions {
   fileName:string
 }
 interface ContentImage{
-  path?:string,
+  path:string,
+  public_id?:string,
   position:number,
   fileName:string,
-  preview?:string,
   _id:string,
   id:number,
   file?:File
@@ -77,7 +77,8 @@ interface SavedPic {
 const EditPost = () => {
   
   const { loggedIn,loading,errorMessage, setErrorMessage } = useAuthenContext();
-  const {allBlogsGlobally, filteredBlogs,setAllBlogsGlobally} = useBlogContext();
+  const {setAllBlogsGlobally} = useBlogContext();
+  const [uploadingCloudinary, setUploadingCloudinary] = useState(false);
   const [cursorPosition, setCursorPosition] = useState(0);
   // const [newTitleImage, setNewTitleImage] = useState(false);
   const [editedSomething, setEditedSomething] = useState(false);
@@ -124,7 +125,8 @@ const EditPost = () => {
       path:'',
       position:0,
       fileName:'',
-      _id:''
+      _id:'',
+      id:0
     }],
   };
 
@@ -170,7 +172,6 @@ const EditPost = () => {
   }, [errorMessage, errors.message])
   const handleNavigation = useCallback(
     async (link:string | number) => {
-      console.log("runs handle Navigation");
       if (await confirmNavigation()) {
         if( typeof(link) === 'number'){
           moveTo(link);
@@ -203,9 +204,14 @@ const EditPost = () => {
   // Convert and Store image as base 64
   
   useEffect(() => {
-    // console.log("receiveLocalImages: ", receiveLocalImages, "localPostData: ", localPostData, 'EditPostData ', editPostData)
+    console.log("receiveLocalImages: ", receiveLocalImages, "post: ", post);
     if(receiveLocalImages?.length){
       setContentImages(receiveLocalImages);
+    }else{
+      if(post?.contentImages){
+         setContentImages(post?.contentImages);
+      }
+     
     }
     if(localPostData?.title || localPostData.contentText){
       setEditPostData(prev => ({
@@ -220,37 +226,9 @@ const EditPost = () => {
   },[localPostData?.title, 
     localPostData?.titleImage, 
     localPostData?.contentText, 
-    localPostData?.imagePreview])
+    localPostData?.imagePreview,
+  post])
 
-  // localPostData, receivedLocalImages
-  
-  // store image as base64
-  // function storeAsBase64(file:File) {
-  //   const Max_FileSize = 5 * 1024 * 1024;
-  //   if(file.size > Max_FileSize){
-  //     console.error("Image File is Too Large");
-  //     return;
-  //   }
-  //   const reader = new FileReader();
-  //   reader.onloadend = function () {
-  //     if(typeof reader.result === 'string')
-  //     {
-  //       localStorage.setItem("titleImagePreview", reader.result);
-  //       setEditPostData((prev)=>{
-  //         return {
-  //           ...prev,
-  //           imagePreview: reader.result as string,
-  //         };
-  //       });
-  //     }else{
-  //       console.error("failed to Read file as base64")
-  //     }
-  //   };
-  //   reader.onerror = function () {
-  //     console.error("Error reading file:", reader.error);
-  //   };
-  //   reader.readAsDataURL(file);
-  // }
 
   // Handle changes to the title input
   const handleChange = (e:React.ChangeEvent<HTMLInputElement>) => {
@@ -323,18 +301,10 @@ const EditPost = () => {
     setEditedSomething(true);
   };
 
-  // save content images using base64
-  function saveContentImages(image:File, callback:(base64result:string) => void) {
-    const reader = new FileReader();
-    reader.onloadend = function () {
-      if(typeof reader.result === 'string')
-      callback(reader.result);
-    };
-    reader.readAsDataURL(image);
-  }
+ 
 
   // handle changes to the content images
-  const handleContentImages = (e:React.ChangeEvent<HTMLInputElement>) => {
+  const handleContentImages = async (e:React.ChangeEvent<HTMLInputElement>) => {
     const newImage = e.target.files?.[0];
     if(!newImage) return ;
     const imageMark = `[image-${contentImages.length}]`;
@@ -343,13 +313,27 @@ const EditPost = () => {
     const newContentText = beforeImage + imageMark + afterImage;
     setEditPostData((prev) => ({ ...prev, contentText: newContentText }));
     localStorage.setItem("textContent", JSON.stringify(newContentText));
-    saveContentImages(newImage, (base64Result) => {
-      const localImage = {
+    const formImage = new FormData();
+    formImage.append('image', newImage);
+     try{
+      setUploadingCloudinary(true);
+       const response = await axios.post(`${VITE_API_URL}/weblog/uploadOnCloudinary`, formImage,
+        {
+          withCredentials:true,
+          headers:{
+            'Content-Type':"multipart/form-data"
+          }
+        }
+       )
+        const imageLink = response.data.cloudinary_link;
+        const publicId = response.data.public_id;
+         const localImage = {
         _id:`tempId${Date.now()}`,
         id: contentImages?.length,
         fileName: newImage.name,
+        public_id: publicId,
+        path:imageLink,
         file: newImage,
-        preview: base64Result,
         position: cursorPosition,
       };
       const allImages = [...contentImages, localImage];
@@ -357,7 +341,14 @@ const EditPost = () => {
       localStorage.setItem("localContentImages", JSON.stringify(allImages));
       setContentImages(allImages);
       setEditedSomething(true);
-    });
+     }catch(err){
+      console.log("error while uploading on Cloudinary: ", err);
+     }
+     finally{
+      setUploadingCloudinary(false)
+     }
+     
+
   };
   
   // removing the content Image
@@ -465,7 +456,6 @@ const EditPost = () => {
       // setNewTitleImage(false);
     } catch (err:unknown) {
       if(isErrorCaught(err)){
-        console.log("err received while updating: ", err);
         if(err.response?.status === 400){
           if(err.response?.data?.name === 'validationError'){
             if(Array.isArray(err.response?.data?.error)){
@@ -534,7 +524,7 @@ const EditPost = () => {
   }
   return (
     <div className="bg-gray-200 min-h-screen py-10">
-
+      {console.log("editPostData: ", editPostData, "contentImages: ", contentImages)}
     {(errors.message || errorMessage) && (
       <div className="max-w-5xl mx-auto mb-5">
         <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded">
@@ -552,7 +542,6 @@ const EditPost = () => {
           </div>
         </div>
       }
-      {console.log("editPostData ", editPostData)}
       <div className="lg:max-w-5xl max-w-4xl bg-gray-800 rounded-lg shadow-lg mx-auto w-full p-5">
         <form method="post" className="space-y-2 flex my-5 flex-col">
           <label htmlFor="title" className="text-pink-600">
@@ -615,10 +604,13 @@ const EditPost = () => {
               </label>
             </div>
           </div>
-          <div className="flex">
-                        
-              {contentImages &&              
+          <div className="flex"> 
+              {contentImages.length > 0 &&    
+              <>
+              <p>calling EDITImages path {contentImages[0].path} {contentImages[1].position}</p>
               <EditContentImages contentImages={contentImages} removeImage={removeImage} contentText={editPostData?.contentText} />
+              </>          
+              
               }
           </div>
         </form>

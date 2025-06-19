@@ -307,21 +307,22 @@ const addBlog = async (req,res) => {
             error: errors.array()
         })
     }
-    const {content,contentImages} = req.body;
+    const {content,contentImages, titleImagePublicId} = req.body;
     console.log("Add Blog Run: Title", req.body);
     const titleCorrected = he.decode(req.body.title);
     const user_id = req.user.userId;
     const titleImage = req.body.titleImage;
     
     // console.log("contentImages from req.body: ", JSON.parse(contentImages), "titleImage: ", titleImage,'title ', title, "Content ", JSON.parse(content));
-
+    console.log("contentImages: ", contentImages)
     try{
         const newBlog = new Blog({
             userId:user_id,
             title:titleCorrected,
             titleImage,
             content:JSON.parse(content),
-            contentImages:JSON.parse(contentImages)
+            contentImages:JSON.parse(contentImages),
+            titleImagePublicId:JSON.parse(titleImagePublicId)
             
         });
         const blogCreated = await newBlog.save();

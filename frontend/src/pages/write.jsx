@@ -12,6 +12,7 @@ export default function Write() {
     title: "",
     titleImg: null,
     imgPreview: "",
+    titleImagePublicId:""
   });
   const moveTo = useNavigate();
   const currentTextArea = useRef(null);
@@ -47,6 +48,9 @@ export default function Write() {
     }
   }, [loggedIn, moveTo]);
 
+  useEffect(()=> {
+    console.log("contntImages: ",  contentImages)
+  },[contentImages])
   const handleTitles = (e) => {
     // const errors = checkValidation();
     setBlogTitle((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -77,12 +81,13 @@ export default function Write() {
           "Content-Type":"multipart/form-data"
         }
       });
-      console.log("frontend response of uploadOnCloudinary: ", uploadOnCloudinary);
       const imageLink = uploadOnCloudinary.data.cloudinary_link;
+      const publicId = uploadOnCloudinary.data.public_id;
       setBlogTitle((prev) => ({
       ...prev,
       titleImg: imageLink,
-      imgPreview: imageLink
+      imgPreview: imageLink,
+      titleImagePublicId:publicId
     }));
     }catch(err){
       console.log("frontend error while uploading on Cloudinary: ", err.message);
@@ -150,10 +155,10 @@ export default function Write() {
         path: cloudinaryUrl,
         public_id:image_public_id,
         fileName: shortName,
-        preview: URL.createObjectURL(image),
         position: cursorPosition,
       },
     ]);
+    
     setContentText(newContent);
     // console.log("content inside handle Image: ", contentImages.length);
   };
@@ -170,11 +175,8 @@ export default function Write() {
     images.forEach((img, ind) => {
       const oldMark = `[image-${img.id}]`;
       const newMark = `[image-${ind}]`;
-      // console.log(`oldMark ${oldMark} & newMark ${newMark}`);
       updatedText = updatedText.split(oldMark).join(newMark);
     });
-
-    // console.log("updateImages: ", updateImages);
     setContentText(updatedText);
   };
 
@@ -215,23 +217,21 @@ export default function Write() {
         },
       ];
       const blogData = new FormData();
-      console.log("blogTitle before appending: ", blogTitle.title.length, "type: ", typeof(blogTitle.title));
+      // console.log("blogTitle before appending: ", blogTitle.title.length, "type: ", typeof(blogTitle.title));
       blogData.append("title", blogTitle.title);
       blogData.append("titleImage", blogTitle.titleImg);
       blogData.append("content", JSON.stringify(contentArray));
+      blogData.append("titleImagePublicId", JSON.stringify(blogTitle.titleImagePublicId))
 // why not we Stringifying the titleImage whereas we are doing on others?
       if (contentImages) {
         const imagesWithPositions = contentImages.map((img, index) => ({
           position: img.position,
           path: img.path,
           public_id:img.public_id,
-          fileName:img.fileName
+          fileName:img.fileName,
+          id:img.id 
         }));
-        blogData.append("contentImages", JSON.stringify(imagesWithPositions));
-        blogData.forEach(function(value,key){
-          console.log("key ", key, " value; typeof", (value));
-        })
-        
+        blogData.append("contentImages", JSON.stringify(imagesWithPositions));  
       }
 
       try {
@@ -249,8 +249,6 @@ export default function Write() {
         );
       
         if (response.data.success) {
-          // alert("response is successfull ");
-          console.log("response.data.newBlog: ", response.data.newBlog);
           blogTitle.title = "";
           blogTitle.imgPreview = "";
           setBlogTitle((prev) => ({

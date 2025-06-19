@@ -36,22 +36,36 @@ const EditContentImages:React.FC<EditContentImagesProps> = ({contentImages, remo
         
     }
     useEffect(() => {
-        console.log("contentImages received EDITCONTENTIMAGES ", contentImages);
+        alert("UseEffect Pushing Hard")
+        console.log("contentImages received EDITCONTENTIMAGES ", contentImages, "contentText: ", contentText);
     },[])
 
     return (
         <div className="flex flex-wrap gap-2">
+            
             {contentImages && contentImages.map((image, ind) => 
                 ( 
                 <div key={ind}>
                     <div className="flex gap-3">
-                        <span className="text-[11px]"> {"image-" + ind }</span>
+                        <span className="text-[11px]"> {"image-" + ind } imagePath: {image.path}</span>
                         <button className="bg-gray-300" onClick={(e) => handleCancel(e, image.id)}> <FaTimes /> </button>
                     </div>
-
+                    {/* <p> {image.fileName} position: {image.position} path: {image.path} </p> */}
                     <span className="text-[11px]"> {image.fileName && image.fileName.length > 22 ?  image.fileName.substring(0,22) : image.fileName } </span>
                    
-                    {image.preview && <img src={image.preview} alt={image.fileName} className="w-20 h-20" />}
+                    {image?.path ? (
+                        <img src={image.path} 
+                        alt={image.fileName} 
+                        className="w-20 h-20 border border-green-500" 
+                        onError = {(e) => {
+                            console.error("failed to display image ",image.path);
+                            e.currentTarget.style.display = 'none'
+                        }}
+                        />): 
+                        <div>
+                            <h2> Loading the Image.. </h2>
+                        </div>
+                        }
                 </div>
                 )
             )}

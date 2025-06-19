@@ -129,6 +129,8 @@ const BlogPost:React.FC = () => {
     console.log("postLoading: ", postLoading, "post title", post.title);
     if(!postLoading && !post._id){
       moveTo('/notFound')
+    }else{
+      console.log("post inside Post; ", post)
     }
   }, [postLoading, post, moveTo])
   

@@ -32,7 +32,12 @@ const UploadImage = async(req,res) => {
             public_id:uploadImage.public_id
         })
     }catch(err){
-        console.log("error while uploading image on cloudinary", err.message)
+        console.log("error while uploading image on cloudinary", err.message);
+
+        return res.status(500).json({
+            success:false,
+            message:err.message
+        })
     }
 }
 
