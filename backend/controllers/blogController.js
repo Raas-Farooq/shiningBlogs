@@ -377,27 +377,13 @@ const updateBlogPost = async(req,res) => {
             error:errs.array()
         })
     }
-
     const user_id = req.user.userId;
     // console.log("updateBlog runs: ", req.body)
-    const {title, newContent, positions, savedImages} = req.body;
-    const useSavedImages = JSON.parse(savedImages) || [];
-    const newPositions = JSON.parse(positions) || [];
+    const {title, newContent, contentImages} = req.body;
+    const updatedContentImages= JSON.parse(contentImages);
     const id = req.params.id; 
  
     const parsedContent = JSON.parse(newContent);
-    if(req.files['contentImages']){
-        // console.log("saved Images: ", useSavedImages, "Req Files: contentImages :", req.files['contentImages'])
-        req.files['contentImages']?.forEach((image,ind) => {
-            useSavedImages.push({
-                path:image.path,
-                position:newPositions[ind].position,
-                fileName:newPositions[ind].fileName
-            })
-        });
-        // console.log("useSaved Images after new PUsh", useSavedImages)
-    }
-    
     
     const newTitleImage = req.files['titleImage'] ? req.files['titleImage'][0].path : ''
     try{
@@ -425,7 +411,7 @@ const updateBlogPost = async(req,res) => {
        
         if(newTitleImage) blogPost.titleImage = newTitleImage;
       
-        if(useSavedImages) blogPost.contentImages = useSavedImages;
+        if(updatedContentImages) blogPost.contentImages = updatedContentImages;
        
         const updatedBlog = await blogPost.save();
        

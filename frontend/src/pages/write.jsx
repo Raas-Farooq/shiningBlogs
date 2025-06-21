@@ -48,9 +48,9 @@ export default function Write() {
     }
   }, [loggedIn, moveTo]);
 
-  useEffect(()=> {
-    console.log("contntImages: ",  contentImages)
-  },[contentImages])
+  // useEffect(()=> {
+  //   console.log("contntImages: ",  contentImages)
+  // },[contentImages])
   const handleTitles = (e) => {
     // const errors = checkValidation();
     setBlogTitle((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -141,6 +141,7 @@ export default function Write() {
       if(uploadingOnCloudinary.data.success){
         cloudinaryUrl = uploadingOnCloudinary.data.cloudinary_link;
         image_public_id = uploadingOnCloudinary.data.public_id;
+        console.log("image_publicId if Successs ", image_public_id);
       }
     }catch(err){
       console.log("this is the err: ", err);
@@ -224,6 +225,7 @@ export default function Write() {
       blogData.append("titleImagePublicId", JSON.stringify(blogTitle.titleImagePublicId))
 // why not we Stringifying the titleImage whereas we are doing on others?
       if (contentImages) {
+        console.log("contentImages before appending: ", contentImages)
         const imagesWithPositions = contentImages.map((img, index) => ({
           position: img.position,
           path: img.path,

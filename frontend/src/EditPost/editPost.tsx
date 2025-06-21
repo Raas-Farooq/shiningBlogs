@@ -19,6 +19,7 @@ interface PostData{
   }],
   contentImages:[{
     id:number,
+    public_id?:string,
     path:string,
     position:number,
     fileName:string,
@@ -197,6 +198,8 @@ const EditPost = () => {
   );
 
   useEffect(() => {
+    
+   
     window.addEventListener("beforeunload", windowLoads);
     return () => window.removeEventListener("beforeunload", windowLoads);
   }, [windowLoads]);
@@ -220,6 +223,7 @@ const EditPost = () => {
         titleImage:localPostData.titleImage || '',
         contentText:localPostData.contentText || '',
         imagePreview: localPostData.imagePreview || '',
+        public_id:''
         })
       )
     }
@@ -263,7 +267,12 @@ const EditPost = () => {
         }
       })
       if(response?.data.success){
-          setEditPostData((prev) => ({ ...prev, titleImage: response.data.cloudinary_link }));
+
+          setEditPostData((prev) => (
+            { ...prev, 
+              titleImage: response.data.cloudinary_link,
+              public_id:response.data.public_id 
+            }));
           // setNewTitleImage(true);
         }
     }
@@ -370,9 +379,11 @@ const EditPost = () => {
     const updateImages = newContentImages.map((image, index) => ({
       _id:`temp-id${Date.now()}`,
       id: index,
-      preview: image.preview,
+      path: image.path,
       fileName: image.fileName,
       position: image.position,
+      public_id:image.public_id,
+
     }));
     setContentImages(updateImages);
     localStorage.setItem("localContentImages", JSON.stringify(updateImages));
@@ -401,28 +412,11 @@ const EditPost = () => {
       ];
       formData.append("newContent", JSON.stringify(contentArray));
     }
-    let positions:ImagePositions[]=[];
 
     if (contentImages) {
-      let savedPics:SavedPic[] = contentImages.filter((image) => !image.file)
-      .map((pic) => ({
-        path: pic.preview?.substring(22),
-        position: pic.position,
-        fileName: pic.fileName,
-      }));
-      formData.append("savedImages", JSON.stringify(savedPics));
-      contentImages.forEach((image) => {
-
-        if (image.file) {
-          positions.push({
-            position: image.position,
-            fileName: image.fileName,
-          });
-          formData.append("contentImages", image.file);
-        }
-      });
+      console.log("content Images before Appending Reposting", contentImages);
+        formData.append("contentImages", JSON.stringify(contentImages));
     }
-    formData.append("positions", JSON.stringify(positions));
     formData.append("titleImage", editPostData.titleImage);
     try {
       setRepostedPost(true)
@@ -607,7 +601,6 @@ const EditPost = () => {
           <div className="flex"> 
               {contentImages.length > 0 &&    
               <>
-              <p>calling EDITImages path {contentImages[0].path} {contentImages[1].position}</p>
               <EditContentImages contentImages={contentImages} removeImage={removeImage} contentText={editPostData?.contentText} />
               </>          
               
