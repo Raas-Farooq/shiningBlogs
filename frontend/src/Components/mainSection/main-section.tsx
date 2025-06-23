@@ -1,10 +1,22 @@
 import clsx from "clsx";
 import { useBlogContext, useUIContext } from "../../globalContext/globalContext"
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
 import { VITE_API_URL } from "../../config";
 
 
 const MainSection = () => {
+
+    const clearLocalStorage = useCallback(() => {
+        localStorage.removeItem("localTitle");
+        localStorage.removeItem("localTitleImage");
+        localStorage.removeItem("localContent");
+        localStorage.removeItem("localContentImages");
+      }, []);
+    
+
+      useEffect(() => {
+        clearLocalStorage();
+      },[])
 
     const {openUserAccount = false, showMenu = false, editProfile = false, setOpenUserAccount, setEditProfile} = useUIContext() || {};
     const {searching=false} = useBlogContext() || {};

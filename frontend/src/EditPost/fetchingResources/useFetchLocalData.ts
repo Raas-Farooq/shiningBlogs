@@ -33,18 +33,17 @@ interface ContentImage{
 }
 
 const getLocalContentImages = (): ContentImage[] => {
-  const localData = localStorage.getItem("localContentImages");
-  if (!localData) return []; // Return empty array if no data exists
+  const localContentImages = localStorage.getItem("localContentImages");
+  if (!localContentImages) return []; // Return empty array if no data exists
 
   try {
-    console.log("localDAta (contentImages) inside hook ", localData);
-    const parsedData = JSON.parse(localData);
+    const parsedData = JSON.parse(localContentImages);
     // Validate that parsedData is an array and matches the ContentImage structure
     if (Array.isArray(parsedData) && parsedData.every(item => (
       typeof item._id === 'string' &&
       typeof item.id === 'number' &&
       typeof item.fileName === 'string' &&
-      typeof item.preview === 'string' &&
+      typeof item.path === 'string' &&
       typeof item.position === 'number'
     ))) {
       return parsedData;
@@ -79,7 +78,7 @@ const [receiveLocalImages, setReceiveLocalImages] = useState<ContentImage[]>([])
         const loadTitleImage = async() => {
           try{
             setLoadingTitleImage(true);
-              const titleImage = localStorage.getItem("titleImage") || '';
+              const titleImage = localStorage.getItem("localTitleImage") || '';
               if(titleImage){
                 setLocalPostData(prev => ({...prev, 
                   imagePreview:titleImage
@@ -87,14 +86,11 @@ const [receiveLocalImages, setReceiveLocalImages] = useState<ContentImage[]>([])
               }
 
               if (post?.titleImage && !titleImage) {
-                console.log("IF post.titleImage ", post.titleImage ," titleImage got grom localStorage: ", titleImage);
-                localStorage.setItem('titleImagePreview', titleImage);
                 setLocalPostData(prev => ({...prev, 
                   imagePreview:titleImage
                 }))
               }
-              // console.log("newImage Preview outside if: ",newImagePreview);
-              localStorage.setItem("titleImage", post?.titleImage);
+              localStorage.setItem("localTitleImage", post?.titleImage);
            
           }
           catch(err){
@@ -115,19 +111,18 @@ const [receiveLocalImages, setReceiveLocalImages] = useState<ContentImage[]>([])
             return;
           }
           try {
-              const titleStored = JSON.parse(localStorage.getItem("titleStorage") || '""');
+              const titleStored = localStorage.getItem("localTitle") || '""';
               const newTitle = post?.title && !titleStored ? post.title : titleStored;
       
               // load Save content Text (Text Data of Post)
               const localContentText = JSON.parse(
-                localStorage.getItem("textContent") || '""'
+                localStorage.getItem("localContent") || '""'
               );
-              
               const newContentText =
                 post?.content && !localContentText
                   ? post.content.find((content) => content.type === "text")?.value ||
                     '""'
-                  : localContentText;
+                  : localContentText[0].value;
               
               setLocalPostData((prev) => ({
                 ...prev,
@@ -142,12 +137,9 @@ const [receiveLocalImages, setReceiveLocalImages] = useState<ContentImage[]>([])
                   (image) => image.path && image.fileName && image._id
                 );
                 if(isContentImagesValid){
-                  // alert("isContentImagesValid true and if runs")
-                  console.log("contentImages before running separate funcitno ", post?.contentImages);
                   let localContentImages:ContentImage[] = getLocalContentImages();
-                  console.log("localContentImages after fetching from separate func: ", localContentImages, " post.contentImages: older version", post.contentImages);
                   const notLocalImages = !localContentImages.length ||
-                  localContentImages.some(image => !image._id || image.fileName || !image.position);
+                  localContentImages.some(image => !image._id || !image.fileName || !image.position);
 
                   if (notLocalImages) {
                     const newImages:ContentImage[] = post.contentImages.map((image, index) => ({
@@ -157,7 +149,6 @@ const [receiveLocalImages, setReceiveLocalImages] = useState<ContentImage[]>([])
                       path: image.path,
                       position: image.position,
                     }));
-                    console.log("if Not localImages & newImages created: ", newImages)
                     setReceiveLocalImages(newImages);
                     localStorage.setItem(
                       "localContentImages",
@@ -165,7 +156,6 @@ const [receiveLocalImages, setReceiveLocalImages] = useState<ContentImage[]>([])
                     );
                   }
                   else {
-                    // console.log("LOCALLLLL IMAGESSSS ", localContentImages)
                     setReceiveLocalImages(localContentImages);
                   }
                 } else{
@@ -184,8 +174,6 @@ const [receiveLocalImages, setReceiveLocalImages] = useState<ContentImage[]>([])
     
         loadInitialData();
       }, [post?._id]);
-      console.log('loading: ', loadingTitleImage)
-      // console.log("BEFORE RETURN postLoading: ", 'localPostData :', localPostData, "receiveLocalImages ",receiveLocalImages);
       return {postLoading, localPostData, receiveLocalImages}
 }
 

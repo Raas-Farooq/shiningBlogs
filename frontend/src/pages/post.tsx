@@ -57,6 +57,10 @@ const BlogPost:React.FC = () => {
   const {post, postLoading} = useFetchPost(id ?? '');
   const moveTo = useNavigate();
   // const apiLink = import.meta.env.Vite_API_URL;
+
+  
+
+
   useEffect(() => {
     setInHomePage(false);
     setErrorMessage('');
@@ -130,7 +134,11 @@ const BlogPost:React.FC = () => {
     if(!postLoading && !post._id){
       moveTo('/notFound')
     }else{
-      console.log("post inside Post; ", post)
+      console.log("post inside Post; ", post);
+      localStorage.setItem('localTitle', post?.title);
+      localStorage.setItem('localTitleImage', post?.titleImage);
+      localStorage.setItem('localContent', JSON.stringify(post?.content));
+      localStorage.setItem("localContentImages", JSON.stringify(post?.contentImages))
     }
   }, [postLoading, post, moveTo])
   

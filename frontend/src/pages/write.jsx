@@ -59,6 +59,7 @@ export default function Write() {
 
       setErrors(errors);
     }
+    localStorage.setItem('localTitle', e.target.value);
   };
   function handleAreaSelect() {
     setCursorPosition(currentTextArea.current.selectionStart);
@@ -89,6 +90,7 @@ export default function Write() {
       imgPreview: imageLink,
       titleImagePublicId:publicId
     }));
+    localStorage.setItem("localTiteImage", imageLink);
     }catch(err){
       console.log("frontend error while uploading on Cloudinary: ", err.message);
     }
@@ -115,6 +117,7 @@ export default function Write() {
       setErrors(errors);
     }
     setContentText(e.target.value);
+    localStorage.setItem("localContent", JSON.stringify(e.target.value))
   };
 
   const handleContentImage = async (e) => {
@@ -161,6 +164,8 @@ export default function Write() {
     ]);
     
     setContentText(newContent);
+    localStorage.setItem('localContentImages', JSON.stringify(contentImages));
+    localStorage.setItem("localContent", JSON.stringify(newContent));
     // console.log("content inside handle Image: ", contentImages.length);
   };
 
@@ -179,6 +184,7 @@ export default function Write() {
       updatedText = updatedText.split(oldMark).join(newMark);
     });
     setContentText(updatedText);
+    localStorage.setItem('localContent', JSON.stringify(updatedText));
   };
 
   const checkValidation = () => {

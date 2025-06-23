@@ -79,7 +79,7 @@ const EditPost = () => {
   
   const { loggedIn,loading,errorMessage, setErrorMessage } = useAuthenContext();
   const {setAllBlogsGlobally} = useBlogContext();
-  const [uploadingCloudinary, setUploadingCloudinary] = useState(false);
+  const [uploadingOnCloudinary, setUploadingOnCloudinary] = useState(false);
   const [cursorPosition, setCursorPosition] = useState(0);
   // const [newTitleImage, setNewTitleImage] = useState(false);
   const [editedSomething, setEditedSomething] = useState(false);
@@ -141,9 +141,9 @@ const EditPost = () => {
   };
 
   const clearLocalStorage = useCallback(() => {
-    localStorage.removeItem("titleStorage");
-    localStorage.removeItem("titleImagePreview");
-    localStorage.removeItem("textContent");
+    localStorage.removeItem("localTitle");
+    localStorage.removeItem("localTitleImage");
+    localStorage.removeItem("localContent");
     localStorage.removeItem("localContentImages");
   }, []);
 
@@ -207,7 +207,6 @@ const EditPost = () => {
   // Convert and Store image as base 64
   
   useEffect(() => {
-    console.log("receiveLocalImages: ", receiveLocalImages, "post: ", post);
     if(receiveLocalImages?.length){
       setContentImages(receiveLocalImages);
     }else{
@@ -237,7 +236,7 @@ const EditPost = () => {
   // Handle changes to the title input
   const handleChange = (e:React.ChangeEvent<HTMLInputElement>) => {
     const newTitle = e.target.value;
-    localStorage.setItem("titleStorage", JSON.stringify(newTitle));
+    localStorage.setItem("localTitle", (newTitle));
     // setNewTitleImage(true);
     setEditPostData((prev) => ({ ...prev, title: newTitle }));
     setEditedSomething(true);
@@ -245,21 +244,30 @@ const EditPost = () => {
 
   // Handle changes to the title Image
   const handleImageChange = async (e:React.ChangeEvent<HTMLInputElement>) => {
-    const image = e.target.files?.[0];
-    if (!image) return;
-    localStorage.setItem("titleImage", JSON.stringify(image));
-    const imageLink = URL.createObjectURL(image);
-    localStorage.setItem('titleImagePreview', imageLink);
-    setEditPostData(prev => {
-        return {
-      ...prev,
-      imagePreview:imageLink
-    }
-  })
+    let image = e.target.files?.[0];
+    if(!image) 
+      {
+        console.warn("no file seleted");
+        return;
+      }    
 
-  try{
-    const formData = new FormData();
-    formData.append("image", image);
+      try{
+          const previewImageLink = URL.createObjectURL(image);
+          setEditPostData((prev) => (
+          { 
+            ...prev,
+            imagePreview:previewImageLink
+          }
+        ))
+      }
+      catch(err){
+        console.warn('got error while creating ObjectURL ', err);
+      }
+      setUploadingOnCloudinary(true);
+    try{
+      
+      const formData = new FormData();
+      formData.append("image", image);
       const response = await axios.post(`${VITE_API_URL}/weblog/uploadOnCloudinary`, formData, {
         withCredentials:true,
         headers:{
@@ -279,7 +287,7 @@ const EditPost = () => {
     catch(err){
       console.error("cloudinary upload error: ", err);
     }finally{
-      
+      setUploadingOnCloudinary(false);
     }
 
       
@@ -306,7 +314,7 @@ const EditPost = () => {
 
     // Save valid content text
     setEditPostData((prev) => ({ ...prev, contentText: newContentText }));
-    localStorage.setItem("textContent", JSON.stringify(newContentText));
+    localStorage.setItem("localContent", JSON.stringify(newContentText));
     setEditedSomething(true);
   };
 
@@ -321,11 +329,11 @@ const EditPost = () => {
     const afterImage = editPostData.contentText.substring(cursorPosition);
     const newContentText = beforeImage + imageMark + afterImage;
     setEditPostData((prev) => ({ ...prev, contentText: newContentText }));
-    localStorage.setItem("textContent", JSON.stringify(newContentText));
+    localStorage.setItem("localContent", JSON.stringify(newContentText));
     const formImage = new FormData();
     formImage.append('image', newImage);
      try{
-      setUploadingCloudinary(true);
+      setUploadingOnCloudinary(true);
        const response = await axios.post(`${VITE_API_URL}/weblog/uploadOnCloudinary`, formImage,
         {
           withCredentials:true,
@@ -354,10 +362,9 @@ const EditPost = () => {
       console.log("error while uploading on Cloudinary: ", err);
      }
      finally{
-      setUploadingCloudinary(false)
+      setUploadingOnCloudinary(false)
      }
-     
-
+    
   };
   
   // removing the content Image
@@ -366,14 +373,14 @@ const EditPost = () => {
     let updatedText = text;
     if (!newContentImages.length) {
       updatedText = updatedText.split("[image-0]").join("");
-      localStorage.setItem("textContent", JSON.stringify(updatedText));
+      localStorage.setItem("localContent", JSON.stringify(updatedText));
       setEditPostData((prev) => ({ ...prev, contentText: updatedText }));
     }
     for (const [index, image] of newContentImages.entries()) {
       updatedText = updatedText
         .split(`[image-${image.id}]`)
         .join(`[image-${index}]`);
-      localStorage.setItem("textContent", JSON.stringify(updatedText));
+      localStorage.setItem("localContent", JSON.stringify(updatedText));
       setEditPostData((prev) => ({ ...prev, contentText: updatedText }));
     }
     const updateImages = newContentImages.map((image, index) => ({
@@ -414,7 +421,6 @@ const EditPost = () => {
     }
 
     if (contentImages) {
-      console.log("content Images before Appending Reposting", contentImages);
         formData.append("contentImages", JSON.stringify(contentImages));
     }
     formData.append("titleImage", editPostData.titleImage);
@@ -433,14 +439,13 @@ const EditPost = () => {
       if (response?.data.success) {
         await axios.get(`${VITE_API_URL}/weblog/allBlogs`).
         then(response => setAllBlogsGlobally(response.data.blogs));;
-        // console.log("respone of allBlogs EDITTT", totalPosts);
         setEditedSomething(false);
         localStorage.setItem(
-          "titleImage",
+          "localTitleImage",
           JSON.stringify(response.data.blog.titleImage)
         );
         localStorage.setItem(
-          "titleStorage",
+          "localTitle",
           JSON.stringify(response.data.blog.title)
         );
       }
@@ -518,7 +523,6 @@ const EditPost = () => {
   }
   return (
     <div className="bg-gray-200 min-h-screen py-10">
-      {console.log("editPostData: ", editPostData, "contentImages: ", contentImages)}
     {(errors.message || errorMessage) && (
       <div className="max-w-5xl mx-auto mb-5">
         <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded">
@@ -526,6 +530,16 @@ const EditPost = () => {
           <p>{errorMessage || errors.message}</p>
         </div>
       </div>
+    )}
+    {uploadingOnCloudinary && (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white rounded-lg shadow-lg p-5 flex items-center gap-3">
+            <FaSpinner className="animate-spin text-purple-600" />
+            <span className="text-lg font-medium text-gray-700">
+              Uploading on Cloudinary, please wait...
+            </span>
+          </div>
+        </div>
     )}
     {repostedPost && <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
           <div className="bg-white rounded-lg shadow-lg p-5 flex items-center gap-3">
@@ -545,7 +559,7 @@ const EditPost = () => {
             type="text"
             name="title"
             placeholder="Edit the Title"
-            className="border border-gray-500 w-100 m-0 p-0"
+            className="border border-gray-500 w-full max-w-md px-3 py-2 "
             onChange={(e) => handleChange(e)}
             value={editPostData.title}
           />
@@ -561,11 +575,17 @@ const EditPost = () => {
               onChange={handleImageChange}
               className="w-[82px] my-2"
             />
-            {editPostData.titleImage && (
+            {editPostData.titleImage ? (
               <img
                 src={editPostData.titleImage}
                 alt={editPostData.title}
-                className="h-52 w-56"
+                className="w-full max-w-md object-fit rounded-lg h-full max-h-sm"
+              />
+            ): (
+              <img
+                src={editPostData.imagePreview}
+                alt={editPostData.title}
+                className="w-full max-w-md object-fit rounded-lg h-full max-h-sm"
               />
             )}
           </div>
