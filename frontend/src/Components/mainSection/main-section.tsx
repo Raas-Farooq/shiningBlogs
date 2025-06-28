@@ -11,6 +11,8 @@ const MainSection = () => {
         localStorage.removeItem("localTitleImage");
         localStorage.removeItem("localContent");
         localStorage.removeItem("localContentImages");
+        localStorage.removeItem("localPublic_id");
+        // localStorage.removeItem("localContentImages");
       }, []);
     
 

@@ -35,11 +35,6 @@ const EditContentImages:React.FC<EditContentImagesProps> = ({contentImages, remo
         }
         
     }
-    useEffect(() => {
-        alert("UseEffect Pushing Hard")
-        console.log("contentImages received EDITCONTENTIMAGES ", contentImages, "contentText: ", contentText);
-    },[])
-
     return (
         <div className="flex flex-wrap gap-2">
             

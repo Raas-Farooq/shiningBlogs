@@ -17,15 +17,12 @@ const Image:React.FC<ImageProps> = ({postImg, title, isFullView}) => {
         const relUrl = postImg.startsWith('uploads/');
         
         if(absUrl){
-            console.log("postImg: ", postImg);
             setImageSrc(postImg);
         }
         else if(relUrl){
             setImageSrc(`${VITE_API_URL}/${postImg}`);
             
         }else{
-            // setImageSrc('../public/Venice Blue.png')
-            // console.error("unable to fetch the Image")
             console.log("image not set for this post")
         }
     }, [postImg])
@@ -33,7 +30,6 @@ const Image:React.FC<ImageProps> = ({postImg, title, isFullView}) => {
     const imageStyles= isFullView ? 'h-[400px] w-4/5 mb-12' : 'rounded-t-lg object-cover h-52 w-56'
     return (
         <>   
-            {/* {console.log("Image source DOM: ", imageSrc)} */}
             {imageSrc && <img src={imageSrc} alt={title} className={imageStyles} />}
         </>
     )

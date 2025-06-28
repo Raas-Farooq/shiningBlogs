@@ -13,6 +13,7 @@ interface PostData{
   userId:string,
   title:string,
   titleImage:string,
+  public_id:string,                               
   content:[{
     type:string,
     value:string
@@ -66,6 +67,7 @@ interface ContentImage{
 interface EditPostData {
   title: string;
   titleImage: string; // Can be a string (URL) or a File object
+  public_id:string,
   contentText: string;
   imagePreview: string;
 }
@@ -102,6 +104,7 @@ const EditPost = () => {
   const [editPostData, setEditPostData] = useState<EditPostData>({
     title: "",
     titleImage: "",
+    public_id:'',
     contentText: "",
     imagePreview: "",
   });
@@ -118,6 +121,7 @@ const EditPost = () => {
     userId: '',
     title: '',
     titleImage: '',
+    public_id:'',
     content:[{
       type:'',
       value:''
@@ -142,6 +146,7 @@ const EditPost = () => {
 
   const clearLocalStorage = useCallback(() => {
     localStorage.removeItem("localTitle");
+    localStorage.removeItem('localPublic_id');
     localStorage.removeItem("localTitleImage");
     localStorage.removeItem("localContent");
     localStorage.removeItem("localContentImages");
@@ -198,8 +203,6 @@ const EditPost = () => {
   );
 
   useEffect(() => {
-    
-   
     window.addEventListener("beforeunload", windowLoads);
     return () => window.removeEventListener("beforeunload", windowLoads);
   }, [windowLoads]);
@@ -207,6 +210,7 @@ const EditPost = () => {
   // Convert and Store image as base 64
   
   useEffect(() => {
+    console.log("localPost Data: ", localPostData, " editPostData ", editPostData);
     if(receiveLocalImages?.length){
       setContentImages(receiveLocalImages);
     }else{
@@ -222,7 +226,7 @@ const EditPost = () => {
         titleImage:localPostData.titleImage || '',
         contentText:localPostData.contentText || '',
         imagePreview: localPostData.imagePreview || '',
-        public_id:''
+        public_id:localPostData.public_id || ''
         })
       )
     }
@@ -230,7 +234,8 @@ const EditPost = () => {
     localPostData?.titleImage, 
     localPostData?.contentText, 
     localPostData?.imagePreview,
-  post])
+  post,
+  localPostData?.public_id])
 
 
   // Handle changes to the title input
@@ -244,6 +249,7 @@ const EditPost = () => {
 
   // Handle changes to the title Image
   const handleImageChange = async (e:React.ChangeEvent<HTMLInputElement>) => {
+    console.log("editPostData: ",editPostData, "post ", post);
     let image = e.target.files?.[0];
     if(!image) 
       {
@@ -264,8 +270,20 @@ const EditPost = () => {
         console.warn('got error while creating ObjectURL ', err);
       }
       setUploadingOnCloudinary(true);
-    try{
       
+    try{
+      if(editPostData?.public_id){
+        alert("editPostData public id exist")
+        try{
+          await axios.delete(`${VITE_API_URL}/weblog/removeCloudinaryImage`, {
+            withCredentials:true,
+              data: {public_id:editPostData.public_id}
+          })
+        }
+        catch(err){
+          console.log("error while removing data",err)
+        }
+      }
       const formData = new FormData();
       formData.append("image", image);
       const response = await axios.post(`${VITE_API_URL}/weblog/uploadOnCloudinary`, formData, {
@@ -275,12 +293,13 @@ const EditPost = () => {
         }
       })
       if(response?.data.success){
-
+          
           setEditPostData((prev) => (
             { ...prev, 
               titleImage: response.data.cloudinary_link,
               public_id:response.data.public_id 
             }));
+            
           // setNewTitleImage(true);
         }
     }
@@ -368,8 +387,27 @@ const EditPost = () => {
   };
   
   // removing the content Image
-  const removeImage = (id:number, text:string) => {
+  const removeImage = async(id:number, text:string) => {
     const newContentImages = contentImages.filter((image) => image.id !== id);
+    let public_id;
+    for (let image of contentImages){
+      if(image.id === id){
+        public_id = image.public_id;
+      }
+    }
+    if(public_id){
+      try{
+        const deleteImage = await axios.delete(`${VITE_API_URL}/weblog/removeCloudinaryImage`, {
+          withCredentials:true,
+            data: {public_id:public_id}
+        })
+        console.log("response of deleting Image ", deleteImage)
+        }
+        catch(err){
+          console.log("error while removing data",err)
+        }
+    }
+    
     let updatedText = text;
     if (!newContentImages.length) {
       updatedText = updatedText.split("[image-0]").join("");
@@ -432,7 +470,7 @@ const EditPost = () => {
         {
           withCredentials: true,
           headers: {
-            "Content-Type": "multipart/formD-data",
+            "Content-Type": "multipart/form-data",
           },
         }
       );

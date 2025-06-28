@@ -1,15 +1,28 @@
 // import React, { useEffect, useState } from "react";
 // import axios from "axios";
 // import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import {
   FaFacebook,
   FaTwitter,
   FaPinterest,
   FaWhatsapp
 } from "react-icons/fa";
+import { VITE_API_URL } from "../config";
+import axios from "axios";
+
 
 
 const About = () => {
+  const [public_id, setPublic_id] = useState('ShinningBlogsImages/kz7yuiua9n160kvbvzzq')
+  const destroyingCloudinaryImage = async() => {
+  
+  }
+
+
+  useEffect(() => {
+   destroyingCloudinaryImage();
+},[])
 
   return (
     <div className="page-content bg-gray-50 min-h-screen">

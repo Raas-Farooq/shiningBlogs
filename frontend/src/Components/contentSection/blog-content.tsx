@@ -90,6 +90,7 @@ interface Blog{
   userId:string,
   title:string,
   titleImage:string,
+  public_id:string,
   content:[],
   contentImages:[],
   createdAt:string,

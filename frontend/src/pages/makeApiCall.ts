@@ -39,7 +39,6 @@ const MakeApiCall = async<T>(
     try{
         setLoading(true);
         const {method:httpMethod, data} = method;
-        console.log("method before destruct: ", method);
         const fetchResult:AxiosResponse<T> = await axios(
            { 
             url, 

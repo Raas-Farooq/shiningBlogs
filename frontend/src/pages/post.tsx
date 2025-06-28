@@ -10,16 +10,31 @@ import useUserPrivileges from "../Hooks/ownerPrivileges.tsx";
 import makeApiCall from "./makeApiCall.ts";
 import clsx from "clsx";
 import { VITE_API_URL } from "../config.ts";
+import axios from "axios";
 
 
+
+interface ContentImage {
+  fileName: string;
+  id: number;
+  path: string;
+  position: number;
+  public_id: string;
+  _id: string;
+}
 
 interface Blog{
   _id:string,
   userId:string,
   title:string,
   titleImage:string,
-  content:[],
-  contentImages:[] | null,
+  public_id:string,
+  content:Array<{
+    type: string;
+    value: string;
+    _id: string;
+  }>,
+  contentImages:ContentImage[],
   createdAt:string,
   updatedAt:string
 }
@@ -63,6 +78,7 @@ const BlogPost:React.FC = () => {
 
   useEffect(() => {
     setInHomePage(false);
+
     setErrorMessage('');
   }, []);
 
@@ -71,8 +87,10 @@ const BlogPost:React.FC = () => {
     const postId = post._id;
     moveTo(`/editPost`, { state: { postId } });
   };
-  const handleDelete:DeleteHandle =(e, id) => {
+  const handleDelete:DeleteHandle = async(e, id) => {
+    
     e.preventDefault();
+    console.log("post when delete clicks ", post);
     const confirm = window.confirm(
       "Are You sure to delete this Post. You won't be able to recover it!"
     );
@@ -85,8 +103,31 @@ const BlogPost:React.FC = () => {
     const oldBolgsCopy = allBlogsGlobally;
     const deletingPost = async () => {
       setAllBlogsGlobally(prevBlogs => prevBlogs.filter(blog => blog._id !== id));
+      
       setBlogOwner(false);
-      setIsDeletingPost(true)
+      setIsDeletingPost(true);
+      try{
+          if(post && post.public_id){
+          await axios.delete(`${VITE_API_URL}/weblog/removeCloudinaryImage`,
+            {
+              withCredentials:true,
+              data:{
+                public_id: post.public_id
+              }
+            }
+          )
+        }
+         if(post?.contentImages && post.contentImages.length > 0){
+          const images_public_id  = (post as Blog).contentImages.map(image => image.public_id);
+              await axios.delete(`${VITE_API_URL}/weblog/removeCloudinaryImage`,{
+              withCredentials:true,
+              data:{images_public_id}
+            })
+          }
+      }
+      catch(err){
+          console.error("got error while removing images from cloudinary ",err)
+      }
       const url = `${VITE_API_URL}/weblog/deleteBlog/${id}`;
       const onSuccess=(response:RespReceived<{success:boolean}>)=> {
         if(response.data.success){
@@ -130,15 +171,14 @@ const BlogPost:React.FC = () => {
     
   }
   useEffect(() => {
-    console.log("postLoading: ", postLoading, "post title", post.title);
     if(!postLoading && !post._id){
       moveTo('/notFound')
     }else{
-      console.log("post inside Post; ", post);
       localStorage.setItem('localTitle', post?.title);
       localStorage.setItem('localTitleImage', post?.titleImage);
       localStorage.setItem('localContent', JSON.stringify(post?.content));
       localStorage.setItem("localContentImages", JSON.stringify(post?.contentImages))
+      localStorage.setItem("localPublic_id", post?.public_id)
     }
   }, [postLoading, post, moveTo])
   

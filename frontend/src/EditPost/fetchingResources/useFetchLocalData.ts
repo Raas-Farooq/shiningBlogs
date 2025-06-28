@@ -8,6 +8,7 @@ interface PostData{
   _id:string,
   userId:string,
   title:string,
+  public_id:string,
   titleImage:string,
   content:[{
     type:string,
@@ -66,6 +67,7 @@ const [localPostData, setLocalPostData] = useState(
     {
         title:'',
         titleImage:'',
+        public_id:"",
         contentText:'',
         imagePreview:'',
     }
@@ -91,13 +93,17 @@ const [receiveLocalImages, setReceiveLocalImages] = useState<ContentImage[]>([])
                 }))
               }
               localStorage.setItem("localTitleImage", post?.titleImage);
-           
+              const public_id = localStorage.getItem('localPublic_id');
+                setLocalPostData(prev => ({
+                  ...prev,
+                  public_id:!public_id ? post.public_id : public_id
+                }))
           }
           catch(err){
             console.error("Got error while accessing image: ", err);
           }
           finally{
-            setLoadingTitleImage(false)
+            setLoadingTitleImage(false);
           }
         }
         loadTitleImage();
@@ -111,8 +117,8 @@ const [receiveLocalImages, setReceiveLocalImages] = useState<ContentImage[]>([])
             return;
           }
           try {
-              const titleStored = localStorage.getItem("localTitle") || '""';
-              const newTitle = post?.title && !titleStored ? post.title : titleStored;
+              const titleStored = localStorage.getItem("localTitle") || '';
+              const newTitle = !titleStored && post?.title ? post.title : titleStored;
       
               // load Save content Text (Text Data of Post)
               const localContentText = JSON.parse(
@@ -159,7 +165,7 @@ const [receiveLocalImages, setReceiveLocalImages] = useState<ContentImage[]>([])
                     setReceiveLocalImages(localContentImages);
                   }
                 } else{
-                  console.log("isContentImage invalid contentImages", post?.contentImages)
+                  console.log("fetchingImages..")
                 }
               }else{
                 setReceiveLocalImages([]);
@@ -174,6 +180,8 @@ const [receiveLocalImages, setReceiveLocalImages] = useState<ContentImage[]>([])
     
         loadInitialData();
       }, [post?._id]);
+
+      console.log("localPost data: before returning ", localPostData);
       return {postLoading, localPostData, receiveLocalImages}
 }
 

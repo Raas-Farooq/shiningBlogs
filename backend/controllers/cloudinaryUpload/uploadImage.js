@@ -7,8 +7,6 @@ dotenv.config();
 const UploadImage = async(req,res) => {
 
     const image = req.file;
-    
-    console.log("image inside cloudinary ", image);
     cloudinary.config({
         cloud_name: process.env.CLOUDINARY_NAME,
         api_key: process.env.CLOUDINARY_API_KEY,     
@@ -21,10 +19,6 @@ const UploadImage = async(req,res) => {
                 folder:'ShinningBlogsImages'
             }
         ).catch(err => console.error('cloudinary caught error', err))
-        if(uploadImage){
-            console.log("this is the Upload Image")
-        }
-        console.log("cloudinaryUploaded Image: ", uploadImage);
         return res.status(200).json({
             success:true,
             message:"uploaded on cloudinary",

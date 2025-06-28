@@ -90,7 +90,7 @@ export default function Write() {
       imgPreview: imageLink,
       titleImagePublicId:publicId
     }));
-    localStorage.setItem("localTiteImage", imageLink);
+    localStorage.setItem("localTitleImage", imageLink);
     }catch(err){
       console.log("frontend error while uploading on Cloudinary: ", err.message);
     }
@@ -228,7 +228,7 @@ export default function Write() {
       blogData.append("title", blogTitle.title);
       blogData.append("titleImage", blogTitle.titleImg);
       blogData.append("content", JSON.stringify(contentArray));
-      blogData.append("titleImagePublicId", JSON.stringify(blogTitle.titleImagePublicId))
+      blogData.append("public_id", blogTitle.titleImagePublicId)
 // why not we Stringifying the titleImage whereas we are doing on others?
       if (contentImages) {
         console.log("contentImages before appending: ", contentImages)

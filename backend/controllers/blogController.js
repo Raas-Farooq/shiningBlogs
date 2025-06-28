@@ -307,7 +307,7 @@ const addBlog = async (req,res) => {
             error: errors.array()
         })
     }
-    const {content,contentImages, titleImagePublicId} = req.body;
+    const {content,contentImages, public_id} = req.body;
     console.log("Add Blog Run: Title", req.body);
     const titleCorrected = he.decode(req.body.title);
     const user_id = req.user.userId;
@@ -322,7 +322,7 @@ const addBlog = async (req,res) => {
             titleImage,
             content:JSON.parse(content),
             contentImages:JSON.parse(contentImages),
-            titleImagePublicId:JSON.parse(titleImagePublicId)
+            public_id:public_id
             
         });
         const blogCreated = await newBlog.save();
@@ -385,7 +385,7 @@ const updateBlogPost = async(req,res) => {
  
     const parsedContent = JSON.parse(newContent);
     
-    const newTitleImage = req.files['titleImage'] ? req.files['titleImage'][0].path : ''
+    const newTitleImage = req.body.titleImage;
     try{
         //updating a blog
         const blogPost = await Blog.findById(id);
