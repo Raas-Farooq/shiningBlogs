@@ -2,7 +2,7 @@ import clsx from "clsx";
 import { useBlogContext, useUIContext } from "../../globalContext/globalContext"
 import { useCallback, useEffect } from "react";
 import { VITE_API_URL } from "../../config";
-
+import heroImage from '../../assets/images/notepad.jpg'
 
 const MainSection = () => {
 
@@ -34,15 +34,17 @@ const MainSection = () => {
     return (
         <>
             <div className={clsx(
-            "flex justify-center items-center w-full mx-auto p-2",
-            (openUserAccount || showMenu || editProfile) && 'mt-12',
-            (showMenu && searching) && 'hidden'
-            )}>
-                <img 
-                src="public/blogPostHero.jpg" 
-                className="w-full max-w-4xl h-auto aspect-video object-cover rounded-lg shadow-lg"
-                // className='w-[80vw] h-[60vh] ' 
-                alt="Greenery Of beautiful Garden" />
+                "flex justify-center items-center w-full mx-auto p-2",
+                (openUserAccount || showMenu || editProfile) && 'mt-12',
+                (showMenu && searching) && 'hidden'
+                )}>
+                <div className="relative w-full h-[100vh] max-h-[450px] lg:max-h-[68vh] overflow-hidden">
+                     <img 
+                    src={heroImage} 
+                    className="absolute w-full h-full object-cover object-top"
+                    alt="Hero Image" />
+                </div>
+               
             </div>
         </>
     )

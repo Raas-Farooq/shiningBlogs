@@ -227,16 +227,16 @@ export default function BlogContent() {
         className="flex justify-center xs:flex-col md:flex-row gap-2"
       >
         {!allBlogsGlobally.length && loading && (
-        <div className="my-5 absolute">    
+        <div className="mt-11 absolute">    
           <FaSpinner className="animate-spin text-lg" /> Loading Blogs
         </div>
       )}
-      <div className="blogsContainer xs:w-[95vw] w-[70vw] text-center m-6 min-h-[30rem]">
+      <div className="blogsContainer xs:w-[95vw] w-[70vw] text-center m-4 min-h-[30rem]">
       
         <button
           type="button"
           onClick={handleRefresh}
-          className={`bg-transparent text-gray-600 hover:text-blue-600 hover:underline w-full ${loading && 'mt-10'}`}
+          className={`bg-transparent text-gray-600 hover:text-blue-600 hover:underline w-full ${loading && 'mt-6'}`}
         >
           Refresh
         </button>

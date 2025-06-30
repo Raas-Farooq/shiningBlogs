@@ -15,28 +15,7 @@ import axios from "axios";
 
 const About = () => {
   const [public_id, setPublic_id] = useState('ShinningBlogsImages/kz7yuiua9n160kvbvzzq')
-  const destroyingCloudinaryImage = async(height_array:Number[]) => {
-     const uniqueNums = new Set();
-     const array_len = height_array.length;
-     for (let i = 1; i <= array_len ; i++){
-      uniqueNums.add(i);
-     }
-     const number_array = Array.from(uniqueNums);
-     number_array.forEach((num, ind) => {
 
-      console.log("numb ", num, "ind ", height_array[ind])
-        // if(num === height_array[ind]){
-        //   uniqueNums.delete(num);
-        // }
-     })
-     console.log("unique nums: ", uniqueNums);
-  }
-
-
-  useEffect(() => {
-    const numsArr = [5,2,3,4, 3,4];
-   destroyingCloudinaryImage(numsArr);
-},[])
 
   return (
     <div className="page-content bg-gray-50 min-h-screen">
