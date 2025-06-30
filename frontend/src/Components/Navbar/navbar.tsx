@@ -12,8 +12,6 @@ export default function Navbar({showSearch=true}){
     const {searchValue,setSearchValue, searching, setSearching, setFilteredBlogs, allBlogsGlobally} = useBlogContext();
     const {loggedIn,currentUser} = useAuthenContext();
     const [userProfileImage, setUserProfileImage] = useState('');
-    // console.log("openUserAccount: ", openUserAccount);
-    // console.log("showMenu: ", showMenu);
     const [searchClicked, setSearchClicked] = useState(false);
     const size = WindowSize();
     const moveTo = useNavigate();
@@ -30,7 +28,6 @@ export default function Navbar({showSearch=true}){
     }, [showSearch]);
 
     useEffect(() => {
-        console.log("currentUser in Navbar: ", currentUser);
         const gettingProfileImage = async() => {
             if(currentUser?.profileImg){
                 const userImage = (`${VITE_API_URL}/${currentUser.profileImg}`);
@@ -55,7 +52,6 @@ export default function Navbar({showSearch=true}){
 
     
     function handleHome(){
-        console.log("Home cliccked: ")
         setShowMenu(false)
     }
     const handleShowCancel = (e:React.MouseEvent<HTMLButtonElement>) => {
@@ -190,7 +186,6 @@ export default function Navbar({showSearch=true}){
             <div className={`${showMenu  || !loggedIn ? 'xs:hidden' : 'xs:block'} `}>
                 <button 
                 onClick={() => {
-                    console.log("userAccount clicked")
                     setOpenUserAccount(true)
                 }
                 }>

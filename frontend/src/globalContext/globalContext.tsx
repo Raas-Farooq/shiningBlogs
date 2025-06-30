@@ -58,9 +58,7 @@ export const AuthenContextProvider = ({children} : {children:ReactNode}) => {
     const [errorMessage, setErrorMessage] = useState('');
     useEffect(() => {
         const userId = localStorage.getItem('userId');
-        console.log("userId inside globaL :", userId);
         if (userId) {
-            console.log("Yes. UserId Present");
           userAuthentication(); // Fetch full user data if we have a userId
         } else {
             setLoading(false);
@@ -94,10 +92,7 @@ export const AuthenContextProvider = ({children} : {children:ReactNode}) => {
     }
     const userAuthentication = async () => {
         try {
-            console.log("Yes. I'm Inside userAuthentication");
-    
             const response = await axios.get(`${VITE_API_URL}/weblog/checkAuthen`, {withCredentials: true});
-            console.log("USer AUTHENTICATIION GLobal Context :", response?.data);
             const token = response.data.token;
             if(isTokenExpired(token)){
                 alert("Token expred.. logging OUt from userAuthentication fetch globalContext");

@@ -180,8 +180,6 @@ const [receiveLocalImages, setReceiveLocalImages] = useState<ContentImage[]>([])
     
         loadInitialData();
       }, [post?._id]);
-
-      console.log("localPost data: before returning ", localPostData);
       return {postLoading, localPostData, receiveLocalImages}
 }
 

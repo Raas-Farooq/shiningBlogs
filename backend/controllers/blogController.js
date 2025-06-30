@@ -297,7 +297,6 @@ const updateUserProfile = async (req, res) => {
 
 
 const addBlog = async (req,res) => {
-    console.log("Add Blog Run: Title", req.body);
     const errors = validationResult(req);
 
     if(!errors.isEmpty()){
@@ -308,13 +307,9 @@ const addBlog = async (req,res) => {
         })
     }
     const {content,contentImages, public_id} = req.body;
-    console.log("Add Blog Run: Title", req.body);
     const titleCorrected = he.decode(req.body.title);
     const user_id = req.user.userId;
     const titleImage = req.body.titleImage;
-    
-    // console.log("contentImages from req.body: ", JSON.parse(contentImages), "titleImage: ", titleImage,'title ', title, "Content ", JSON.parse(content));
-    console.log("contentImages: ", contentImages)
     try{
         const newBlog = new Blog({
             userId:user_id,
@@ -378,8 +373,7 @@ const updateBlogPost = async(req,res) => {
         })
     }
     const user_id = req.user.userId;
-    // console.log("updateBlog runs: ", req.body)
-    const {title, newContent, contentImages} = req.body;
+    const {title, newContent, contentImages, public_id} = req.body;
     const updatedContentImages= JSON.parse(contentImages);
     const id = req.params.id; 
  
@@ -401,18 +395,16 @@ const updateBlogPost = async(req,res) => {
                 success:false,
                 message:"you are not authorize to Updte it"
             })
-        }else{
-            console.log("success You are authorized to edit this blog")
         }
       
         if(title) blogPost.title = title;
-    
+        if(public_id) blogPost.public_id = public_id;
         if(parsedContent) blogPost.content = parsedContent;
        
         if(newTitleImage) blogPost.titleImage = newTitleImage;
       
         if(updatedContentImages) blogPost.contentImages = updatedContentImages;
-       
+        
         const updatedBlog = await blogPost.save();
        
         // successfully updated the blogPost
@@ -431,7 +423,7 @@ const updateBlogPost = async(req,res) => {
     catch(error){
         res.status(500).json({
             success:true,
-            message:"Server responded with error while updating the Blog"
+            message:"Server responded with error while updating the Blog",error
         })
     }
 }

@@ -7,6 +7,8 @@ import { useAuthenContext, useBlogContext } from "../globalContext/globalContext
 import useFetchLocalData from "./fetchingResources/useFetchLocalData.ts";
 import { VITE_API_URL } from "../config.ts";
 import { FaSpinner } from "react-icons/fa";
+import {ObjectId} from 'bson';
+
 
 interface PostData{
   _id:string,
@@ -210,7 +212,6 @@ const EditPost = () => {
   // Convert and Store image as base 64
   
   useEffect(() => {
-    console.log("localPost Data: ", localPostData, " editPostData ", editPostData);
     if(receiveLocalImages?.length){
       setContentImages(receiveLocalImages);
     }else{
@@ -249,7 +250,6 @@ const EditPost = () => {
 
   // Handle changes to the title Image
   const handleImageChange = async (e:React.ChangeEvent<HTMLInputElement>) => {
-    console.log("editPostData: ",editPostData, "post ", post);
     let image = e.target.files?.[0];
     if(!image) 
       {
@@ -262,6 +262,7 @@ const EditPost = () => {
           setEditPostData((prev) => (
           { 
             ...prev,
+            titleImage:'',
             imagePreview:previewImageLink
           }
         ))
@@ -273,7 +274,6 @@ const EditPost = () => {
       
     try{
       if(editPostData?.public_id){
-        alert("editPostData public id exist")
         try{
           await axios.delete(`${VITE_API_URL}/weblog/removeCloudinaryImage`, {
             withCredentials:true,
@@ -364,7 +364,7 @@ const EditPost = () => {
         const imageLink = response.data.cloudinary_link;
         const publicId = response.data.public_id;
          const localImage = {
-        _id:`tempId${Date.now()}`,
+        _id:new ObjectId().toHexString(),
         id: contentImages?.length,
         fileName: newImage.name,
         public_id: publicId,
@@ -389,6 +389,7 @@ const EditPost = () => {
   // removing the content Image
   const removeImage = async(id:number, text:string) => {
     const newContentImages = contentImages.filter((image) => image.id !== id);
+    setContentImages(newContentImages);
     let public_id;
     for (let image of contentImages){
       if(image.id === id){
@@ -401,7 +402,7 @@ const EditPost = () => {
           withCredentials:true,
             data: {public_id:public_id}
         })
-        console.log("response of deleting Image ", deleteImage)
+        console.log("Image Deletion ", deleteImage)
         }
         catch(err){
           console.log("error while removing data",err)
@@ -422,7 +423,7 @@ const EditPost = () => {
       setEditPostData((prev) => ({ ...prev, contentText: updatedText }));
     }
     const updateImages = newContentImages.map((image, index) => ({
-      _id:`temp-id${Date.now()}`,
+      _id:new ObjectId().toHexString(),
       id: index,
       path: image.path,
       fileName: image.fileName,
@@ -448,6 +449,7 @@ const EditPost = () => {
     // }
     // formData.append('titleImage', editPostData.titleImage);
     formData.append("title", editPostData.title);
+    formData.append('public_id', editPostData.public_id);
     if (editPostData.contentText) {
       const contentArray = [
         {
@@ -643,7 +645,7 @@ const EditPost = () => {
               required
             />
             <div className="absolute bottom-3 right-2 ">
-              <label className="px-4 py-2 bg-white text-gray-700 hover:bg-gray-100 rounded-full shadow-lg transition-all duration-300 cursor-pointer">
+              <label className="px-4 py-2 bg-pink-500 text-gray-700 hover:bg-pink-400 rounded-full shadow-lg transition-all duration-300 cursor-pointer">
               <span className="text-sm"> Add Image</span>
               <input
                 type="file"

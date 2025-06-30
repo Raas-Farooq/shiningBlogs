@@ -24,7 +24,6 @@ const MainSection = () => {
     const {searching=false} = useBlogContext() || {};
 
     useEffect(() => {
-        console.log("VITE_APi url: inside Main-Section", VITE_API_URL);
         fetch(`${VITE_API_URL}/wake-up`).catch(() => console.log("Backend might be sleeping, retrying..."));
         setOpenUserAccount(false);
         setEditProfile(false)
@@ -34,10 +33,15 @@ const MainSection = () => {
 
     return (
         <>
-            <div className={clsx(`flex justify-center h-full`,(openUserAccount || showMenu || editProfile) && 'mt-12', (showMenu && searching) && 'hidden')}>
+            <div className={clsx(
+            "flex justify-center items-center w-full mx-auto p-2",
+            (openUserAccount || showMenu || editProfile) && 'mt-12',
+            (showMenu && searching) && 'hidden'
+            )}>
                 <img 
-                src="https://wallpapercave.com/wp/wp2060641.jpg" 
-                className='w-11/12 h-[60vh] object-cover' 
+                src="public/blogPostHero.jpg" 
+                className="w-full max-w-4xl h-auto aspect-video object-cover rounded-lg shadow-lg"
+                // className='w-[80vw] h-[60vh] ' 
                 alt="Greenery Of beautiful Garden" />
             </div>
         </>

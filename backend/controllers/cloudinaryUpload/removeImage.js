@@ -3,8 +3,6 @@ import dotenv from 'dotenv';
 
 const RemoveImage = async(req,res) => {
 
-    console.log("req.bodyRemove IMQGE", req.body);
-    // const public_id = req.body.public_id;
      cloudinary.config({
             cloud_name: process.env.CLOUDINARY_NAME,
             api_key: process.env.CLOUDINARY_API_KEY,     
