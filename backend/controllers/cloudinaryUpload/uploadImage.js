@@ -10,7 +10,8 @@ const UploadImage = async(req,res) => {
     cloudinary.config({
         cloud_name: process.env.CLOUDINARY_NAME,
         api_key: process.env.CLOUDINARY_API_KEY,     
-        api_secret:process.env.CLOUDINARY_SECRET_KEY
+        api_secret:process.env.CLOUDINARY_SECRET_KEY, 
+        secure:true
     })
 
     try{
@@ -22,7 +23,7 @@ const UploadImage = async(req,res) => {
         return res.status(200).json({
             success:true,
             message:"uploaded on cloudinary",
-            cloudinary_link:uploadImage.url,
+            cloudinary_link:uploadImage.secure_url,
             public_id:uploadImage.public_id
         })
     }catch(err){

@@ -12,6 +12,7 @@ import {
     
     useAuthenContext,
     useBlogContext,
+    useUIContext,
 } from "../../globalContext/globalContext.jsx";
 import { VITE_API_URL } from "../../config.ts";
 import { clsx } from "clsx";
@@ -60,7 +61,7 @@ function UserProfile( {currentUser, profileImage}:userProfileProps) {
           {currentUser?.goal && currentUser.goal.length ? (
             <h3> {currentUser.goal} </h3>
           ) : (
-            <h3>Goal is Empty</h3>
+            <h3>Goal is not defined</h3>
           )}
         </section>
         <section>
@@ -106,10 +107,10 @@ const BlogCard:React.FC<BlogCardProps> = ({ blog, handlePostClick }) => {
   // eslint-disable-next-line no-unused-vars
   const { allBlogsGlobally, searching } = useBlogContext();
 
-useEffect(() => {
-     console.log("BlogsCount: ", allBlogsGlobally)
-  }
- ,[])
+  useEffect(() => {
+      console.log("BlogsCount: ", allBlogsGlobally)
+    }
+  ,[])
 
 
   return (
@@ -149,13 +150,14 @@ export default function BlogContent() {
     searchValue,
     setFilteredBlogs,
     setSearchValue,
+    searching,
     setSearching,
     filteredBlogs,
     allBlogsGlobally,
     setAllBlogsGlobally,
   } = useBlogContext();
 
-  
+  const {showMenu} = useUIContext();
   const { loggedIn, currentUser, setErrorMessage} = useAuthenContext();
   
   const [loading, setLoading] = useState<boolean>(true);
@@ -224,7 +226,10 @@ export default function BlogContent() {
     <>
       <div
         data-component="AllBlogsParent"
-        className="flex justify-center xs:flex-col md:flex-row gap-2"
+        className={clsx(
+          "flex justify-center xs:flex-col md:flex-row gap-2",
+          showMenu && searching && 'flex justify-end items-end pt-44'
+        )}
       >
         {!allBlogsGlobally.length && loading && (
         <div className="mt-11 absolute">    
@@ -243,7 +248,7 @@ export default function BlogContent() {
         {allBlogsGlobally?.length > 0 && 
         <div
         data-component="bottomBlogsContainer"
-        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 text-center justify-center"
+        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 justify-items-center"
         >
         {BlogsToShow.map((blog, index) => 
           {
@@ -270,9 +275,11 @@ export default function BlogContent() {
     <footer>
       <div
         className="flex justify-center"
-        onClick={() => navigateTo("/userAccount")}
+        
       >
-        <button className={clsx('sm:hidden border bg-green-400 text-center p-3 hover:bg-green-200', !loggedIn ? 'xs:hidden' : 'block')}>
+        <button 
+        onClick={() => navigateTo("/userAccount")}
+        className={clsx('sm:hidden border bg-blue-500 rounded-lg text-center px-3 py-2 hover:border-blue-700 transition-all duration-300', !loggedIn ? 'xs:hidden' : 'block')}>
           About Me
         </button>
       </div>

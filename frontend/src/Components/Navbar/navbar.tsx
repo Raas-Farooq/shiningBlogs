@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import {FaBars, FaTimes, FaFacebook, FaPinterest, FaTwitter, FaWhatsapp, FaRegUser} from 'react-icons/fa';
+import {FaBars, FaTimes, FaRegUser} from 'react-icons/fa';
 import { useAuthenContext, useBlogContext,useUIContext } from '../../globalContext/globalContext';
 import WindowSize from '../../windowSize.ts';
 import { Link, useNavigate } from 'react-router-dom';
@@ -8,8 +8,8 @@ import { VITE_API_URL } from '../../config.ts';
 
 export default function Navbar({showSearch=true}){
 
-    const {inHomePage, setInHomePage, setOpenUserAccount, openUserAccount, setShowMenu, showMenu} = useUIContext();
-    const {searchValue,setSearchValue, searching, setSearching, setFilteredBlogs, allBlogsGlobally} = useBlogContext();
+    const {inHomePage, setInHomePage, setOpenUserAccount, setShowMenu, showMenu} = useUIContext();
+    const {searchValue,setSearchValue, setSearching, setFilteredBlogs, allBlogsGlobally} = useBlogContext();
     const {loggedIn,currentUser} = useAuthenContext();
     const [userProfileImage, setUserProfileImage] = useState('');
     const [searchClicked, setSearchClicked] = useState(false);
@@ -35,7 +35,8 @@ export default function Navbar({showSearch=true}){
             }
         }
         gettingProfileImage();
-    }, []);
+        console.log("logged IN value: ", loggedIn)
+    }, [loggedIn]);
 
 
     useEffect(() => {
@@ -105,11 +106,7 @@ export default function Navbar({showSearch=true}){
             }
         }
 
-        const getLogClass = () => clsx({
-            hidden: loggedIn || (searchValue && 
-            !inHomePage),
-            'md:block':!loggedIn && searchValue,
-        })
+
 
         // md:absolute lg:relative lg:mt-0 
        const searchBarClass = () => clsx({
@@ -121,89 +118,77 @@ export default function Navbar({showSearch=true}){
         'xs:hidden lg:hidden': showMenu || !inHomePage,
         'md:block md:mt-0': loggedIn,
         })
-
+        const linkStyles = 'text-lg font-semibold  text-gray-800 hover:text-blue-500 transition-colors duration-200';
     return(
-        <nav className={`flex bg-[#5D62FF]-300 shadow-lg text-white bg-[#FFFFFF] top-0 z-10 items-center fixed w-full justify-between ${showMenu ? 'flex-col pb-[8rem] ' : 'flex'} ${showMenu &&  openUserAccount ?'flex-col fixed': 'relative'} ${showMenu && searching && 'flex-col pb-[1rem]'}` }> 
-            <div className={`pl-12 pb-4 md:hidden text-black text-xl`}>
-                <button onMouseDown={(e) => handleShowCancel(e)} className="border border-red-200 p-2 mt-2 hover:bg-gray-200 transition-transform duration-300 hover:scale-110"> {showMenu ?  <FaTimes /> : <FaBars />}</button>
-                    
-            </div> 
-            <div className={`transition-opacity duration-300 
-            ${showMenu? 'opacity-100' : 'opacity-0 hidden'}`}>
-                <div className={`${!inHomePage && 'xs:hidden'}`}>
-                    <input type="search" 
-                        id="search" 
-                        value={searchValue}
-                        onChange={handleSearchChange}
-                        onFocus={() => setSearching(true)} 
-                        // onBlur={() => setSearching(false)} 
-                        placeholder='Search Dream Blog' 
-                        className='text-black pb-1 bg-white border border-green-300 rounded'/>
+        <nav className={`flex items-center justify-between bg-white,
+             backdrop-blur-sm bg-opacity-80 py-3 fixed top-0 z-20 w-full
+              ${showMenu && 'flex-col items-center'}` }>
+            
+            {/* Mobile Menu Toggle */}
+            <div className="flex justify-between items-center md:hidden w-full">
+                <div className="text-2xl">
+                    <button onClick={handleShowCancel} className="p-2 transition-transform duration-300 hover:scale-110">
+                        {showMenu ? <FaTimes /> : <FaBars />}
+                    </button>
+                </div>
+                <div className={clsx(loggedIn && 'hidden', 'text-sm')}>
+                    <Link to="/login" className="text-gray-600 hover:text-gray-900">Login</Link>
+                    <Link to="/registerUser" className="ml-4 bg-blue-500 rounded-lg px-2 py-2 text-white hover:text-gray-900">Register</Link>
                 </div>
             </div>
-            {/* flex flex-col items-start mt-2 */}
-            <ul className={`md:flex md:translate-y-0 my-2 ml-10 w-1/3 ${showMenu ? 'opacity-100 translate-y-0': '-translate-y-20 hidden'} ${showMenu && searching && 'hidden'} transition-all duration-300`}>
-                <li className="flex">
-                   <Link to={'/'} onClick={handleHome} className='px-2 py-2 ml-3 bg-green-300 hover:bg-green-200 xs:w-24 md:w-auto my-2 '>Home</Link>   
-                </li>
-                <li className=" flex">
-                   <Link to={'/about'} className='px-2 py-2 ml-3 text-blue-600 bg-green-300 hover:bg-green-200 xs:w-24 md:w-auto my-2 '>About</Link>
-                   </li>
-                <li className="flex">
-                   <span onClick={handleWriteClick} className='cursor-pointer px-2 py-2 ml-3 text-blue-600 bg-green-300 hover:bg-green-200 xs:w-24 md:w-auto my-2 '>Write</span>   
-                </li>
-                <li className="flex">
-                   <span onClick={handleContentClick} className='md:text-[13px] text-blue-600 sm:text-[12px] px-2 py-2 ml-3 bg-green-300 hover:bg-green-200 cursor-pointer my-2 xs:w-24 md:w-20'>My Posts</span>   
-                </li>
-            </ul>
-            
-            <ul className={`md:flex mb-2 ml-8 w-1/3 md:w-1/4 ${showMenu ? 'flex-col ': 'hidden'} ${showMenu && searching && 'hidden'}`}>
-                <li className="px-2 ml-3 py-2 " ><a href=""><FaFacebook /> </a></li>
-                <li className="px-2 ml-3 py-2" ><a href=""><FaTwitter /> </a></li>
-                <li className="px-2 ml-3 py-2" ><a href=""><FaPinterest /> </a></li>
-                <li className="px-2 ml-3 py-2" ><a href=""><FaWhatsapp /> </a></li>
+
+            {/* Logo/Site Title (visible on all screen sizes) */}
+            <div className="hidden md:block">
+                <Link to={'/'} className='text-xl font-bold text-orange-500'>Dream Blog</Link>
+            </div>
+
+            {/* Desktop Navigation Links */}
+            <ul className={clsx(
+                'md:flex md:items-center md:space-x-6',
+                !showMenu && 'hidden',
+                showMenu && 'flex flex-col items-center space-y-4 md:space-y-0',
+                'transition-all duration-300',
+            )}>
+                <li><Link to={'/'} onClick={handleHome} className={`${linkStyles}`}>Home</Link></li>
+                <li><Link to={'/about'} className={`${linkStyles}`}>About</Link></li>
+                <li><span onClick={handleWriteClick} className={`cursor-pointer ${linkStyles}`}>Write</span></li>
+                <li><span onClick={handleContentClick} className={`cursor-pointer ${linkStyles}`}>My Posts</span></li>
             </ul>
 
-            <ul className={`md:flex mb-4 w-1/3 md:text-sm relative ${showMenu ? 'flex': 'hidden'} ${!loggedIn ? 'md:text-xl ml-12 xs:flex' : 'lg:mt-4'}`}>
-                <div className="flex mb-2 lg:mb-0">
-                    <li className={getLogClass()}><Link to={"/login"} className='px-2 py-2 hover:text-gray-300'> Login </Link></li>
-                    <li className={getLogClass()} ><Link to={"/registerUser"} className='px-2 py-2 hover:text-gray-300'> Register </Link></li>
-
-                </div>
-
-                <div className={searchBarClass()}>
-                    <input type="search" 
-                    id="search" 
-                    placeholder='Search Blog' 
-                    onChange={handleSearchChange}
-                    // onSubmit={handleSearchSubmit}
+            {/* Search Bar (Mobile & Desktop) */}
+            <div className={clsx('transition-all duration-300', showMenu ? 'w-full':'hidden md:block md:mr-4')}>
+                <input
+                    type="search"
+                    id="search"
                     value={searchValue}
-                    className='text-black w-28 pb-1 bg-white border border-green-300 rounded placeholder:text-sm'/>
-                </div>
-                
+                    onChange={handleSearchChange}
+                    placeholder='Search Any Blog By Its Name'
+                    className='w-full rounded border border-gray-300 px-3 py-1 text-gray-800 placeholder-gray-500 focus:border-blue-500 focus:outline-none'
+                />
+            </div>
+
+            {/* User Account / Login / Register (Desktop) */}
+            <ul className={clsx('transition-all duration-300', loggedIn ? 'hidden' : 'hidden md:flex md:items-center md:space-x-1 md:mr-2 lg:space-x-6')}>
+                <li><Link to={"/login"} className='rounded-md px-4 py-2 text-gray-700 transition-colors duration-200 hover:bg-gray-100'>Login</Link></li>
+                <li><Link to={"/registerUser"} className='rounded-md bg-blue-500 px-4 py-2 mr:4 text-white hover:text-white transition-colors duration-200 hover:bg-blue-600 '>Register</Link></li>
             </ul>
 
-            <div className={`${showMenu  || !loggedIn ? 'xs:hidden' : 'xs:block'} `}>
-                <button 
-                onClick={() => {
-                    setOpenUserAccount(true)
-                }
-                }>
-                    <Link className={clsx(`block text-center p-2 bg-green-300`, userProfileImage && 'bg-white' )}
-                    to={'/userAccount'}
-                        >
-                            {userProfileImage 
-                            ? 
-                            <img src={userProfileImage} className='w-14'></img> 
-                            : 
-                            <FaRegUser /> 
-                            }
-                        
-                    </Link>
-                </button>
-            
-            </div>
+            {/* User Profile Image */}
+            {loggedIn && (
+                <div className="absolute right-6 top-4 md:relative md:top-0 md:right-4">
+                    <button onClick={() => setOpenUserAccount(true)} className="rounded-full ring-2 ring-blue-500 transition-all duration-200 hover:ring-4">
+                        <Link to={'/userAccount'}>
+                            {userProfileImage ? (
+                                <img src={userProfileImage} className='w-10 h-10 rounded-full object-cover' alt="User Profile" />
+                            ) : (
+                                <FaRegUser className="w-10 h-10 p-2 bg-gray-200 rounded-full text-gray-600" />
+                            )}
+                        </Link>
+                    </button>
+                </div>
+            )}
         </nav>
     )
     
 }
+

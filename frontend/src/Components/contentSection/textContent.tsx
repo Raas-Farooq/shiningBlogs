@@ -46,12 +46,13 @@ const TextContent: React.FC<TextContentProps> = ({
     const textItem = content.find((item) => item.type === "text");
     const textContent = textItem?.value || "";
     setText(textContent);
-
+    
     if (textContent) {
       const contentWithImages: CombinedContent[] = [];
       let endIndex = 0;
 
       if (contentImages && contentImages.length > 0) {
+        console.log("contentImages ", contentImages);
         const sortedImages = contentImages.sort((a, b) => a.position - b.position);
         const cleanText = textContent.replace(/\[image-\d+\]/g, "         ");
 
@@ -82,7 +83,7 @@ const TextContent: React.FC<TextContentProps> = ({
           contentWithImages.push({ type: "text", value: para });
         });
       }
-
+      console.log("contentWith Images; ", contentWithImages)
       setTransformedText(contentWithImages); // Store CombinedContent objects
     }
   }, [content, contentImages]);
@@ -103,7 +104,7 @@ const TextContent: React.FC<TextContentProps> = ({
             ) : (
               <img
                 key={index}
-                src={item.imageUrl?.startsWith("http://") ? item.imageUrl : `${VITE_API_URL}/${item.imageUrl}`}
+                src={item.imageUrl?.startsWith("https://") ? item.imageUrl : `${VITE_API_URL}/${item.imageUrl}`}
                 alt="Image"
                 className="block w-56 h-52 rounded-t-lg max-w-full my-4"
               />

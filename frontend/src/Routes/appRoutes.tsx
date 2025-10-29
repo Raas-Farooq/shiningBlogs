@@ -86,7 +86,7 @@ const ProtecedRoute = ({ children, stayOnPage = false }: ProtectedRouteProps) =>
 
 const AppRoutes = () => {
     return (
-        <BrowserRouter>
+        <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }} >
             <PageTransition />
         </BrowserRouter>
     );
