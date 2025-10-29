@@ -35,13 +35,13 @@ const MainSection = () => {
         <>
             <div className={clsx(
                 "flex justify-center items-center w-full mx-auto p-2",
-                (openUserAccount || showMenu || editProfile) && 'mt-12',
+                (openUserAccount || showMenu || editProfile) && 'mt-20',
                 (showMenu && searching) && 'hidden'
                 )}>
                 <div className="relative w-full h-[100vh] max-h-[450px] lg:max-h-[68vh] overflow-hidden">
                      <img 
                     src={heroImage} 
-                    className="absolute w-full h-full object-cover object-top"
+                    className="absolute w-full h-full object-cover object-top top-16"
                     alt="Hero Image" />
                 </div>
                

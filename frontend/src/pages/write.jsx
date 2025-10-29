@@ -82,6 +82,7 @@ export default function Write() {
           "Content-Type":"multipart/form-data"
         }
       });
+      console.log("cloudinary result ", uploadOnCloudinary);
       const imageLink = uploadOnCloudinary.data.cloudinary_link;
       const publicId = uploadOnCloudinary.data.public_id;
       setBlogTitle((prev) => ({
@@ -142,6 +143,7 @@ export default function Write() {
         }
        })
       if(uploadingOnCloudinary.data.success){
+        console.log("receive cloudinary image after success ", uploadingOnCloudinary.data);
         cloudinaryUrl = uploadingOnCloudinary.data.cloudinary_link;
         image_public_id = uploadingOnCloudinary.data.public_id;
         console.log("image_publicId if Successs ", image_public_id);
@@ -316,12 +318,12 @@ export default function Write() {
             <div className="bg-white text-black shadow-lg flex items-center p-5 rounded-lg ">
               <FaSpinner className="animate-spin text-purple-600" />
               <span className="text-black font-lg">
-                UPloading Image on Cloudinary
+                Uploading Image on Cloudinary
               </span>
               </div>
           </div>
           }
-        {errorMessage && <h2> {errorMessage} </h2>} 
+        {errorMessage && <h2 className="text-red-500"> *{errorMessage} </h2>} 
         {localLoading && 
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
             <div className="bg-white rounded-lg shadow-lg p-5 flex items-center gap-3">
@@ -400,7 +402,7 @@ export default function Write() {
             <div
               className="absolute bottom-4 right-4 "
               >
-              <label htmlFor="contentImg" className="flex items-center bg-white hover:bg-gray-50 text-gray-700 px-4 py-2 rounded-full shadow-lg transition-all duration-300 cursor-pointer">
+              <label htmlFor="contentImg" className="flex items-center bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-full shadow-lg transition-all duration-300 cursor-pointer">
                 <span className="text-sm ">Add Image</span>
                 <input   
                   type="file"

@@ -214,15 +214,17 @@ const BlogPost:React.FC = () => {
           </div>
         ) : (
           
-          <div className="w-full max-w-4xl mx-auto px-4 py-5 rounded:md shadow-lg bg-white">
+          <div className="w-full max-w-4xl mx-auto px-4 py-5 rounded:md shadow-lg bg-white mt-10">
             
             <div className="">
             
               <div key={post?._id} id={post?._id}>
-                <h2 className="text-center w-4/5 text-2xl text-purple-600 font-medium mb-10 p-5">
+               <div className="text-center flex justify-center">
+                 <h2 className=" w-fit text-2xl text-gray-900 border-b-2 border-orange-400 font-bold mt-10 mb-4 mr-10">
                   {" "}
                   {post?.title}{" "}
                 </h2>
+                </div>
                 {loggedIn && blogOwner && (
                   <div className="text-right flex justify-end gap-2 mb-2 w-[80%] text-black">
                     <button onClick={(e) => handleEdit(e, post)}>

@@ -74,11 +74,11 @@ const UserAccount = () => {
     :
     <div className="flex justify-center m-5 p-5 w-full">
       <div className="">
-        <h2 className="font-extrabold "> About {currentUser && currentUser.username} </h2>
+        <h2 className="font-extrabold underline mb-6 text-gray-700 text-2xl"> About {currentUser && currentUser.username} </h2>
         {imagePreview && <img
           src={imagePreview}
           alt="greenry"
-          className="w-auto md:h-h-[210px]"
+          className="w-auto max-w-md rounded-lg hover:scale-105 transition-transform duration-300"
           style={{ width: "240px", height: "250px" }}
 
         />
@@ -96,7 +96,7 @@ const UserAccount = () => {
           </h3>
           <span className="border-t border-blue-400"></span>
           <div>
-            {currentUser && currentUser.TopicsInterested.map((interest,ind) => 
+            {currentUser && currentUser.TopicsInterested?.length > 0 && currentUser?.TopicsInterested.map((interest,ind) => 
               <h5 key={ind}> {interest} </h5>
             )
             }
@@ -104,7 +104,7 @@ const UserAccount = () => {
         </div>
 
         <div>
-          <button className="border mt-3 border-blue bg-red-400 p-1 text-white hover:bg-red-200" 
+          <button className="border border-red-500 text-red-500 hover:bg-red-500 hover:text-white transition-colors duration-200 px-3 py-1 rounded-md" 
           onClick={handleLogout}>
           LogOut
           
@@ -117,14 +117,14 @@ const UserAccount = () => {
               navigate(-1)
             }
             }
-            className="p-2 border bg-green-400 mr-2 hover:bg-green-300 text-white text-bolder xs:mb-4 xs:text-sm"
+            className="text-gray-600 hover:text-gray-900 transition-colors duration-200 px-3 py-1 rounded-md"
             style={{lineHeight:'1.2'}}
             >
             Back
           </button>
           <button onClick={() => setOpenUserAccount(false)}>
             <Link
-              className="p-2 border bg-green-400 mr-2 hover:bg-green-300 text-white text-bolder xs:mb-4 xs:text-sm"
+              className="text-gray-600 hover:text-gray-900 transition-colors duration-200 px-3 py-1 rounded-md"
               
               to="/"
             >
@@ -133,14 +133,14 @@ const UserAccount = () => {
           </button>
         </div>
       </div>
-      <div className="mt-5 xs:flex flex-col gap-5">
+      <div className="mt-2 xs:flex flex-col gap-5">
       
       <button
         onClick={() => {
           setEditProfile(true);
         }}
       >
-          <Link className=" border bg-green-400 hover:bg-green-300 text-white text-bolder xs:mt-4 p-2"
+          <Link className="border border-gray-400 text-gray-700 hover:border-blue-500 hover:text-blue-500 transition-colors duration-200 px-3 py-1 rounded-md xs:mt-4 p-2"
           to={"/updateProfile"}>
             Edit Profile</Link>  
         </button>
@@ -155,3 +155,4 @@ const UserAccount = () => {
 
 export default UserAccount;
 
+// 'conscious + sabarSpirit' accounts
