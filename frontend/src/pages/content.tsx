@@ -56,7 +56,6 @@ export default function Content() {
             
         }
         catch(err){
-            console.error("error while accessing yourContent: ", err);
             setLoading(false)
         }
         finally{
@@ -70,7 +69,7 @@ export default function Content() {
     }
     return(
         <div className="page-content bg-gradient-to-b from-gray-50 to-gray-100 px-6 py-8">
-            <h1 className="text-purple-600 text-center border-b-4 inline-block border-red-500 my-3"> My POSTS </h1>
+            <h1 className="text-gray-600 text-center border-b-4 inline-block border-orange-500 my-3"> My Posts </h1>
             <div className="BlogsContainer flex flex-wrap justify-center bg-white max-w-6xl mx-auto gap-6">
             {loading ? (
                 <div>
@@ -96,7 +95,16 @@ export default function Content() {
               )
             }
             </div>
-            <div className="mt-6 flex justify-center space-x-4">
+            {(!loading && yourContent?.length === 0) && 
+                <div className="text-center">
+                    <h2 className="text-xl mb-5"> Write Your First Blog Here</h2>
+                    <button type="button" 
+                    onClick={() => moveTo('/write')}
+                    className="border border-gray-600 px-4 py-2 rounded-md hover:border-blue-600 hover:text-blue-700"
+                    > Create Blog </button>
+                </div> 
+                }
+            <div className="mt-16 flex justify-center space-x-4">
                 <button className="text-gray-600 hover:text-gray-900 hover:font-bold" onClick={() => moveTo(-1)}> Back </button>
             <button onClick={() => moveTo('/')}  className='text-gray-600 hover:text-gray-900 hover:font-bold'> Back To Home</button>
             </div>
