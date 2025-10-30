@@ -64,9 +64,7 @@ export default function Write() {
   function handleAreaSelect() {
     setCursorPosition(currentTextArea.current.selectionStart);
   }
-  const handleTitleImage = async (e) => {
-    const image = e.target.files[0];
-    // console.log("image when submitting: files[0]", image);
+  async function uploadTitleImage(image){
     setBlogTitle((prev) => ({
       ...prev,
       imgPreview: URL.createObjectURL(image)
@@ -85,14 +83,15 @@ export default function Write() {
       console.log("cloudinary result ", uploadOnCloudinary);
       const imageLink = uploadOnCloudinary.data.cloudinary_link;
       const publicId = uploadOnCloudinary.data.public_id;
-      setBlogTitle((prev) => ({
-      ...prev,
-      titleImg: imageLink,
-      imgPreview: imageLink,
-      titleImagePublicId:publicId
-    }));
-    localStorage.setItem("localTitleImage", imageLink);
-    }catch(err){
+        setBlogTitle((prev) => ({
+        ...prev,
+        titleImg: imageLink,
+        imgPreview: imageLink,
+        titleImagePublicId:publicId
+      }));
+      localStorage.setItem("localTitleImage", imageLink);
+    }
+    catch(err){
       console.log("frontend error while uploading on Cloudinary: ", err.message);
     }
     finally{
@@ -103,6 +102,16 @@ export default function Write() {
       errors.titleImageError = "";
       setErrors(errors);
     }
+  }
+  const handleTitleImage = async (e) => {
+    const image = e.target.files[0];
+    if(image){
+      if(image instanceof File){
+        uploadTitleImage(image)
+      }
+      
+    }
+
   };
   const handleContent = (e) => {
     const originalPlaceholders = contentText.match(/\[image-\d\]/g) || [];
@@ -343,7 +352,7 @@ export default function Write() {
             type="text"
             name="title"
             placeholder="Enter the Title of Post "
-            className="border border-gray-500 w-100 rounded-md placeholder:text-gray-500 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
+            className="border border-gray-500 px-4 py-2 max-w-md rounded-md placeholder:text-gray-500 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
             onChange={handleTitles}
             value={blogTitle.title}
             required
@@ -355,18 +364,19 @@ export default function Write() {
           {errors.titleError && (
             <p className="text-red-600"> {errors.titleError}* </p>
           )}
-          <label htmlFor="titleImage" className="text-pink-600">
-            Upload Your Title Image
+          <label htmlFor="titleImage" className="cursor-pointer placeholder:text-gray-500 w-fit border border-gray-500 rounded-lg px-4 py-2 hover:bg-blue-100 hover:text-blue-700">
+            Upload Image
           </label>
           <input
             type="file"
             name="titleImg"
+            id="titleImage"
             accept="image/*"
             onChange={handleTitleImage}
-            className="w-[103px] cursor-pointer rounded-md placeholder:text-gray-500"
+            className="hidden"
           />
           {blogTitle && blogTitle.imgPreview ? (
-            <img src={blogTitle.imgPreview} className="w-24 h-24 " />
+            <img src={blogTitle.imgPreview} className="max-w-xs" />
           ) : (
             ""
           )}
@@ -427,12 +437,12 @@ export default function Write() {
           <button
             type="submit"
             onClick={handleSubmit}
-            className="border rounded-md border-blue-400 bg-blue-400 transition-colors duration:400 hover:bg-blue-600 w-fit p-2"
+            className="border rounded-md border-blue-400 text-white bg-blue-500 transition-colors duration:400 hover:bg-blue-600 w-fit p-2"
           >
             Publish Post
           </button>
         </form>
-        <button>
+        <button className="mt-3">
           <Link to={"/"} className="text-gray-600 hover:text-gray-900">
             {" "}
             Back To Home

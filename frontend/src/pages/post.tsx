@@ -208,7 +208,7 @@ const BlogPost:React.FC = () => {
       )}
       
         {(postLoading || ownerLoading) ? (
-          <div className="text-center flex justify-center">
+          <div className="text-center flex justify-center mt-15">
             <FaSpinner className="animate-spin text-center inline text-xl" /> Loading
             the Post..
           </div>

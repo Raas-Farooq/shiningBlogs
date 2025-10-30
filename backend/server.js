@@ -4,6 +4,7 @@ import router from './routes/route.js';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import TestOrigins from './middleware/testOrigins.js';
+import { Blog } from './models/model.js';
 
 const app = express();
 
@@ -21,8 +22,18 @@ app.use(cors({
   credentials: true
 }));
 
-// app.use(cors());
-// app.use(TestOrigins);
+app.get('/health', async (req, res) => {
+  try {
+    // Perform a lightweight database query to keep the connection warm
+    await Blog.findOne().lean();
+    return res.status(200).json({ status: 'ok', database: 'connected' });
+  } catch (error) {
+    console.error('Health check failed :', error);
+    return res.status(500).json({ status: 'error', database: 'disconnected' });
+  }
+});
+
+
 app.use(express.json({strict:false}));
 app.use(express.urlencoded({extended:true}));
 app.use((req, res, next) => {

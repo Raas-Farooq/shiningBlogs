@@ -277,11 +277,11 @@ export default function BlogContent() {
         className="flex justify-center"
         
       >
-        <button 
+        {/* <button 
         onClick={() => navigateTo("/userAccount")}
-        className={clsx('sm:hidden border bg-blue-500 rounded-lg text-center px-3 py-2 hover:border-blue-700 transition-all duration-300', !loggedIn ? 'xs:hidden' : 'block')}>
+        className={clsx('border bg-blue-500 rounded-lg text-white text-center px-3 py-2 hover:border-blue-700 transition-all duration-300', !loggedIn ? 'hidden' : 'block')}>
           About Me
-        </button>
+        </button> */}
       </div>
     </footer>
     </>

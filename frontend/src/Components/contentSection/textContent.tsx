@@ -52,7 +52,6 @@ const TextContent: React.FC<TextContentProps> = ({
       let endIndex = 0;
 
       if (contentImages && contentImages.length > 0) {
-        console.log("contentImages ", contentImages);
         const sortedImages = contentImages.sort((a, b) => a.position - b.position);
         const cleanText = textContent.replace(/\[image-\d+\]/g, "         ");
 
@@ -83,7 +82,6 @@ const TextContent: React.FC<TextContentProps> = ({
           contentWithImages.push({ type: "text", value: para });
         });
       }
-      console.log("contentWith Images; ", contentWithImages)
       setTransformedText(contentWithImages); // Store CombinedContent objects
     }
   }, [content, contentImages]);
