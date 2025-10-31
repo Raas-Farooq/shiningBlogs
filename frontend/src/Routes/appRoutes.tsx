@@ -13,6 +13,7 @@ import BlogPost from "../pages/post.tsx";
 import EditPost from '../EditPost/editPost.tsx';
 import NotFound from '../pages/notFound.tsx';
 import ErrorBoundary from "./errorBoundary.jsx";
+import ScrollToTop from "../utils/scrollToTop.tsx";
 
 interface ProtectedRouteProps {
     children: ReactNode;
@@ -87,6 +88,7 @@ const ProtecedRoute = ({ children, stayOnPage = false }: ProtectedRouteProps) =>
 const AppRoutes = () => {
     return (
         <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }} >
+            <ScrollToTop />
             <PageTransition />
         </BrowserRouter>
     );

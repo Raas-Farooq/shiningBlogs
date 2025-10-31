@@ -1,8 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import axios from "axios";
-import PostImage from "./titleImage.tsx";
-import TextContent from "./textContent.tsx";
-import Title from "./Title.jsx";
+
 import {useNavigate } from "react-router-dom";
 import {FaSpinner } from "react-icons/fa";
 // import { Sidebar, User } from "lucide-react";
@@ -16,74 +14,15 @@ import {
 } from "../../globalContext/globalContext.jsx";
 import { VITE_API_URL } from "../../config.ts";
 import { clsx } from "clsx";
+import UserProfile from "./userProfile.tsx";
+import BlogCard from "./BlogCard.tsx";
 // import ContentImages from "./ContentImage.jsx";
 
-interface PresentUser{
-  _id:string,
-  username:string,
-  email:string,
-  password:string,
-  profileImg:string,
-  TopicsInterested:[],
-  goal:string,
-  createdAt:string,
-  updatedAt:string
-}
-
-interface userProfileProps {
-  currentUser:PresentUser | null,
-  profileImage:string
-}
 
 
-function UserProfile( {currentUser, profileImage}:userProfileProps) {
-  
-  return (
-    <aside
-      className={`py-8 p-4 w-[25vw] text-center bg-gray-50 shadow:sm rounded:lg text-gray-700`}
-    >
-      <h2 className="font-bold text:xl mb-6">
-        {" "}
-        {currentUser?.username && currentUser.username.length
-          ? `About ${currentUser.username.toUpperCase()}`
-          : "About"}
-      </h2>
-      {profileImage && (
-        <img
-          src={profileImage}
-          alt="greenry"
-          className="w-auto h-52 mx-auto rounded-lg shadow-md mb-6 "
-        />
-      )}
-      <div className="space-y-6">
-        <section>
-          <h2 className="font-bold mt-4"> Goal</h2>
-          {currentUser?.goal && currentUser.goal.length ? (
-            <h3> {currentUser.goal} </h3>
-          ) : (
-            <h3>Goal is not defined</h3>
-          )}
-        </section>
-        <section>
-          <h3 className="text-bold text-lg font-bold mt-4 text-center border-t border-blue-400">
-            {" "}
-            Interest{" "}
-          </h3>
-          <span className="border-t border-blue-400"></span>
 
-          {currentUser?.TopicsInterested &&
-          currentUser.TopicsInterested.length ? (
-            currentUser.TopicsInterested.map((interest, index) => (
-              <h5 key={index}>{interest} </h5>
-            ))
-          ) : (
-            <h3> interests are not Added</h3>
-          )}
-        </section>
-      </div>
-    </aside>
-  );
-}
+
+
 
 
 interface Blog{
@@ -98,48 +37,6 @@ interface Blog{
   updatedAt:string
 }
 
-interface BlogCardProps{
-  blog:Blog,
-  handlePostClick:(e:React.MouseEvent<HTMLElement>, post:Blog) => void,
-  filtering:boolean
-}
-const BlogCard:React.FC<BlogCardProps> = ({ blog, handlePostClick }) => {
-  // eslint-disable-next-line no-unused-vars
-  const { allBlogsGlobally, searching } = useBlogContext();
-
-  useEffect(() => {
-      console.log("BlogsCount: ", allBlogsGlobally)
-    }
-  ,[])
-
-
-  return (
-    <article
-      onClick={(e) => {
-        if(searching){
-          handlePostClick(e, blog)
-        }
-      }}
-      className="flex flex-col items-center p-4 rounded-lg transition-all duration-300 hover:scale-105
-      shadow-md hover:shadow-xl bg-white
-      max-w-sm w-full"
-    >
-      <h2 className="text-center text-base sm:text-lg font-medium mb-4">
-        <Title title={blog.title} />
-      </h2>
-      <PostImage postImg={blog.titleImage} title={blog.title} />
-      <TextContent content={blog.content} isFullView={false} contentImages={blog?.contentImages} />
-      <button
-        className="mt-4 bg-blue-500 text-white py-2 px-4 rounded-lg 
-        hover:bg-blue-600 transition-colors duration-200
-        focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
-        onClick={(e) => handlePostClick(e, blog)}
-      >
-        Read More
-      </button>
-    </article>
-  );
-};
 
 export default function BlogContent() {
 
