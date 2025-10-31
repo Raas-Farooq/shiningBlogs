@@ -96,14 +96,14 @@ const UserAccount = () => {
 
             />
             }
-            <div className="w-[200px] ">
-              <h2 className="font-bold mt-4"> Goal</h2>
+            <div className="my-10 ">
+              <h2 className="font-bold mt-4 border-t  border-b font-bold my-4 border-t border-blue-400 text-center"> Goal</h2>
               <h3>
                 {currentUser && currentUser.goal ? currentUser.goal : 'No Goal is defined Yet'}
               </h3>
             </div>
             <div className="my-10">
-              <h3 className="text-bold border-b border-gray-400 text-lg text-center font-bold mt-4 border-t border-blue-400 mb-4">
+              <h3 className="text-bold border-b text-lg text-center font-bold my-4 border-t border-blue-400 ">
                 {" "}
                 Interest{" "}
               </h3>

@@ -290,7 +290,7 @@ const BlogPost:React.FC = () => {
             !loggedIn && "xs: sm:hidden"
           )}
         >
-          {currentUser ? (
+          {currentUser && currentUser._id &&  (
             <>
               <h2 className="font-extrabold text-gray-600 ">
                 {" "}
@@ -329,8 +329,6 @@ const BlogPost:React.FC = () => {
                 <h3> You should add Interests</h3>
               )}
             </>
-          ) : (
-            <h2> Loading..</h2>
           )}
         </div>
 
