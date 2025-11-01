@@ -70,12 +70,12 @@ const UserAccount = () => {
   if (accountLoading) return <h1> Please Wait.. </h1>
 
   return (
-    <>
+    <div className="w-full bg-gray-50 flex justify-center items-center">
       {accountLoading ? <h1> Please Wait.. </h1>
         :
-        <div className="flex justify-center m-5 p-5 w-full">
-          <div className="">
-            <div className="flex gap-5 mb-10">
+        <section className="w-full flex justify-center items-center mx-auto max-w-lg p-12 mt-10 bg-white shadow-2xl rounded-lg space-y-8">
+          <article className="">
+            <div className="flex justify-between mb-5 w-full">
               <h2 className="font-extrabold underline text-gray-700 text-2xl"> About {currentUser && currentUser.username} </h2>
               <button
               className=""
@@ -88,55 +88,57 @@ const UserAccount = () => {
               </button>
 
             </div>
-            {imagePreview && <img
+            <div className="w-full flex justify-center max-auto">
+              {imagePreview && <img
               src={imagePreview}
               alt="greenry"
-              className="w-auto max-w-md rounded-lg hover:scale-105 transition-transform duration-300"
+              className="w-auto rounded-full max-w-md hover:scale-105 transition-transform duration-300"
               style={{ width: "240px", height: "250px" }}
 
             />
             }
-            <div className="my-10 ">
-              <h2 className="font-bold mt-4 border-t  border-b font-bold my-4 border-t border-blue-400 text-center"> Goal</h2>
-              <h3>
-                {currentUser && currentUser.goal ? currentUser.goal : 'No Goal is defined Yet'}
-              </h3>
             </div>
-            <div className="my-10">
-              <h3 className="text-bold border-b text-lg text-center font-bold my-4 border-t border-blue-400 ">
+            <div className="bg-orange-100 m-4 p-4 flex flex-col">
+              <h2 className="font-bold mt-4 rounded-lg border-t border-blue-400 text-center text-orange-600"> Goal</h2>
+              <p className="italic text-center text-sm pt-4">
+                {currentUser && currentUser.goal ? currentUser.goal : 'No Goal is defined Yet'}
+              </p>
+            </div>
+            <div className="m-4 p-4 bg-blue-100 rounded-lg">
+              <h3 className="font-bold mt-4 rounded-lg border-t border-blue-400 text-center text-blue-600">
                 {" "}
                 Interest{" "}
               </h3>
-              <div className="">
+              <div className="text-center">
                 {currentUser && currentUser.TopicsInterested?.length > 0 ? currentUser?.TopicsInterested.map((interest, ind) =>
-                  <h5 key={ind}> {interest} </h5>
+                  <p key={ind} className="text-sm italic"> {interest} </p>
                 ):
-                <h3> Edit Profile to Write Your Interests</h3>
+                <p className="italic text-sm"> Edit Profile to Write Your Interests</p>
                 }
               </div>
             </div>
 
-            <div>
-              <button className="border border-red-500 text-red-500 hover:bg-red-500 hover:text-white transition-colors duration-200 px-3 py-1 rounded-md"
+            <div className="">
+              <button className="w-full text-center border border-red-500 text-red-500 hover:bg-red-500 hover:text-white transition-colors duration-200 px-3 py-1 rounded-md"
                 onClick={handleLogout}>
                 Log Out
 
               </button>
             </div>
-            <div className="mt-4">
+            <div className="flex justify-between mt-4">
               <button onClick={() => {
                 setOpenUserAccount(false)
                 navigate(-1)
               }
               }
-                className="text-gray-600 hover:text-gray-900 transition-colors duration-200 px-3 py-1 rounded-md"
-                style={{ lineHeight: '1.2' }}
+                className="text-gray-600 hover:text-blue-700 transition-colors duration-200 px-3 py-1 rounded-md"
+                // style={{ lineHeight: '1.2' }}
               >
                 Back
               </button>
               <button onClick={() => setOpenUserAccount(false)}>
                 <Link
-                  className="text-gray-600 hover:text-gray-900 transition-colors duration-200 px-3 py-1 rounded-md"
+                  className="text-gray-600 hover:text-blue-700 transition-colors duration-200 px-3 py-1 rounded-md"
 
                   to="/"
                 >
@@ -144,11 +146,11 @@ const UserAccount = () => {
                 </Link>
               </button>
             </div>
-          </div>
-        </div>
+          </article>
+        </section>
       }
 
-    </>
+    </div>
   );
 };
 
