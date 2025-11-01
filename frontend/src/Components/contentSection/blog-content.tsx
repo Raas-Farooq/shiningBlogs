@@ -1,16 +1,16 @@
 import { useCallback, useEffect, useState } from "react";
 import axios from "axios";
 
-import {useNavigate } from "react-router-dom";
-import {FaSpinner } from "react-icons/fa";
+import { Link, useNavigate } from "react-router-dom";
+import { FaSpinner } from "react-icons/fa";
 // import { Sidebar, User } from "lucide-react";
 // BlogContent
 //
 import {
-    
-    useAuthenContext,
-    useBlogContext,
-    useUIContext,
+
+  useAuthenContext,
+  useBlogContext,
+  useUIContext,
 } from "../../globalContext/globalContext.jsx";
 import { VITE_API_URL } from "../../config.ts";
 import { clsx } from "clsx";
@@ -25,23 +25,23 @@ import BlogCard from "./BlogCard.tsx";
 
 
 
-interface Blog{
-  _id:string,
-  userId:string,
-  title:string,
-  titleImage:string,
-  public_id:string,
-  content:[],
-  contentImages:[],
-  createdAt:string,
-  updatedAt:string
+interface Blog {
+  _id: string,
+  userId: string,
+  title: string,
+  titleImage: string,
+  public_id: string,
+  content: [],
+  contentImages: [],
+  createdAt: string,
+  updatedAt: string
 }
 
 
 export default function BlogContent() {
 
-  interface PostClick{
-    (e:React.MouseEvent<HTMLElement>, post:Blog):void;
+  interface PostClick {
+    (e: React.MouseEvent<HTMLElement>, post: Blog): void;
   }
   const {
     searchValue,
@@ -54,9 +54,9 @@ export default function BlogContent() {
     setAllBlogsGlobally,
   } = useBlogContext();
 
-  const {showMenu} = useUIContext();
-  const { loggedIn, currentUser, setErrorMessage} = useAuthenContext();
-  
+  const { showMenu } = useUIContext();
+  const { loggedIn, currentUser, setErrorMessage } = useAuthenContext();
+
   const [loading, setLoading] = useState<boolean>(true);
   const [profileImage, setProfileImage] = useState<string>("");
   const navigateTo = useNavigate();
@@ -64,7 +64,7 @@ export default function BlogContent() {
     if (currentUser?.profileImg) {
       const myImage = `${VITE_API_URL}/${currentUser.profileImg}`;
       setProfileImage(myImage);
-      
+
     }
     if (!allBlogsGlobally.length) {
       setLoading(true);
@@ -83,13 +83,13 @@ export default function BlogContent() {
 
   useEffect(() => {
     clearLocalStorage();
-    if(allBlogsGlobally.length === 0){
+    if (allBlogsGlobally.length === 0) {
       setLoading(true);
       axios.get(
-          `${VITE_API_URL}/weblog/allBlogs`
-        ).then(response => {
-          setAllBlogsGlobally(response.data.blogs);
-        })
+        `${VITE_API_URL}/weblog/allBlogs`
+      ).then(response => {
+        setAllBlogsGlobally(response.data.blogs);
+      })
         .catch(err => {
           console.error("got errors while fetching all blogs: ", err);
           setErrorMessage(err);
@@ -99,26 +99,26 @@ export default function BlogContent() {
     }
   }, [allBlogsGlobally?.length]);
 
-  function handleRefresh(e:React.MouseEvent) {
+  function handleRefresh(e: React.MouseEvent) {
     e.preventDefault();
     e.stopPropagation();
     setAllBlogsGlobally([]);
-    if(!loading){
+    if (!loading) {
       setSearching(false);
       setFilteredBlogs([]);
       setSearchValue("");
     }
   }
-  const handlePostClick:PostClick = (e, post) => {
+  const handlePostClick: PostClick = (e, post) => {
     e.stopPropagation();
     navigateTo(`/BlogPost/${post._id}`, { state: { post } });
   };
 
-    const getBlogsToShow = () => {
-      return searchValue || filteredBlogs.length ? filteredBlogs : allBlogsGlobally;
-    };
-    
-    const BlogsToShow = getBlogsToShow();
+  const getBlogsToShow = () => {
+    return searchValue || filteredBlogs.length ? filteredBlogs : allBlogsGlobally;
+  };
+
+  const BlogsToShow = getBlogsToShow();
   return (
     <>
       <div
@@ -129,58 +129,46 @@ export default function BlogContent() {
         )}
       >
         {!allBlogsGlobally.length && loading && (
-        <div className="mt-11 absolute">    
-          <FaSpinner className="animate-spin text-lg" /> Loading Blogs
-        </div>
-      )}
-      <div className="blogsContainer xs:w-[95vw] w-[70vw] text-center m-4 min-h-[30rem]">
-      
-        <button
-          type="button"
-          onClick={handleRefresh}
-          className={`bg-transparent text-gray-600 hover:text-blue-600 hover:underline w-full ${loading && 'mt-6'}`}
-        >
-          Refresh
-        </button>
-        {allBlogsGlobally?.length > 0 && 
-        <div
-        data-component="bottomBlogsContainer"
-        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 justify-items-center"
-        >
-        {BlogsToShow.map((blog, index) => 
-          {
-            return (
-              <BlogCard
-              key={index}
-              blog={blog}
-              handlePostClick={handlePostClick}
-              filtering={false}
-            />
-            )
-          }
+          <div className="mt-11 absolute">
+            <FaSpinner className="animate-spin text-lg" /> Loading Blogs
+          </div>
         )}
-      </div>}
-        
-      </div>
+        <div className="blogsContainer xs:w-[95vw] w-[70vw] text-center m-4 min-h-[30rem]">
 
-      <div className={`hidden md:block`}>
-        {loggedIn && currentUser &&(
-          <UserProfile currentUser={currentUser} profileImage={profileImage} />
-        )}
+          <button
+            type="button"
+            onClick={handleRefresh}
+            className={`bg-transparent text-gray-600 hover:text-blue-600 hover:underline w-full ${loading && 'mt-6'}`}
+          >
+            Refresh
+          </button>
+          {allBlogsGlobally?.length > 0 &&
+            <div
+              data-component="bottomBlogsContainer"
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 justify-items-center"
+            >
+              {BlogsToShow.map((blog, index) => {
+                return (
+                  <BlogCard
+                    key={index}
+                    blog={blog}
+                    handlePostClick={handlePostClick}
+                    filtering={false}
+                  />
+                )
+              }
+              )}
+            </div>}
+
+        </div>
+
+        <div className={`hidden md:block`}>
+          {loggedIn && currentUser && (
+            <UserProfile currentUser={currentUser} profileImage={profileImage} />
+          )}
+        </div>
       </div>
-    </div>
-    <footer>
-      <div
-        className="flex justify-center"
-        
-      >
-        {/* <button 
-        onClick={() => navigateTo("/userAccount")}
-        className={clsx('border bg-blue-500 rounded-lg text-white text-center px-3 py-2 hover:border-blue-700 transition-all duration-300', !loggedIn ? 'hidden' : 'block')}>
-          About Me
-        </button> */}
-      </div>
-    </footer>
+  
     </>
   );
 }
