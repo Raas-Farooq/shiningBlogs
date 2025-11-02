@@ -5,6 +5,7 @@ import WindowSize from '../../windowSize.ts';
 import { Link, useNavigate } from 'react-router-dom';
 import clsx from 'clsx';
 import { VITE_API_URL } from '../../config.ts';
+import useLoginConfirm from '../../utils/useLoginConfirm.tsx';
 
 export default function Navbar({showSearch=true}){
 
@@ -15,7 +16,7 @@ export default function Navbar({showSearch=true}){
     const [searchClicked, setSearchClicked] = useState(false);
     const size = WindowSize();
     const moveTo = useNavigate();
-
+    const loginConfirm = useLoginConfirm();
     
 
     useEffect(() => {
@@ -64,27 +65,14 @@ export default function Navbar({showSearch=true}){
         // setSearching(false);
         // setSearchValue('')
     }
-    const handleSearchChange = (e:React.ChangeEvent<HTMLInputElement>) => {
-        const blogSearch = e.target.value;
-        setSearchValue(blogSearch);
-        setSearching(true);
-        if(!blogSearch){
-            setSearching(false);
-        }
-        const filtered = allBlogsGlobally?.filter(blog => {
-            if(blog.title.toString().toLowerCase().includes(blogSearch?.toString().toLowerCase())){
-                return blog;
-            }
-        })
-        setFilteredBlogs(filtered);
-    } 
+   
 
     
 
-    const handleWriteClick = (e:React.MouseEvent<HTMLButtonElement>) => {
+    const handleWriteClick = async (e:React.MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();
         if(!loggedIn){
-            const confirmMessage= window.confirm("You are Not Logged In! Logged In and create a blog");
+            const confirmMessage = await loginConfirm();
             if(confirmMessage){
                 moveTo('/login')
             }
@@ -93,15 +81,15 @@ export default function Navbar({showSearch=true}){
             moveTo('/write')
         }
     }
-    const handleContentClick = () => 
+    const handleContentClick = async () => 
         {
             if(!loggedIn){
-                const moveToLoggin = window.confirm("You Should Login If You want to see Your Content");
-                if(moveToLoggin){
-                    moveTo('/Login')
-                }
-
-            }else{
+            const confirmMessage = await loginConfirm();
+            if(confirmMessage){
+                moveTo('/login')
+            }
+            
+        } else{
                 moveTo('/content')
             }
         }
@@ -154,18 +142,6 @@ export default function Navbar({showSearch=true}){
                 <li><span onClick={handleWriteClick} className={`cursor-pointer ${linkStyles}`}>Write</span></li>
                 <li><span onClick={handleContentClick} className={`cursor-pointer ${linkStyles}`}>My Posts</span></li>
             </ul>
-
-            {/* Search Bar (Mobile & Desktop) */}
-            <div className={clsx('transition-all duration-300', showMenu ? 'w-full':'hidden md:block md:mr-4')}>
-                <input
-                    type="search"
-                    id="search"
-                    value={searchValue}
-                    onChange={handleSearchChange}
-                    placeholder='Search Any Blog By Its Name'
-                    className='w-full rounded border border-gray-300 px-3 py-1 text-gray-800 placeholder-gray-500 focus:border-blue-500 focus:outline-none'
-                />
-            </div>
 
             {/* User Account / Login / Register (Desktop) */}
             <ul className={clsx('transition-all duration-300', loggedIn ? 'hidden' : 'hidden md:flex md:items-center md:space-x-1 md:mr-2 lg:space-x-6')}>

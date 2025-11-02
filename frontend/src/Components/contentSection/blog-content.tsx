@@ -16,6 +16,7 @@ import { VITE_API_URL } from "../../config.ts";
 import { clsx } from "clsx";
 import UserProfile from "./userProfile.tsx";
 import BlogCard from "./BlogCard.tsx";
+import BlogSearchComponent from "./customBlogSearch.tsx";
 // import ContentImages from "./ContentImage.jsx";
 
 
@@ -71,6 +72,8 @@ export default function BlogContent() {
     }
   }, [currentUser?.profileImg, allBlogsGlobally]);
 
+  
+
   const clearLocalStorage = useCallback(() => {
     const keys = [
       "titleStorage",
@@ -121,6 +124,7 @@ export default function BlogContent() {
   const BlogsToShow = getBlogsToShow();
   return (
     <>
+    <BlogSearchComponent />
       <div
         data-component="AllBlogsParent"
         className={clsx(
@@ -135,13 +139,13 @@ export default function BlogContent() {
         )}
         <div className="blogsContainer xs:w-[95vw] w-[70vw] text-center m-4 min-h-[30rem]">
 
-          <button
+          {/* <button
             type="button"
             onClick={handleRefresh}
             className={`bg-transparent text-gray-600 hover:text-blue-600 hover:underline w-full ${loading && 'mt-6'}`}
           >
             Refresh
-          </button>
+          </button> */}
           {allBlogsGlobally?.length > 0 &&
             <div
               data-component="bottomBlogsContainer"

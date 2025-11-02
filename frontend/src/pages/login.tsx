@@ -116,9 +116,10 @@ const Login = () => {
     return (
         <div className="flex items-center justify-center min-h-screen w-screen bg-gray-50">
            
-                <section className="w-full mx-w-md p-6 bg-white rounded-lg shadow-lg">
+                <section className="section-container w-full max-w-6xl flex justify-center mx-auto">
                     {/* <button className="p-4 rounded-full text-center text-white shadow-lg bg-blue-600" onClick={handleMagicButton()}>Magic Button</button> */}
-                    <h1 className="text-3xl text-pink-600 font-bold text-center mb-8"> Login Here</h1>
+                   <article className="w-full max-w-lg p-6 bg-white rounded-lg shadow-2xl space-y-10">
+                        <h1 className="text-3xl text-orange-600 font-bold text-center mb-8"> Login Here</h1>
                     {loading && (
                     <div className="text-center mb-4">
                         <FaSpinner className="animate-spin inline mr-2" /> Please wait...
@@ -150,7 +151,7 @@ const Login = () => {
                                 {errors.general && <p className="ml-5 text-red-500"> {errors.general}!</p>}
                             <button type="submit" onClick={handleSubmit} 
                             aria-label="Submit" 
-                            className="border transition-colors duration-300 text-lg border-gray-300 p-4 m-5 bg-red-400 rounded-2xl">
+                            className="border transition-colors duration-300 text-lg border-gray-300 px-3 py-2 hover:border-orange-600 hover:text-orange-600 rounded-2xl">
                                 Login
                             </button>
                             {/* {message && <p> {message} </p>} */}
@@ -176,6 +177,9 @@ const Login = () => {
                             </Link>
                         </div>
                     </div>
+
+                   </article>
+                    
                     
                 </section>
             {/* )} */}

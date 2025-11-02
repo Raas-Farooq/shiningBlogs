@@ -68,8 +68,8 @@ export default function Content() {
         moveTo(`/BlogPost/${post._id}`)
     }
     return(
-        <div className="page-content bg-gradient-to-b from-gray-50 to-gray-100 px-6 py-8">
-            <h1 className="text-gray-600 text-center border-b-4 inline-block border-orange-500 my-3"> My Posts </h1>
+        <div className="page-content bg-gradient-to-b from-gray-50 to-gray-100 px-6 py-8 text-center">
+            <h1 className="text-orange-600 text-4xl md:text-5xl font-bold text-center border-b-4 inline-block border-gray-500 my-3"> My Posts </h1>
             <div className="BlogsContainer flex flex-wrap justify-center bg-white max-w-6xl mx-auto gap-6">
             {loading ? (
                 <div>
