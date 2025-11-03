@@ -32,7 +32,7 @@ const Title:React.FC<TitleProps> = ({title}) => {
             (<>
                 {slicedTitle.lastWords ? (
                     <>
-                        <p className={`text-center xs:text-xs xl:text-sm font-semibold text-gray-800 `}>
+                        <p className={`text-center xs:text-xs sm:text-sm font-semibold text-gray-800 `}>
                             {slicedTitle?.initialWords}
                         </p>
                         <p className={`text-center xs:text-xs xl:text-sm font-semibold text-gray-800 `}>
@@ -41,7 +41,7 @@ const Title:React.FC<TitleProps> = ({title}) => {
                     </>
                 ):
                 
-                <p className="text-center xs:text-xs font-semibold xl:text-sm pb-4 xl:pb-3 xl:pb-5 text-gray-800"> {slicedTitle?.initialWords} </p>
+                <p className="text-center xs:text-xs font-semibold sm:text-lg pb-4 xl:pb-3 xl:pb-5 text-gray-800"> {slicedTitle?.initialWords} </p>
                 }
             </>)
             }

@@ -1,3 +1,5 @@
+import { useEffect } from "react";
+
 interface CurrentUser{
   _id:string,
   username:string,
@@ -17,6 +19,10 @@ interface userProfileProps {
 
 
 function UserProfile( {currentUser, profileImage}:userProfileProps) {
+  
+  useEffect(() => {
+    console.log(" current User: ",currentUser);
+  }, []);
   
   return (
     <aside

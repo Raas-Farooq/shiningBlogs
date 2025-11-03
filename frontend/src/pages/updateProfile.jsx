@@ -4,11 +4,12 @@ import { Link, useNavigate, useNavigation } from "react-router-dom";
 import { FaImage } from "react-icons/fa";
 import axios from 'axios';
 import { VITE_API_URL } from "../config.ts";
+import toast from "react-hot-toast";
 
 
 const UpdateProfile = () => {
 
-    const { isAuthenticated, setImagePreview, imagePreview, currentUser } = useAuthenContext();
+    const { isAuthenticated, setImagePreview, imagePreview, currentUser, setCurrentUser } = useAuthenContext();
     const { setEditProfile } = useUIContext();
     // const [userImage, setUserImage] = useState('');
     const [userReceived, setUserReceived] = useState({});
@@ -106,6 +107,7 @@ const UpdateProfile = () => {
         if (formData.interests && formData.interests.length > 0) {
             formInfo.append('interests', JSON.stringify(formData.interests));
         }
+        const toastId = toast.loading('Updating Profile..')
         setLocalLoading(true);
         try {
             const response = await axios.put(
@@ -120,10 +122,13 @@ const UpdateProfile = () => {
                 })
             if (response.data.success) {
                 setLocalLoading(false);
-                window.alert("Updated Successfully! Plz Refresh the Page")
+                // console.log("response.data: ", response.data);
+                setCurrentUser(response.data.new_Profile);
+                toast.success("Updated Profile Successfully", { id: toastId });
             }
         } catch (err) {
             console.log("err: ", err);
+             toast.error('Got Error while updating profile', { id: toastId });
         }
         finally {
             setLocalLoading(false);

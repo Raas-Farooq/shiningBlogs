@@ -4,6 +4,8 @@ import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { VITE_API_URL } from "../../config";
 import { FaEdit } from "react-icons/fa";
+import toast from "react-hot-toast";
+import { User } from "lucide-react";
 
 interface Response {
   isAuthenticated: boolean,
@@ -14,7 +16,7 @@ interface Response {
 const UserAccount = () => {
 
 
-  const { setIsAuthenticated, setLoggedIn, imagePreview, currentUser, setImagePreview } = useAuthenContext();
+  const { setIsAuthenticated, setLoggedIn, imagePreview, setCurrentUser, currentUser, setImagePreview } = useAuthenContext();
   const { setOpenUserAccount, setEditProfile } = useUIContext();
 
   const [accountLoading, setAccountLoading] = useState(false);
@@ -22,7 +24,6 @@ const UserAccount = () => {
   useEffect(() => {
 
     if (currentUser?.profileImg) {
-
       const myImage = `${VITE_API_URL}/${currentUser.profileImg}`;
       setImagePreview(myImage);
     }
@@ -34,8 +35,9 @@ const UserAccount = () => {
       }
       if (userId) {
         try {
-          console.log("VITE_API_URL: ", VITE_API_URL, "currentUser: ", currentUser)
-          const response: Response = await axios.get(`${VITE_API_URL}/weblog/checkAuthen`);
+          const response: Response = await axios.get(`${VITE_API_URL}/weblog/checkAuthen`, 
+            {withCredentials:true}
+          );
           if (response.isAuthenticated) {
             setAccountLoading(false)
           }
@@ -55,15 +57,25 @@ const UserAccount = () => {
   }, [currentUser])
   const handleLogout = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
+    const toastId = toast.loading (
+  "Logging Out.."
+    )
     try {
       await axios.post(`${VITE_API_URL}/weblog/logout`, {}, { withCredentials: true });
       localStorage.removeItem('userId');
+      setCurrentUser(null)
       setLoggedIn(false)
-      setIsAuthenticated(false)
+      setIsAuthenticated(false);
+      setImagePreview('');
+      toast.success("Successfully logged Out ", {id:toastId});
+      setTimeout(() => {
+        navigate("/");
+      },200)
     } catch (err) {
-      console.log("Error while logging out ")
+      console.log("Error while logging out ");
+      toast.error("Error occurred while logging off ", {id:toastId});
     }
-    navigate("/");
+    
   }
 
 
@@ -89,13 +101,16 @@ const UserAccount = () => {
 
             </div>
             <div className="w-full flex justify-center max-auto">
-              {imagePreview && <img
+    
+              {imagePreview ?  <img
               src={imagePreview}
               alt="greenry"
               className="w-auto rounded-full max-w-md hover:scale-105 transition-transform duration-300"
               style={{ width: "240px", height: "250px" }}
 
-            />
+            />:
+
+             <span> <User className="text-gray-900"/> </span>
             }
             </div>
             <div className="bg-orange-100 m-4 p-4 flex flex-col">

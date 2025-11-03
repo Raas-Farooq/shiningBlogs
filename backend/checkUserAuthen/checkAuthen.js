@@ -3,6 +3,7 @@ import { User } from '../models/model.js';
 
 const CheckAuthen = async(req, res) => {
     const token = req.cookies.token;
+     console.log("Token inside authentication ",token);
     if(!token){
         return res.status(401).json({
             isAuthenticated:false
@@ -19,6 +20,7 @@ const CheckAuthen = async(req, res) => {
                 try{
                     const userId = decoded.user.userId;
                     const user = await User.findById(userId).select('-password');
+                    console.log("got user inside Authenticaton ", user)
                     if(!user){
                         return res.status(404).json({
                             success:false,

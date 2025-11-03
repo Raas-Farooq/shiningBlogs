@@ -26,7 +26,7 @@ const Image:React.FC<ImageProps> = ({postImg, title, isFullView}) => {
         }
     }, [postImg])
 
-    const imageStyles= isFullView ? 'rounded-t-lg h-[400px] w-4/5 mb-12' : 'rounded-t-lg object-cover h-52 w-56'
+    const imageStyles= isFullView ? 'rounded-t-lg h-[450px] w-4/5 mb-12' : ' max-w-sm aspect-[4/3] rounded-t-lg overflow-hidden'
     return (
         <>   
             {imageSrc && <img src={imageSrc} alt={title} className={imageStyles} />}

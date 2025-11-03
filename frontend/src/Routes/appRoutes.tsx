@@ -14,6 +14,7 @@ import EditPost from '../EditPost/editPost.tsx';
 import NotFound from '../pages/notFound.tsx';
 import ErrorBoundary from "./errorBoundary.jsx";
 import ScrollToTop from "../utils/scrollToTop.tsx";
+import BlogContent from "../Components/contentSection/blog-content.tsx";
 
 interface ProtectedRouteProps {
     children: ReactNode;
@@ -57,6 +58,7 @@ const PageTransition = () => {
                     <Route path="/about" element={<About />} />
                     <Route path="/write" element={<ProtecedRoute stayOnPage={true}><Write /></ProtecedRoute>} />
                     <Route path="/content" element={<Content />} />
+                    <Route path="/allBlogs" element={<BlogContent />} />
                     <Route path="/userAccount" element={<UserAccount />} />
                     <Route path="/updateProfile" element={<UpdateProfile />} /> 
                     <Route path="/registerUser" element={<Register />} />   

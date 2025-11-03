@@ -4,6 +4,7 @@ import MainSection from  './Components/mainSection/main-section.tsx';
 import BlogContent from './Components/contentSection/blog-content.tsx';
 import { useAuthenContext } from './globalContext/globalContext.tsx';
 import Home from './Home/home.tsx';
+import { Toaster } from 'react-hot-toast';
 
 function App() {
   const {loading} = useAuthenContext();
@@ -16,9 +17,18 @@ function App() {
       <Home />
      </>
     )}
-      
+      <Toaster 
+      position='top-center'
+      toastOptions={
+       {
+         duration:4000
+       }
+      }
+      />
     </>
   )
 }
 
 export default App
+
+// https://chatgpt.com/s/t_69072b7b6f88819191e108e04de2e8f3

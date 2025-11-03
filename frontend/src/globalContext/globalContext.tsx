@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useState, ReactNode } from "react"
 import axios from 'axios';
 import { jwtDecode } from "jwt-decode";
 import { VITE_API_URL } from "../config";
+import toast from "react-hot-toast";
 
 // import { BiLogoMailchimp } from "react-icons/bi";
 // import UserAccount from "../Components/userAccount/userAccout";
@@ -58,6 +59,7 @@ export const AuthenContextProvider = ({children} : {children:ReactNode}) => {
     const [errorMessage, setErrorMessage] = useState('');
     useEffect(() => {
         const userId = localStorage.getItem('userId');
+          console.log("user Id On Refresh: ", userId)
         if (userId) {
           userAuthentication(); // Fetch full user data if we have a userId
         } else {
@@ -65,9 +67,11 @@ export const AuthenContextProvider = ({children} : {children:ReactNode}) => {
         }
     }, []);
 
-    useEffect(() => {
+    // useEffect(() => {
 
-    },[imagePreview])
+    // },[imagePreview])
+
+
     useEffect(() => {
         const interval = setInterval(() => {
             userAuthentication();
@@ -94,15 +98,16 @@ export const AuthenContextProvider = ({children} : {children:ReactNode}) => {
         try {
             const response = await axios.get(`${VITE_API_URL}/weblog/checkAuthen`, {withCredentials: true});
             const token = response.data.token;
+          
             if(isTokenExpired(token)){
-                alert("Token expred.. logging OUt from userAuthentication fetch globalContext");
+                toast("Token expred.. logging OUt from userAuthentication fetch globalContext");
                 setLoggedIn(false);
                 setCurrentUser(null);
                 localStorage.removeItem('userId');
                 return;
             }
             if (response.data.isAuthenticated) {
-    
+                console.log(" inside isAuthenticated: ", response.data)
                 setLoggedIn(true);
                 const user = response.data.user;
                 setCurrentUser(user);
@@ -113,6 +118,7 @@ export const AuthenContextProvider = ({children} : {children:ReactNode}) => {
                 }
                 localStorage.setItem('userId', response.data.user._id);
             } else {
+                 console.log("neither expired time nor inside isAuthenticated: ", response.data)
                 setLoggedIn(false);
                 setCurrentUser(null);
                 localStorage.removeItem('userId');
