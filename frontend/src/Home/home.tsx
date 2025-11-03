@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom"
 import { useAuthenContext } from "../globalContext/globalContext";
 import useLoginConfirm from "../utils/useLoginConfirm";
 import toast from "react-hot-toast"
+import { useEffect } from "react";
 // import toast from 'react-hot-toast';
 const footerLinks = [
 
@@ -48,6 +49,11 @@ const Home = () => {
 
     const navigate = useNavigate();
 
+    useEffect(() => {
+          localStorage.removeItem('localContent');
+          localStorage.removeItem('localTitle');
+          localStorage.removeItem('localTitleImage');
+    },[])
     const handleWriteBlog = async () => {
         if (!loggedIn) {
             const loginResult = await confirmLogin();

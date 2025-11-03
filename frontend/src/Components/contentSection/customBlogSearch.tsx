@@ -22,7 +22,7 @@ const BlogSearchComponent = () => {
 
 
     return (
-        <div className="flex justify-center items-center my-8">
+        <div className="flex justify-center items-center mt-16 mb-6">
             <div className={clsx('w-full max-w-md  transition-all duration-300', 'w-full')}>
                     <input
                         type="search"
@@ -30,7 +30,7 @@ const BlogSearchComponent = () => {
                         value={searchValue}
                         onChange={handleSearchChange}
                         placeholder='Search Any Blog By Its Name'
-                        className='w-full rounded border border-gray-300 px-3 py-1 text-gray-800 placeholder-gray-500 focus:border-blue-500 focus:outline-none'
+                        className='w-full rounded border border-gray-300 px-3 py-1 text-gray-800 placeholder-gray-500 outline-none focus:ring-2 focus:border-orage-500 focus:ring-orange-600'
                     />
                 </div>
         </div>

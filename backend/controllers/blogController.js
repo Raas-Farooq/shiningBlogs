@@ -8,6 +8,7 @@ import { body, validationResult } from 'express-validator';
 import jwt from 'jsonwebtoken';
 import authMiddleware from '../middleAuthentication/authMiddleware.js';
 import he from 'he';
+
 // import { isConstructorDeclaration } from 'typescript';
 
 
@@ -88,6 +89,70 @@ const registerUser = async (req,res) => {
     
 }
 
+
+// pipleline = [{
+//     $match:{status:'completed'},
+// },
+// {
+//     $addFields:{
+//         totalAmount:{
+//             $sum:{
+//                 $map:{
+//                     input: "$items",
+//                     as:'item',
+//                     in:{$multiply : ["$$items.price", "$$items.quantity"]}
+//                 }
+//             }
+//         }
+//     }
+// }, {
+//     $group:{
+//         ordersOfCustomer:{$count:customerId},
+//         revenue:{$sum:items.price}
+//     }
+// }]
+
+// await orders.aggregate(pipleline)
+ 
+// const filterByImages = async (req,res) => {
+//     const {blogId} = req.body;
+//     try{
+
+//         const pipeline = [{
+//             $match:{_id: blogId, $exp:{$gte:[{$size: contentImages}, 2 ]} },
+            
+//             $project:{
+//                 content:1,
+//                 title:1,
+//                 publid_id:1
+//             },
+//             group:{
+//                 _id:"$public_id",
+//                 title:{blogTitle:title}
+//             }
+//         }]
+//         const aggregateResult = await Blog.aggregate(pipeline);
+
+//         if(!aggregateResult){
+//             return res.status(400).json({
+//                 success:false,
+//                 message:"Unable to find the requested user. Try Again"
+//             })
+//         }
+//         return res.status(200).json({
+//             success:true,
+//             message:"Successfully access the User",
+//             aggregateResult
+//         })
+//     }
+
+//     catch(err){
+//         res.status(500).json({
+//             success:false,
+//             message:"Got server error while getting the user"
+//         })
+//     }
+// }
 // user Login Function
 
 /**Handles user login by validating input, checking credentials, and generating a JWT token.

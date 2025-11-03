@@ -17,6 +17,7 @@ import { clsx } from "clsx";
 import UserProfile from "./userProfile.tsx";
 import BlogCard from "./BlogCard.tsx";
 import BlogSearchComponent from "./customBlogSearch.tsx";
+import Navbar from "../Navbar/navbar.tsx";
 // import ContentImages from "./ContentImage.jsx";
 
 
@@ -124,6 +125,7 @@ export default function BlogContent() {
   const BlogsToShow = getBlogsToShow();
   return (
     <>
+    <Navbar />
     <BlogSearchComponent />
       <div
         data-component="AllBlogsParent"
@@ -137,7 +139,7 @@ export default function BlogContent() {
             <FaSpinner className="animate-spin text-lg" /> Loading Blogs
           </div>
         )}
-        <div className="blogsContainer xs:w-[95vw] w-[70vw] text-center m-4 min-h-[30rem]">
+        <div className={`blogsContainer xs:w-[95vw] w-[70vw] text-center m-4 min-h-[30rem] ${!loggedIn  ? 'w-[100vw]' : 'xs:w-[95vw] w-[70vw]'}`}>
 
           {/* <button
             type="button"
@@ -149,8 +151,8 @@ export default function BlogContent() {
           {allBlogsGlobally?.length > 0 &&
             <div
               data-component="bottomBlogsContainer"
-              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 justify-items-center"
-            >
+              className={`grid grid-cols-1 md:grid-cols-2 gap-10 justify-items-center ${!loggedIn && 'lg:grid-cols-3'}`}
+              >
               {BlogsToShow.map((blog, index) => {
                 return (
                   <BlogCard

@@ -46,7 +46,7 @@ const BlogCard:React.FC<BlogCardProps> = ({ blog, handlePostClick }) => {
       <h2 className="text-center text-base sm:text-lg font-medium mb-4">
         <Title title={blog.title} />
       </h2>
-      <PostImage postImg={blog.titleImage} title={blog.title} />
+      <img src={blog.titleImage} className="aspect-[4/3] overflow-hidden rounded-xl " />
       <TextContent content={blog.content} isFullView={false} contentImages={blog?.contentImages} />
       <button
         className="mt-4 bg-blue-500 text-white py-2 px-4 rounded-lg 

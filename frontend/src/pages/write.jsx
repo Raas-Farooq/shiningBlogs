@@ -6,6 +6,7 @@ import { BlogContextProvider, useAuthenContext, useBlogContext } from "../global
 import { Upload } from "lucide-react";
 import { VITE_API_URL } from "../config.ts";
 import { FaSpinner } from "react-icons/fa";
+import toast from "react-hot-toast";
 
 export default function Write() {
   const [blogTitle, setBlogTitle] = useState({
@@ -252,6 +253,7 @@ export default function Write() {
         }));
         blogData.append("contentImages", JSON.stringify(imagesWithPositions));  
       }
+      const toastId = toast.loading('Creating Your Blog..')
 
       try {
         const response = await axios.post(
@@ -276,6 +278,9 @@ export default function Write() {
             titleImg: "",
             imgPreview: "",
           }));
+          localStorage.removeItem('localContent');
+          localStorage.removeItem('localTitle');
+          localStorage.removeItem('localTitleImage');
           setContentImages([]);
           setContentText("");
           setImagesShortNames([]);
@@ -285,7 +290,8 @@ export default function Write() {
             [...earlierBlogs, response.data.newBlog]
           )
           )
-          alert("Blog Created Successfully");
+          
+          toast.success("Blog Created. Success!", { id: toastId });
           moveTo("/");
         }
       } catch (err) {
@@ -314,6 +320,7 @@ export default function Write() {
       } finally {
         setLocalLoading(false);
       }
+      toast.error(errorMessage, { id: toastId });
     }
   };
 
@@ -321,7 +328,7 @@ export default function Write() {
   return (
     <div className="bg-gray-50 min-h-screen py-10">
       <div className="bg-white shadow-md rounded:lg px-6 py-8 w-full mx-auto max-w-3xl">
-        <h2 className="text-3xl font-bold text-center text-purple-600"> Your Shinning Post</h2>
+        <h2 className="text-3xl font-bold md:text-4xl text-center text-orange-600"> Your Shinning Post</h2>
         {loadingCloudinaryUpload && 
           <div className="fixed inset-0 z-50 flex justify-center bg-black items-center bg-opacity-50">
             <div className="bg-white text-black shadow-lg flex items-center p-5 rounded-lg ">
@@ -344,7 +351,7 @@ export default function Write() {
           </div>}
 
         <form method="post" className="space-y-3 flex flex-col">
-          <label htmlFor="title" className="text-pink-600">
+          <label htmlFor="title" className="text-gray-600 font-medium">
             {" "}
             Enter your title
           </label>
@@ -352,7 +359,7 @@ export default function Write() {
             type="text"
             name="title"
             placeholder="Enter the Title of Post "
-            className="border border-gray-500 px-4 py-2 max-w-md rounded-md placeholder:text-gray-500 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
+            className="border border-gray-500 px-4 py-2 max-w-md rounded-md placeholder:text-gray-500 outline-none focus:ring-1 focus:ring-gray-700 focus:border-gray-800 transition-all"
             onChange={handleTitles}
             value={blogTitle.title}
             required
@@ -387,7 +394,7 @@ export default function Write() {
             </p>
           )}
 
-          <label htmlFor="titleImage" className="text-pink-600 w-fit">
+          <label htmlFor="titleImage" className="text-gray-600 font-medium w-fit">
             Start Writing Your Post Content
           </label>
           <div className="relative">
