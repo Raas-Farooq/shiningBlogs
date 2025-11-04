@@ -208,7 +208,7 @@ const BlogPost:React.FC = () => {
       )}
       
         {(postLoading || ownerLoading) ? (
-          <div className="text-center flex justify-center mt-15">
+          <div className="text-center flex justify-center mt-20">
             <FaSpinner className="animate-spin text-center inline text-xl" /> Loading
             the Post..
           </div>
@@ -285,9 +285,9 @@ const BlogPost:React.FC = () => {
         <div
           className={clsx(
             "px-2 py-32 flex justify-right ml-auto",
-            loggedIn ? "w-[30vw]" : "w-0",
-            "bg-white text-gray-700 text-center relative xs:hidden sm:block",
-            !loggedIn && "xs: sm:hidden"
+            loggedIn ? "hidden md:w-[30vw]" : "w-0",
+            "bg-white text-gray-700 text-center relative hidden md:block",
+            !loggedIn && "hidden"
           )}
         >
           {currentUser && currentUser._id &&  (
