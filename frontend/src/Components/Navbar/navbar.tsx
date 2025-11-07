@@ -71,10 +71,14 @@ export default function Navbar({showSearch=true}){
 
     const handleWriteClick = async (e:React.MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();
+        console.log("Write has been clicked ");
         if(!loggedIn){
+            console.log("inside The !logged In condtino")
             const confirmMessage = await loginConfirm();
             if(confirmMessage){
-                moveTo('/login')
+                setTimeout(() => {
+                    moveTo('/login')
+                },1200)
             }
             
         }else{
@@ -106,7 +110,7 @@ export default function Navbar({showSearch=true}){
         'xs:hidden lg:hidden': showMenu || !inHomePage,
         'md:block md:mt-0': loggedIn,
         })
-        const linkStyles = 'text-lg font-semibold  text-gray-800 hover:text-blue-500 transition-colors duration-200';
+        const linkStyles = 'text-lg font-semibold  text-gray-800 hover:text-blue-500 transition-colors duration-200 focus:outline-none focus:ring-0';
     return(
         <nav className={`flex items-center justify-between bg-white,
              backdrop-blur-sm bg-opacity-80 py-3 fixed top-0 z-20 w-full

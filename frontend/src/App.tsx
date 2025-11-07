@@ -5,6 +5,7 @@ import BlogContent from './Components/contentSection/blog-content.tsx';
 import { useAuthenContext } from './globalContext/globalContext.tsx';
 import Home from './Home/home.tsx';
 import { Toaster } from 'react-hot-toast';
+import { Outlet } from 'react-router-dom';
 
 function App() {
   const {loading} = useAuthenContext();
@@ -12,11 +13,8 @@ function App() {
     <>
     {loading ? <h1> ..Loading </h1> : (
      <>
+     
       <Navbar />
-      {/* <MainSection /> */}
-      <Home />
-     </>
-    )}
       <Toaster 
       position='top-center'
       toastOptions={
@@ -24,7 +22,12 @@ function App() {
          duration:4000
        }
       }
+      containerStyle={{zIndex:9999}}
       />
+      <Outlet />
+     </>
+    )}
+      
     </>
   )
 }

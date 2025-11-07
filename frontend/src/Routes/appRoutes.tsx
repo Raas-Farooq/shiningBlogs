@@ -15,6 +15,7 @@ import NotFound from '../pages/notFound.tsx';
 import ErrorBoundary from "./errorBoundary.jsx";
 import ScrollToTop from "../utils/scrollToTop.tsx";
 import BlogContent from "../Components/contentSection/blog-content.tsx";
+import Home from "../Home/home.tsx";
 
 interface ProtectedRouteProps {
     children: ReactNode;
@@ -53,19 +54,21 @@ const PageTransition = () => {
         >
             <ErrorBoundary>
                 <Routes location={displayLocation}>
-                    <Route path="*" element={<App />} />
-                    <Route path="/" element={<App />} />
-                    <Route path="/about" element={<About />} />
-                    <Route path="/write" element={<ProtecedRoute stayOnPage={true}><Write /></ProtecedRoute>} />
-                    <Route path="/content" element={<Content />} />
-                    <Route path="/allBlogs" element={<BlogContent />} />
-                    <Route path="/userAccount" element={<UserAccount />} />
-                    <Route path="/updateProfile" element={<UpdateProfile />} /> 
-                    <Route path="/registerUser" element={<Register />} />   
-                    <Route path="/login" element={<Login />} /> 
-                    <Route path="/BlogPost/:id" element={<BlogPost />} />
-                    <Route path="/editPost" element={<EditPost />} />
-                    <Route path="/notFound" element={<NotFound />} />
+                    <Route path="/" element={<App />} >
+                        <Route index element={<Home />} />
+                        <Route path="/about" element={<About />} />
+                        <Route path="/write" element={<ProtecedRoute stayOnPage={true}><Write /></ProtecedRoute>} />
+                        <Route path="/content" element={<Content />} />
+                        <Route path="/allBlogs" element={<BlogContent />} />
+                        <Route path="/userAccount" element={<UserAccount />} />
+                        <Route path="/updateProfile" element={<UpdateProfile />} /> 
+                        <Route path="/registerUser" element={<Register />} />   
+                        <Route path="/login" element={<Login />} /> 
+                        <Route path="/BlogPost/:id" element={<BlogPost />} />
+                        <Route path="/editPost" element={<EditPost />} />
+                        
+                    </Route>
+                    <Route path="*" element={<NotFound />} />
                 </Routes>
             </ErrorBoundary>
         </div>

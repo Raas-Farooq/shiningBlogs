@@ -341,7 +341,7 @@ export default function Write() {
           </div>
           }
         {errorMessage && <h2 className="text-red-500"> *{errorMessage} </h2>} 
-        {localLoading && 
+        {/* {localLoading && 
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
             <div className="bg-white rounded-lg shadow-lg p-5 flex items-center gap-3">
               <FaSpinner className="animate-spin text-purple-600" />
@@ -349,7 +349,7 @@ export default function Write() {
                 Creating the Post, please wait...
               </span>
             </div>
-          </div>}
+          </div>} */}
 
         <form method="post" className="space-y-3 flex flex-col">
           <label htmlFor="title" className="text-gray-600 font-medium">

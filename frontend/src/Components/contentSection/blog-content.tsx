@@ -3,6 +3,7 @@ import axios from "axios";
 
 import { Link, useNavigate } from "react-router-dom";
 import { FaSpinner } from "react-icons/fa";
+import toast from "react-hot-toast";
 // import { Sidebar, User } from "lucide-react";
 // BlogContent
 //
@@ -62,6 +63,7 @@ export default function BlogContent() {
   const [loading, setLoading] = useState<boolean>(true);
   const [profileImage, setProfileImage] = useState<string>("");
   const navigateTo = useNavigate();
+  
   useEffect(() => {
     if (currentUser?.profileImg) {
       const myImage = `${VITE_API_URL}/${currentUser.profileImg}`;
@@ -92,7 +94,11 @@ export default function BlogContent() {
       axios.get(
         `${VITE_API_URL}/weblog/allBlogs`
       ).then(response => {
-        setAllBlogsGlobally(response.data.blogs);
+        if(response.data.success){
+          const reversed = [...response.data.blogs].reverse();
+          setAllBlogsGlobally(reversed);
+        }
+        
       })
         .catch(err => {
           console.error("got errors while fetching all blogs: ", err);
@@ -125,7 +131,6 @@ export default function BlogContent() {
   const BlogsToShow = getBlogsToShow();
   return (
     <>
-    <Navbar />
     <BlogSearchComponent />
       <div
         data-component="AllBlogsParent"
