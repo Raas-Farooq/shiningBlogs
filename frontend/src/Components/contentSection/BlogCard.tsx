@@ -40,7 +40,7 @@ const BlogCard:React.FC<BlogCardProps> = ({ blog, handlePostClick }) => {
           handlePostClick(e, blog)  
       }}
       className="flex flex-col items-center cursor-pointer p-4 rounded-lg transition-all duration-300 hover:scale-105
-      shadow-md hover:shadow-xl bg-white
+      shadow-xl hover:shadow-2xl bg-white
       max-w-sm w-full"
     >
       <h2 className="text-center text-base sm:text-lg font-medium mb-4">

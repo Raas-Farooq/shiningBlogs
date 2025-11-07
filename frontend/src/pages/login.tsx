@@ -25,7 +25,7 @@ interface ErrorHandle {
 
 const Login = () => {
 
-    const { setIsAuthenticated, setCurrentUser, setLoggedIn, setImagePreview } = useAuthenContext();
+    const { setIsAuthenticated, setCurrentUser, setLoggedIn, setImagePreview, scheduleAutoLogout} = useAuthenContext();
     const [email, setEmail] = useState<string>('');
     // const [message, setMessage] = useState<string>('');
     const [password, setPassword] = useState<string>('');
@@ -78,6 +78,7 @@ const Login = () => {
 
             if (login_response.data.success) {
                 console.log("login: ", login_response.data);
+                const token = login_response.data.token;
                 toast.success("Logged In. Success!", { id: toastId });
                 const userId = login_response.data.user._id;
                 localStorage.setItem('userId', userId);
@@ -90,7 +91,7 @@ const Login = () => {
                     );
                     imgPreview = `data:${user.profileImg.contentType};base64,${base64String}`;
                 }
-                
+                scheduleAutoLogout(token);
                 setImagePreview(imgPreview);
                 setCurrentUser(login_response.data.user);
                 setIsAuthenticated(true);
@@ -161,14 +162,14 @@ const Login = () => {
                             {errors.general && <p className="ml-5 text-red-500"> {errors.general}!</p>}
                             <button type="submit" onClick={handleSubmit}
                                 aria-label="Submit"
-                                className="border mt-10 transition-colors duration-300 bg-orange-500 text-white text-lg border-gray-300 px-4 py-2 hover:bg-orange-600 rounded-2xl">
+                                className="border mt-7 transition-colors duration-300 bg-orange-500 text-white text-lg border-gray-300 px-4 py-2 hover:bg-orange-600 rounded-2xl">
                                 Login
                             </button>
                             {/* {message && <p> {message} </p>} */}
                         </div>
                     </form>
                     <div className="text-center ">
-                        <p className="mb-5"> Do not have Account ?</p>
+                        <p className="mt-5 mb-3"> Do not have Account ?</p>
                         <Link
                             className="border p-3 hover:underline rounded-xl"
                             to="/registerUser">Register Here </Link>

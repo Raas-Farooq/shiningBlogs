@@ -30,6 +30,7 @@ interface decodedToken{
 }
 interface AuthenContentProps {
     loggedIn: boolean;
+    scheduleAutoLogout:(token:string) => void;
     setLoggedIn: React.Dispatch<React.SetStateAction<boolean>>; // Add this line
     registerData: RegisterNewUser | null;
     setRegisterData: React.Dispatch<React.SetStateAction<RegisterNewUser | null>>; // Also add this
@@ -59,7 +60,6 @@ export const AuthenContextProvider = ({children} : {children:ReactNode}) => {
     const [errorMessage, setErrorMessage] = useState('');
     useEffect(() => {
         const userId = localStorage.getItem('userId');
-          console.log("user Id On Refresh: ", userId)
         if (userId) {
           userAuthentication(); // Fetch full user data if we have a userId
         } else {
@@ -67,18 +67,11 @@ export const AuthenContextProvider = ({children} : {children:ReactNode}) => {
         }
     }, []);
 
-    // useEffect(() => {
-
-    // },[imagePreview])
-
 
     useEffect(() => {
-        const interval = setInterval(() => {
-            userAuthentication();
-        }, 60000);
-    
-        return () => clearInterval(interval)
+        userAuthentication();
     },[])
+
     const decodeToken = (token:string): decodedToken | null => {
         try{
             return jwtDecode(token)
@@ -86,20 +79,45 @@ export const AuthenContextProvider = ({children} : {children:ReactNode}) => {
             return null
         }
     }
-    const isTokenExpired = (token:string):boolean => {
+
+
+    const logout = async ()=> {
+
+        try{
+            await axios.post(`${VITE_API_URL}/weblog/logout`); 
+        }catch{
+            console.error('error while logging out');
+        }
+
+      localStorage.removeItem('userId');
+      setCurrentUser(null)
+      setLoggedIn(false)
+      setIsAuthenticated(false);
+      setImagePreview('');
+    }
+
+    const scheduleAutoLogout = (token:string) => {
         const decoded = decodeToken(token);
-    
+        console.log("schedule logout: ", token);
         if(!decoded || !decoded.exp) return true
-    
-        return Date.now() > decoded.exp * 1000
+        const expiry = decoded.exp * 1000 - Date.now();
+        console.log(" deconded.exp ", decoded.exp * 1000, " Date.now() ", Date.now())
+        if(expiry <= 0){
+            logout();
+        }
+        setTimeout(() => {
+            
+            logout();
+        }, expiry)
         
     }
+
     const userAuthentication = async () => {
         try {
             const response = await axios.get(`${VITE_API_URL}/weblog/checkAuthen`, {withCredentials: true});
             const token = response.data.token;
           
-            if(isTokenExpired(token)){
+            if(scheduleAutoLogout(token)){
                 toast("Token expred.. logging OUt from userAuthentication fetch globalContext");
                 setLoggedIn(false);
                 setCurrentUser(null);
@@ -107,7 +125,6 @@ export const AuthenContextProvider = ({children} : {children:ReactNode}) => {
                 return;
             }
             if (response.data.isAuthenticated) {
-                console.log(" inside isAuthenticated: ", response.data)
                 setLoggedIn(true);
                 const user = response.data.user;
                 setCurrentUser(user);
@@ -137,6 +154,7 @@ export const AuthenContextProvider = ({children} : {children:ReactNode}) => {
 
     return (
         <AuthenContext.Provider value={{
+            scheduleAutoLogout,
             loggedIn,
             setLoggedIn,
             registerData,

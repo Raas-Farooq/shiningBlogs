@@ -241,7 +241,7 @@ export default function Write() {
       blogData.append("titleImage", blogTitle.titleImg);
       blogData.append("content", JSON.stringify(contentArray));
       blogData.append("public_id", blogTitle.titleImagePublicId)
-// why not we Stringifying the titleImage whereas we are doing on others?
+
       if (contentImages) {
         console.log("contentImages before appending: ", contentImages)
         const imagesWithPositions = contentImages.map((img, index) => ({
@@ -295,7 +295,7 @@ export default function Write() {
           moveTo("/");
         }
       } catch (err) {
-        console.log("only Error: ", err)
+        
         if (
           err.response?.data?.error === "jwt expired" ||
           err.response?.data?.message === "Unable to get Token Bearer"
@@ -317,10 +317,11 @@ export default function Write() {
         else{
           setErrorMessage(err);
         }
+         toast.error(errorMessage, { id: toastId });
       } finally {
         setLocalLoading(false);
       }
-      toast.error(errorMessage, { id: toastId });
+     
     }
   };
 
