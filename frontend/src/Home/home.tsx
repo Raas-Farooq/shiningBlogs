@@ -4,6 +4,7 @@ import { useAuthenContext } from "../globalContext/globalContext";
 import useLoginConfirm from "../utils/useLoginConfirm";
 import toast from "react-hot-toast"
 import { useEffect } from "react";
+import useImageCached from "../utils/useImageCached";
 // import toast from 'react-hot-toast';
 const footerLinks = [
 
@@ -46,14 +47,17 @@ const famousTopics = [
 const Home = () => {
     const { loggedIn } = useAuthenContext();
     const confirmLogin = useLoginConfirm();
+    const heroImage = useImageCached('/blog5.jpg')
+    const readingImage = useImageCached('/reading1.jpg')
 
     const navigate = useNavigate();
 
     useEffect(() => {
-          localStorage.removeItem('localContent');
-          localStorage.removeItem('localTitle');
-          localStorage.removeItem('localTitleImage');
-    },[])
+        localStorage.removeItem('localContent');
+        localStorage.removeItem('localTitle');
+        localStorage.removeItem('localTitleImage');
+    }, [])
+
     const handleWriteBlog = async () => {
         if (!loggedIn) {
             const loginResult = await confirmLogin();
@@ -70,18 +74,40 @@ const Home = () => {
     //     navi
     // }
     // bg-gradient-to-r from-purple-50 to-white 
+    const commonClasses = "w-full max-w-4xl shadow-md rounded-lg object-cover";
     return (
         <main className="min-h-screen bg-gray-50">
             <div className="container mx-auto space-y-16 px-4 sm:px-6 lg:px-8">
                 <section className="Hero relative py-16 md:py-24 rounded-lg shadow-lg">
-                    <div className="max-w-6xl mx-auto flex flex-col items-center text-center px-6 py-12">
-                        <h1 className="text-4xl md:text-5xl font-bold mb-5"> Become Blogger Today</h1>
-                        <div className="relative">
-                            <img src="/blog5.jpg" className="w-full object-cover shadow-md rounded-lg" />
+                    <div className="max-w-6xl mx-auto flex flex-col items-center text-center px-6 py-8">
+                        <h1 className="text-4xl md:text-5xl font-bold mb-3"> Become Blogger Today</h1>
+                        <div className="flex justify-center w-full relative">
+                            {heroImage.imageStatus === 'loading' && (
+                                // Display the placeholder only when loading
+                                <div className={`${commonClasses} bg-gray-200 aspect-[6/3] animate-pulse z-10`}>
+                                </div>
+                            )}
+
+                            {heroImage.imageStatus === 'loaded' && (
+                                // Display the actual image only when loaded
+                                <img
+                                    src={'/blog5.jpg'}
+                                    alt="Hero"
+                                    className={`${commonClasses} aspect-[6/3]`}
+                                />
+                            )}
+
+                            {heroImage.imageStatus === 'failed' && (
+                                <div className={`${commonClasses} bg-red-400 flex items-center justify-center`}>
+                                    <p className="text-white">Image Failed to Load</p>
+                                </div>
+                            )}
                             <button
                                 onClick={() => handleWriteBlog()}
-                                className="text-xs sm:text-base absolute border font-mono bottom-6 left-1/2 -translate-x-1/2 border-gray-500 px-6 py-3 bg-orange-500 hover:bg-orange-700 text-white rounded-lg transition-colors duration-300">
-                                Write Your First Blog
+                                className="text-xs sm:text-base absolute border font-mono bottom-6 left-1/2 -translate-x-1/2
+                                 border-gray-500 px-6 py-3 bg-orange-500 hover:bg-orange-700 text-white rounded-lg 
+                                 transition-colors duration-300">
+                                Write Blog Here
                             </button>
                         </div>
                     </div>
@@ -100,7 +126,19 @@ const Home = () => {
                                 Lets Dive In
                             </button>
                         </div>
-                        <img src="/reading1.jpg" className="w-full md:w-1/2 max-w-lg object-cover shadow-md rounded-lg" />
+                        <div className="flex w-full md:w-1/2 justify-center ">
+                            {readingImage.imageStatus === 'loading' && 
+                            <>
+                              <div className="w-full aspect-[4/3] max-w-lg bg-gray-200 animate-pulse shadow-md rounded-lg"> </div>
+                              
+                            </>
+                          
+                            }
+
+                            {readingImage.imageStatus === 'loaded' && 
+                            <img src="/reading1.jpg" className="w-full aspect-[4/3] max-w-lg object-cover shadow-md rounded-lg" />
+                            }
+                        </div>
                     </div>
                 </section>
                 <section className="TopBlogs relative">
@@ -160,3 +198,4 @@ export default Home
 
 
 // return direct function  
+// sabar@gmail.com - sabarSpirit
