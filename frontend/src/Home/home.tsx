@@ -127,16 +127,16 @@ const Home = () => {
                             </button>
                         </div>
                         <div className="flex w-full md:w-1/2 justify-center ">
-                            {readingImage.imageStatus === 'loading' && 
-                            <>
-                              <div className="w-full aspect-[4/3] max-w-lg bg-gray-200 animate-pulse shadow-md rounded-lg"> </div>
-                              
-                            </>
-                          
+                            {readingImage.imageStatus === 'loading' &&
+                                <>
+                                    <div className="w-full aspect-[4/3] max-w-lg bg-gray-200 animate-pulse shadow-md rounded-lg"> </div>
+
+                                </>
+
                             }
 
-                            {readingImage.imageStatus === 'loaded' && 
-                            <img src="/reading1.jpg" className="w-full aspect-[4/3] max-w-lg object-cover shadow-md rounded-lg" />
+                            {readingImage.imageStatus === 'loaded' &&
+                                <img src="/reading1.jpg" className="w-full aspect-[4/3] max-w-lg object-cover shadow-md rounded-lg" />
                             }
                         </div>
                     </div>
@@ -160,8 +160,11 @@ const Home = () => {
                         </div>
                     </div>
                 </section>
-                <footer className="relative ">
-                    <div className="max-w-full flex flex-col justify-center py-6">
+            </div>
+            <footer className="relative ">
+                <div className="min-w-screen bg-blue-900 h-36"></div>
+                <div className="max-w-full flex flex-col justify-center py-6">
+                    <div className="container mx-auto px-4 sm:px-6 md:px-8">
                         <div className="ml-5 mt-5 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2">
                             {footerLinks.map((links, index) => (
                                 <div
@@ -169,17 +172,19 @@ const Home = () => {
                                     className="flex flex-col"
                                 >
                                     <h3 className="sm:text-center font-bold mb-2" style={{ color: '#70767c' }}>{links.name}</h3>
-                                    {
+                                    <div className="flex flex-col justify-center sm:items-center">
+                                        {
                                         links.fields.map((field, ind) => (
                                             <Link
                                                 key={ind}
                                                 to={'#'}
-                                                className={clsx('sm:text-center mt-3 text-sm text-gray-800 font-bold hover:text-blue-700 transition-all duration-300')}>
+                                                className={clsx('sm:text-center mt-3 text-sm text-gray-800 font-bold hover:text-blue-700 transition-all duration-300 w-fit ')}>
 
                                                 {field}
                                             </Link>
                                         ))
                                     }
+                                    </div>
                                 </div>
                             ))}
                         </div>
@@ -188,8 +193,8 @@ const Home = () => {
                             <p className="text-sm text-gray-600">Lahore 42000 | &copy; 2025 RaasBlogs for Public, Medical Education and Research. All Rights Reserved</p>
                         </div>
                     </div>
-                </footer>
-            </div>
+                </div>
+            </footer>
         </main>
     )
 }

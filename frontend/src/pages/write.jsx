@@ -25,7 +25,6 @@ export default function Write() {
   const [errors, setErrors] = useState({});
   const [contentText, setContentText] = useState("");
   const [imagesShortNames, setImagesShortNames] = useState([]);
-  const [loadingCloudinaryUpload, setLoadingCloudinaryUpload] = useState(false);
   const [contentImages, setContentImages] = useState([]);
 
   function smallText(text) {
@@ -49,9 +48,6 @@ export default function Write() {
     }
   }, [loggedIn, moveTo]);
 
-  // useEffect(()=> {
-  //   console.log("contntImages: ",  contentImages)
-  // },[contentImages])
   const handleTitles = (e) => {
     // const errors = checkValidation();
     setBlogTitle((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -72,8 +68,8 @@ export default function Write() {
     }));
     const formData = new FormData();
     formData.append('image', image);
+    const toastId = toast.loading(' Uploading Image on Cloudinary ');
     try{
-      setLoadingCloudinaryUpload(true);
       const uploadOnCloudinary= await axios.post(`${VITE_API_URL}/weblog/uploadOnCloudinary`, formData,
       {
         withCredentials:true,
@@ -81,24 +77,22 @@ export default function Write() {
           "Content-Type":"multipart/form-data"
         }
       });
-      console.log("cloudinary result ", uploadOnCloudinary);
-      const imageLink = uploadOnCloudinary.data.cloudinary_link;
-      const publicId = uploadOnCloudinary.data.public_id;
-        setBlogTitle((prev) => ({
-        ...prev,
-        titleImg: imageLink,
-        imgPreview: imageLink,
-        titleImagePublicId:publicId
-      }));
+      if(uploadOnCloudinary.data.success){
+        const imageLink = uploadOnCloudinary.data.cloudinary_link;
+        const publicId = uploadOnCloudinary.data.public_id;
+          setBlogTitle((prev) => ({
+          ...prev,
+          titleImg: imageLink,
+          imgPreview: imageLink,
+          titleImagePublicId:publicId
+        }));
+      toast.success('Successfully uploaded', {id:toastId})
       localStorage.setItem("localTitleImage", imageLink);
+      }
     }
     catch(err){
-      console.log("frontend error while uploading on Cloudinary: ", err.message);
+       toast.error('caught error while uploading on Cloudinary', {id:toastId})
     }
-    finally{
-      setLoadingCloudinaryUpload(false);
-    }
-    
     if (errors.titleImageError) {
       errors.titleImageError = "";
       setErrors(errors);
@@ -120,7 +114,6 @@ export default function Write() {
     const placeholders = currentContent.match(/\[image-\d+\]/g) || [];
     if (originalPlaceholders.length !== placeholders.length) {
       alert("you can't remove the image placeholders manualy");
-      // console.log("you deleted the placeholder");
       return;
     }
     if (errors.textContentError) {
@@ -144,8 +137,8 @@ export default function Write() {
     imageData.append('image', image);
     let cloudinaryUrl;
     let image_public_id;
+    const toastId = toast.loading(' Uploading Image on Cloudinary ');
     try{
-        setLoadingCloudinaryUpload(true);
         const uploadingOnCloudinary= await axios.post(`${VITE_API_URL}/weblog/uploadOnCloudinary`, imageData,{
         withCredentials:true,
         headers:{
@@ -153,15 +146,14 @@ export default function Write() {
         }
        })
       if(uploadingOnCloudinary.data.success){
-        console.log("receive cloudinary image after success ", uploadingOnCloudinary.data);
+
         cloudinaryUrl = uploadingOnCloudinary.data.cloudinary_link;
         image_public_id = uploadingOnCloudinary.data.public_id;
-        console.log("image_publicId if Successs ", image_public_id);
+        toast.success('Successfully uploaded', {id:toastId})
       }
     }catch(err){
-      console.log("this is the err: ", err);
-    }finally{
-      setLoadingCloudinaryUpload(false);
+
+      toast.error('caught error while uploading on Cloudinary', {id:toastId})
     }
     setContentImages([
       ...contentImages,
@@ -178,7 +170,7 @@ export default function Write() {
     setContentText(newContent);
     localStorage.setItem('localContentImages', JSON.stringify(contentImages));
     localStorage.setItem("localContent", JSON.stringify(newContent));
-    // console.log("content inside handle Image: ", contentImages.length);
+
   };
 
   const removeContentImage = (id, newText) => {
@@ -221,14 +213,11 @@ export default function Write() {
     e.preventDefault();
     const seeErrors = checkValidation();
     if (Object.keys(seeErrors).length > 0) {
-      // setLocalLoading(false);
       setErrors(seeErrors);
       alert("Some Necessary Data is Missing");
       return;
     } else {
-      setLocalLoading(true);
       setErrors({});
-      // setLoadingErr(true);
       let contentArray = [
         {
           type: "text",
@@ -236,14 +225,12 @@ export default function Write() {
         },
       ];
       const blogData = new FormData();
-      // console.log("blogTitle before appending: ", blogTitle.title.length, "type: ", typeof(blogTitle.title));
       blogData.append("title", blogTitle.title);
       blogData.append("titleImage", blogTitle.titleImg);
       blogData.append("content", JSON.stringify(contentArray));
       blogData.append("public_id", blogTitle.titleImagePublicId)
 
       if (contentImages) {
-        console.log("contentImages before appending: ", contentImages)
         const imagesWithPositions = contentImages.map((img, index) => ({
           position: img.position,
           path: img.path,
@@ -254,7 +241,7 @@ export default function Write() {
         blogData.append("contentImages", JSON.stringify(imagesWithPositions));  
       }
       const toastId = toast.loading('Creating Your Blog..')
-
+      setLocalLoading(true);
       try {
         const response = await axios.post(
           `${VITE_API_URL}/weblog/addBlog`,
@@ -327,30 +314,10 @@ export default function Write() {
 
 
   return (
-    <div className="bg-gray-50 min-h-screen py-10">
+    <div className="bg-gray-50 min-h-screen py-10 mt-10">
       <div className="bg-white shadow-md rounded:lg px-6 py-8 w-full mx-auto max-w-3xl">
         <h2 className="text-3xl font-bold md:text-4xl text-center text-orange-600"> Your Shinning Post</h2>
-        {loadingCloudinaryUpload && 
-          <div className="fixed inset-0 z-50 flex justify-center bg-black items-center bg-opacity-50">
-            <div className="bg-white text-black shadow-lg flex items-center p-5 rounded-lg ">
-              <FaSpinner className="animate-spin text-purple-600" />
-              <span className="text-black font-lg">
-                Uploading Image on Cloudinary
-              </span>
-              </div>
-          </div>
-          }
         {errorMessage && <h2 className="text-red-500"> *{errorMessage} </h2>} 
-        {/* {localLoading && 
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-            <div className="bg-white rounded-lg shadow-lg p-5 flex items-center gap-3">
-              <FaSpinner className="animate-spin text-purple-600" />
-              <span className="text-lg font-medium text-gray-700">
-                Creating the Post, please wait...
-              </span>
-            </div>
-          </div>} */}
-
         <form method="post" className="space-y-3 flex flex-col">
           <label htmlFor="title" className="text-gray-600 font-medium">
             {" "}
@@ -444,8 +411,9 @@ export default function Write() {
           
           <button
             type="submit"
+            disabled={localLoading}
             onClick={handleSubmit}
-            className="border rounded-md border-blue-400 text-white bg-blue-500 transition-colors duration:400 hover:bg-blue-600 w-fit p-2"
+            className={`${localLoading? 'cursor-pointer-none bg-gray-400 w-fit p-2': 'border rounded-md border-blue-400 text-white bg-blue-500 transition-colors duration:400 hover:bg-blue-600 w-fit p-2' }`}
           >
             Publish Post
           </button>

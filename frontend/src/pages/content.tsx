@@ -69,7 +69,7 @@ export default function Content() {
     }
 
     return(
-        <div className="page-content bg-gradient-to-b from-gray-50 to-gray-100 px-6 py-8 text-center">
+        <div className="page-content bg-gradient-to-b from-gray-50 to-gray-100 px-6 py-8 text-center  mt-16">
             <h1 className="text-orange-600 text-4xl md:text-5xl font-bold text-center border-b-4 inline-block border-gray-500 my-3"> My Posts </h1>
             <div className="BlogsContainer flex flex-wrap justify-center bg-white max-w-6xl mx-auto gap-6">
             {loading ? (
@@ -97,7 +97,7 @@ export default function Content() {
             }
             </div>
             {(!loading && yourContent?.length === 0) && 
-                <div className="text-center mt-16">
+                <div className="text-center">
                     <h2 className="text-xl mb-5"> Write Your First Blog Here</h2>
                     <button type="button" 
                     onClick={() => moveTo('/write')}

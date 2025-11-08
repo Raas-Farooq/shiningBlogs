@@ -10,7 +10,7 @@ import useLoginConfirm from '../../utils/useLoginConfirm.tsx';
 export default function Navbar({showSearch=true}){
 
     const {inHomePage, setInHomePage, setOpenUserAccount, setShowMenu, showMenu} = useUIContext();
-    const {searchValue,setSearchValue, setSearching, setFilteredBlogs, allBlogsGlobally} = useBlogContext();
+    const {searchValue, setSearching} = useBlogContext();
     const {loggedIn,currentUser} = useAuthenContext();
     const [userProfileImage, setUserProfileImage] = useState('');
     const [searchClicked, setSearchClicked] = useState(false);
@@ -32,11 +32,14 @@ export default function Navbar({showSearch=true}){
         const gettingProfileImage = async() => {
             if(currentUser?.profileImg){
                 const userImage = (`${VITE_API_URL}/${currentUser.profileImg}`);
+
                 setUserProfileImage(userImage);
+            }else{
+                setUserProfileImage('')
             }
         }
         gettingProfileImage();
-        console.log("logged IN value: ", loggedIn)
+
     }, [loggedIn]);
 
 
@@ -71,9 +74,7 @@ export default function Navbar({showSearch=true}){
 
     const handleWriteClick = async (e:React.MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();
-        console.log("Write has been clicked ");
         if(!loggedIn){
-            console.log("inside The !logged In condtino")
             const confirmMessage = await loginConfirm();
             if(confirmMessage){
                 setTimeout(() => {

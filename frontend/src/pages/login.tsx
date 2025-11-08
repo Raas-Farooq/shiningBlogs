@@ -77,9 +77,7 @@ const Login = () => {
                 });
 
             if (login_response.data.success) {
-                console.log("login: ", login_response.data);
                 const token = login_response.data.token;
-                toast.success("Logged In. Success!", { id: toastId });
                 const userId = login_response.data.user._id;
                 localStorage.setItem('userId', userId);
                 const user = login_response.data.user;
@@ -91,6 +89,7 @@ const Login = () => {
                     );
                     imgPreview = `data:${user.profileImg.contentType};base64,${base64String}`;
                 }
+                toast.success("Logged In. Success!", { id: toastId });
                 scheduleAutoLogout(token);
                 setImagePreview(imgPreview);
                 setCurrentUser(login_response.data.user);
@@ -113,11 +112,7 @@ const Login = () => {
             else {
                 setErrors({ ...errors, general: "An unexpected error occurred." });
             }
-            console.log("errorMesg ", errorMsg);
             toast.error(errorMsg , { id: toastId });
-        }
-        finally {
-            setLoading(false)
         }
     }
 
@@ -129,11 +124,11 @@ const Login = () => {
             <section className="section-container w-full max-w-6xl flex flex-col justify-center items-center mx-auto">
                 <h1 className="text-3xl text-orange-600 font-bold text-center mb-8"> Login Here</h1>
                 <article className="w-full max-w-lg p-16 bg-white rounded-lg shadow-2xl">
-                    {loading && (
+                    {/* {loading && (
                         <div className="text-center mb-4">
                             <FaSpinner className="animate-spin inline mr-2" /> Please wait...
                         </div>
-                    )}
+                    )} */}
                     <form className="flex justify-center items-center" method="post" >
                         <div className="flex flex-col gap-5 max-w-3xl">
                             <input type="email" id="email" placeholder="Enter Your Email"
