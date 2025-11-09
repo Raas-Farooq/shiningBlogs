@@ -3,6 +3,8 @@ import axios from 'axios';
 import { jwtDecode } from "jwt-decode";
 import { VITE_API_URL } from "../config";
 import toast from "react-hot-toast";
+import { Blog } from "../types/globalTypes";
+import useFetchAllBlogs from "../Hooks/fetchAllBlogs";
 
 // import { BiLogoMailchimp } from "react-icons/bi";
 // import UserAccount from "../Components/userAccount/userAccout";
@@ -98,17 +100,17 @@ export const AuthenContextProvider = ({children} : {children:ReactNode}) => {
 
     const scheduleAutoLogout = (token:string) => {
         const decoded = decodeToken(token);
-        console.log("schedule logout: ", token);
         if(!decoded || !decoded.exp) return true
         const expiry = decoded.exp * 1000 - Date.now();
-        console.log(" deconded.exp ", decoded.exp * 1000, " Date.now() ", Date.now())
+
         if(expiry <= 0){
             logout();
+        }else{
+            setTimeout(() => {
+             logout();
+            }, expiry)
+
         }
-        setTimeout(() => {
-            
-            logout();
-        }, expiry)
         
     }
 
@@ -135,13 +137,13 @@ export const AuthenContextProvider = ({children} : {children:ReactNode}) => {
                 }
                 localStorage.setItem('userId', response.data.user._id);
             } else {
-                 console.log("neither expired time nor inside isAuthenticated: ", response.data)
+                 console.error("neither expired time nor inside isAuthenticated: ", response.data)
                 setLoggedIn(false);
                 setCurrentUser(null);
                 localStorage.removeItem('userId');
             }
         } catch (err) {
-            console.error("Authentication error:", err);
+            console.error("error while authenticating ", err);
             setCurrentUser(null);
             setLoggedIn(false);
             localStorage.removeItem('userId');
@@ -176,22 +178,13 @@ export const AuthenContextProvider = ({children} : {children:ReactNode}) => {
     )
 } 
 
-interface Blog{
-    _id:string,
-    userId:string,
-    title:string,
-    titleImage:string,
-    public_id:string,
-    content:[],
-    contentImages:[],
-    createdAt:string,
-    updatedAt:string
-}
 
 
 interface BlogContextProps{
-    allBlogsGlobally: Blog[],
-    setAllBlogsGlobally: React.Dispatch<React.SetStateAction<Blog[]>>,
+    allBlogsGlobally: Blog[] | null,
+    fetchBlogsError:string | any,
+    fetchBlogsLoading: boolean,
+    // setAllBlogsGlobally: React.Dispatch<React.SetStateAction<Blog[]>>,
     filteredBlogs: Blog[],
     setFilteredBlogs: React.Dispatch<React.SetStateAction<Blog[]>>,
     searchValue:string,
@@ -204,15 +197,26 @@ const BlogContext = React.createContext<BlogContextProps | undefined>(undefined)
 export const BlogContextProvider = ({children}:{children:ReactNode}) => {
     
 
-    const [allBlogsGlobally, setAllBlogsGlobally] = useState<Blog[]>([]);
+    // const [allBlogsGlobally, setAllBlogsGlobally] = useState<Blog[]>([]);
     const [filteredBlogs, setFilteredBlogs] = useState<Blog[]>([]);
     const [searchValue,setSearchValue] = useState<string>('');
     const [searching, setSearching] = useState<boolean>(false);
+    const {fetchBlogsLoading, fetchBlogsError, allBlogs} = useFetchAllBlogs();
 
+    // useEffect(() =>{
+    //     if(!allBlogs.length)return;
+    //      console.log("allBlogs globally ", allBlogs);
+    //     if(allBlogs.length > 0){
+    //         setAllBlogsGlobally(allBlogs);
+    //     }
+       
+    // },[allBlogs])
+    
     return(
         <BlogContext.Provider value={{
-            allBlogsGlobally,
-            setAllBlogsGlobally,
+            allBlogsGlobally: allBlogs,
+            fetchBlogsError,
+            fetchBlogsLoading,
             filteredBlogs,
             setFilteredBlogs,
             searching,

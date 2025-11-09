@@ -22,7 +22,7 @@ const BlogSearchComponent = () => {
 
 
     return (
-        <div className="flex justify-center items-center mt-16 mb-6">
+        <div className="flex justify-center items-center mt-20 mb-6">
             <div className={clsx('w-full max-w-md  transition-all duration-300', 'w-full')}>
                     <input
                         type="search"

@@ -184,7 +184,6 @@ const BlogPost:React.FC = () => {
   
   return (
     <>
-      <Navbar showSearch={false} />
       {errorMessage && 
       <h2 className="text-center">
         {errorMessage}

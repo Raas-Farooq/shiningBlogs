@@ -640,7 +640,7 @@ const canEditBlog = async(req,res) => {
     try{
         const blog = await Blog.findById(blogId);
         if(!blog){
-            res.status(404).json({
+            return res.status(404).json({
                 success:false,
                 message:"Blog not fuond",
             })
@@ -661,7 +661,7 @@ const canEditBlog = async(req,res) => {
         }
         
     }catch(err){
-        res.status(500).json(
+        return res.status(500).json(
             {
                 success:false,
                 message:"Server error while checking the privilege of user",

@@ -10,7 +10,7 @@ import useLoginConfirm from '../../utils/useLoginConfirm.tsx';
 export default function Navbar({showSearch=true}){
 
     const {inHomePage, setInHomePage, setOpenUserAccount, setShowMenu, showMenu} = useUIContext();
-    const {searchValue,setSearchValue, setSearching, setFilteredBlogs, allBlogsGlobally} = useBlogContext();
+    const {searchValue, setSearching} = useBlogContext();
     const {loggedIn,currentUser} = useAuthenContext();
     const [userProfileImage, setUserProfileImage] = useState('');
     const [searchClicked, setSearchClicked] = useState(false);
@@ -32,11 +32,14 @@ export default function Navbar({showSearch=true}){
         const gettingProfileImage = async() => {
             if(currentUser?.profileImg){
                 const userImage = (`${VITE_API_URL}/${currentUser.profileImg}`);
+
                 setUserProfileImage(userImage);
+            }else{
+                setUserProfileImage('')
             }
         }
         gettingProfileImage();
-        console.log("logged IN value: ", loggedIn)
+
     }, [loggedIn]);
 
 
@@ -74,7 +77,9 @@ export default function Navbar({showSearch=true}){
         if(!loggedIn){
             const confirmMessage = await loginConfirm();
             if(confirmMessage){
-                moveTo('/login')
+                setTimeout(() => {
+                    moveTo('/login')
+                },1200)
             }
             
         }else{
@@ -106,7 +111,7 @@ export default function Navbar({showSearch=true}){
         'xs:hidden lg:hidden': showMenu || !inHomePage,
         'md:block md:mt-0': loggedIn,
         })
-        const linkStyles = 'text-lg font-semibold  text-gray-800 hover:text-blue-500 transition-colors duration-200';
+        const linkStyles = 'text-lg font-semibold  text-gray-800 hover:text-blue-500 transition-colors duration-200 focus:outline-none focus:ring-0';
     return(
         <nav className={`flex items-center justify-between bg-white,
              backdrop-blur-sm bg-opacity-80 py-3 fixed top-0 z-20 w-full
