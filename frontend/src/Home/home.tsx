@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom"
 import { useAuthenContext } from "../globalContext/globalContext";
 import useLoginConfirm from "../utils/useLoginConfirm";
 import toast from "react-hot-toast"
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
 import useImageCached from "../utils/useImageCached";
 // import toast from 'react-hot-toast';
 const footerLinks = [
@@ -52,10 +52,18 @@ const Home = () => {
 
     const navigate = useNavigate();
 
+    const clearLocalStorage = useCallback(() => {
+    const keys = [
+      "titleStorage",
+      "titleImagePreview",
+      "textContent",
+      "localContentImages",
+    ];
+    keys.forEach((key) => localStorage.removeItem(key));
+  }, []);
+
     useEffect(() => {
-        localStorage.removeItem('localContent');
-        localStorage.removeItem('localTitle');
-        localStorage.removeItem('localTitleImage');
+        clearLocalStorage();
     }, [])
 
     const handleWriteBlog = async () => {
@@ -70,10 +78,9 @@ const Home = () => {
 
     }
 
-    // const handleBlogsReading = () => {
-    //     navi
-    // }
-    // bg-gradient-to-r from-purple-50 to-white 
+    const handleTopics = (title:string) => {
+        navigate('/lifeBlogs', {state:{title}});
+    }
     const commonClasses = "w-full max-w-4xl shadow-md rounded-lg object-cover";
     return (
         <main className="min-h-screen bg-gray-50">
@@ -152,7 +159,9 @@ const Home = () => {
                                         <div className="relative group hover:scale-110 transition-transform duration-500">
                                             <img src={topic.src} className="w-full object-cover shadow-md rounded-2xl" />
                                             <button className="absolute text-orange-600 px-4 py-2 bg-white/90 backdrop/blur rounded-lg left-1/2 
-                                             -translate-x-1/2 bottom-3 group-hover:bg-orange-600 group-hover:text-white group-hover:scale-105 transition">{topic.title}</button>
+                                             -translate-x-1/2 bottom-3 group-hover:bg-orange-600 group-hover:text-white group-hover:scale-105 transition"
+                                             onClick={() => handleTopics(topic.title)}
+                                             >{topic.title}</button>
                                         </div>
                                     </div>
                                 ))

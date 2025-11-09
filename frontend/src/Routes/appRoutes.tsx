@@ -16,6 +16,7 @@ import ErrorBoundary from "./errorBoundary.jsx";
 import ScrollToTop from "../utils/scrollToTop.tsx";
 import BlogContent from "../Components/contentSection/blog-content.tsx";
 import Home from "../Home/home.tsx";
+import Life from "../Home/Topics/Life.tsx";
 
 interface ProtectedRouteProps {
     children: ReactNode;
@@ -63,6 +64,7 @@ const PageTransition = () => {
                         <Route path="/userAccount" element={<UserAccount />} />
                         <Route path="/updateProfile" element={<UpdateProfile />} /> 
                         <Route path="/registerUser" element={<Register />} />   
+                        <Route path="/lifeBlogs" element={<Life />} />
                         <Route path="/login" element={<Login />} /> 
                         <Route path="/BlogPost/:id" element={<BlogPost />} />
                         <Route path="/editPost" element={<EditPost />} />

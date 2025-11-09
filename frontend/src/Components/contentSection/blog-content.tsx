@@ -1,12 +1,8 @@
-import { useCallback, useEffect, useState } from "react";
-import axios from "axios";
+import { useEffect, useState } from "react";
+import {toast} from "react-hot-toast";
 
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { FaSpinner } from "react-icons/fa";
-import toast from "react-hot-toast";
-// import { Sidebar, User } from "lucide-react";
-// BlogContent
-//
 import {
 
   useAuthenContext,
@@ -18,28 +14,8 @@ import { clsx } from "clsx";
 import UserProfile from "./userProfile.tsx";
 import BlogCard from "./BlogCard.tsx";
 import BlogSearchComponent from "./customBlogSearch.tsx";
-import Navbar from "../Navbar/navbar.tsx";
-// import ContentImages from "./ContentImage.jsx";
-
-
-
-
-
-
-
-
-interface Blog {
-  _id: string,
-  userId: string,
-  title: string,
-  titleImage: string,
-  public_id: string,
-  content: [],
-  contentImages: [],
-  createdAt: string,
-  updatedAt: string
-}
-
+import useLoginConfirm from "../../utils/useLoginConfirm.tsx";
+import { Blog } from "../../types/globalTypes.ts";
 
 export default function BlogContent() {
 
@@ -48,17 +24,16 @@ export default function BlogContent() {
   }
   const {
     searchValue,
-    setFilteredBlogs,
-    setSearchValue,
+    fetchBlogsError,
+    fetchBlogsLoading,
     searching,
-    setSearching,
     filteredBlogs,
     allBlogsGlobally,
-    setAllBlogsGlobally,
+    // setAllBlogsGlobally,
   } = useBlogContext();
 
   const { showMenu } = useUIContext();
-  const { loggedIn, currentUser, setErrorMessage } = useAuthenContext();
+  const { loggedIn, currentUser } = useAuthenContext();
 
   const [loading, setLoading] = useState<boolean>(true);
   const [profileImage, setProfileImage] = useState<string>("");
@@ -70,55 +45,42 @@ export default function BlogContent() {
       setProfileImage(myImage);
 
     }
-    if (!allBlogsGlobally.length) {
-      setLoading(true);
-    }
   }, [currentUser?.profileImg, allBlogsGlobally]);
 
   
 
-  const clearLocalStorage = useCallback(() => {
-    const keys = [
-      "titleStorage",
-      "titleImagePreview",
-      "textContent",
-      "localContentImages",
-    ];
-    keys.forEach((key) => localStorage.removeItem(key));
-  }, []);
-
-  useEffect(() => {
-    clearLocalStorage();
-    if (allBlogsGlobally.length === 0) {
-      setLoading(true);
-      axios.get(
-        `${VITE_API_URL}/weblog/allBlogs`
-      ).then(response => {
-        if(response.data.success){
-          const reversed = [...response.data.blogs].reverse();
-          setAllBlogsGlobally(reversed);
+  
+   async function handleCreateBlog(){
+        const confirmLogin = useLoginConfirm();
+        if(loggedIn){
+            navigateTo('/write');
         }
-        
-      })
-        .catch(err => {
-          console.error("got errors while fetching all blogs: ", err);
-          setErrorMessage(err);
-        }).finally(() => {
-          setLoading(false);
-        })
+        else{
+            const userResponse = await confirmLogin();
+            if(userResponse){
+                navigateTo('/login')
+            }
+        }
     }
-  }, [allBlogsGlobally?.length]);
 
-  function handleRefresh(e: React.MouseEvent) {
-    e.preventDefault();
-    e.stopPropagation();
-    setAllBlogsGlobally([]);
-    if (!loading) {
-      setSearching(false);
-      setFilteredBlogs([]);
-      setSearchValue("");
-    }
-  }
+    useEffect(() => {
+      let toastId:string | undefined;
+      if(fetchBlogsLoading)
+      {
+        toastId = toast.loading('Loading All Blogs..');
+      }
+      return () => {
+        if(toastId) toast.dismiss(toastId);
+      }
+    },[])
+
+    useEffect(() => {
+      if(fetchBlogsError){
+          toast.error('Error while fetching all Blogs');
+        }
+    },[fetchBlogsError])
+
+  
   const handlePostClick: PostClick = (e, post) => {
     e.stopPropagation();
     navigateTo(`/BlogPost/${post._id}`, { state: { post } });
@@ -139,26 +101,30 @@ export default function BlogContent() {
           showMenu && searching && 'flex justify-end items-end pt-44'
         )}
       >
-        {!allBlogsGlobally.length && loading && (
-          <div className="mt-11 absolute">
-            <FaSpinner className="animate-spin text-lg" /> Loading Blogs
-          </div>
-        )}
-        <div className={`blogsContainer xs:w-[95vw] w-[70vw] text-center m-4 min-h-[30rem] ${!loggedIn  ? 'w-[100vw]' : 'xs:w-[95vw] w-[70vw]'}`}>
 
-          {/* <button
-            type="button"
-            onClick={handleRefresh}
-            className={`bg-transparent text-gray-600 hover:text-blue-600 hover:underline w-full ${loading && 'mt-6'}`}
-          >
-            Refresh
-          </button> */}
-          {allBlogsGlobally?.length > 0 &&
+        {fetchBlogsLoading && (
+          ( <div className="mt-11 absolute">
+            <FaSpinner className="animate-spin text-lg" /> Loading Blogs
+          </div> )
+        )}
+        
+        <div className={`blogsContainer text-center m-4 ${!loggedIn  ? 'w-[100vw]' : 'xs:w-[95vw] w-[70vw]'}`}>
+          { (!fetchBlogsLoading && allBlogsGlobally?.length === 0) && 
+                (<div className="w-full flex flex-col justify-center items-center gap-6">
+                    <h1>Become the First To Create A Blog</h1>
+                    <button 
+                    onClick={() => handleCreateBlog()}
+                    className="bg-orange-500 border px-4 py-2 text-white hover:bg-orange-600 rounded-xl shadow-md">
+                        Create Blog Here
+                    </button>
+                </div>)
+          }
+          {allBlogsGlobally && allBlogsGlobally?.length > 0 &&
             <div
               data-component="bottomBlogsContainer"
               className={`grid grid-cols-1 md:grid-cols-2 gap-10 justify-items-center ${!loggedIn && 'lg:grid-cols-3'}`}
               >
-              {BlogsToShow.map((blog, index) => {
+              {BlogsToShow?.map((blog, index) => {
                 return (
                   <BlogCard
                     key={index}
@@ -169,7 +135,8 @@ export default function BlogContent() {
                 )
               }
               )}
-            </div>}
+            </div>
+            }
 
         </div>
 

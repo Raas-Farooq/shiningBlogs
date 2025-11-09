@@ -27,7 +27,7 @@ const usersSchema = new mongoose.Schema({
     profileImg:{
         type:String
     },
-
+   
     createdAt:{
         type:Date,
         default:Date.now
@@ -70,7 +70,10 @@ const blogSchema = new mongoose.Schema({
         },
         value:String
     }]
-,
+    ,
+ category:{
+        type:String
+    },
     contentImages:[{
         id:Number,
         path:String,
