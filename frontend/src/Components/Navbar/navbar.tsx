@@ -132,7 +132,7 @@ export default function Navbar({showSearch=true}){
 
             {/* Logo/Site Title (visible on all screen sizes) */}
             <div className="hidden md:block">
-                <Link to={'/'} className='text-xl font-bold text-orange-500'>Dream Blog</Link>
+                <Link to={'/'} className='text-xl font-bold text-orange-500'>RaasBlogs</Link>
             </div>
 
             {/* Desktop Navigation Links */}

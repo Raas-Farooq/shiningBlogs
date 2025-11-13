@@ -96,9 +96,10 @@ const Login = () => {
                 setIsAuthenticated(true);
                 setEmail('');
                 setPassword('');
-                setTimeout(() => {
-                    navigate('/');
-                },100)
+                navigate('/')
+                // setTimeout(() => {
+                //     navigate('/');
+                // },100)
                 setLoggedIn(true);
             }
         }

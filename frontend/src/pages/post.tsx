@@ -5,7 +5,6 @@ import { useNavigate, useParams } from "react-router-dom";
 import TextContent from "../Components/contentSection/textContent.jsx";
 import { FaEdit, FaSpinner, FaTrash } from "react-icons/fa";
 import useFetchPost from "../Hooks/fetchPost.ts";
-import Navbar from "../Components/Navbar/navbar.tsx";
 import useUserPrivileges from "../Hooks/ownerPrivileges.tsx";
 import makeApiCall from "./makeApiCall.ts";
 import clsx from "clsx";
@@ -77,10 +76,10 @@ const BlogPost:React.FC = () => {
 
 
   useEffect(() => {
+    if(!post._id) return ;
     setInHomePage(false);
-
     setErrorMessage('');
-  }, []);
+  }, [post?._id]);
 
   const handleEdit:EditHandle = (e, post) => {
     e.preventDefault();
@@ -90,7 +89,6 @@ const BlogPost:React.FC = () => {
   const handleDelete:DeleteHandle = async(e, id) => {
     
     e.preventDefault();
-    console.log("post when delete clicks ", post);
     const confirm = window.confirm(
       "Are You sure to delete this Post. You won't be able to recover it!"
     );
@@ -100,7 +98,7 @@ const BlogPost:React.FC = () => {
       window.onbeforeunload = null;
     }
 
-    const oldBolgsCopy = allBlogsGlobally;
+    const oldBolgsCopy = allBlogsGlobally || [];
     const deletingPost = async () => {
       setAllBlogsGlobally(prevBlogs => prevBlogs.filter(blog => blog._id !== id));
       
@@ -148,8 +146,6 @@ const BlogPost:React.FC = () => {
 
         }
         else if(err.response?.data?.message){
-          alert('else if runs');
-          console.log("err.resopsne.data else if ", err.response?.data?.message);
           setErrorMessage(err.response.data.message);
         }
         else if(err.request){

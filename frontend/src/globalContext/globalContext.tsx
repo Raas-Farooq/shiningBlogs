@@ -102,7 +102,7 @@ export const AuthenContextProvider = ({children} : {children:ReactNode}) => {
         const decoded = decodeToken(token);
         if(!decoded || !decoded.exp) return true
         const expiry = decoded.exp * 1000 - Date.now();
-
+        console.log("expiry time inside schedule ", decoded.exp * 1000);
         if(expiry <= 0){
             logout();
         }else{
@@ -184,7 +184,7 @@ interface BlogContextProps{
     allBlogsGlobally: Blog[] | null,
     fetchBlogsError:string | any,
     fetchBlogsLoading: boolean,
-    // setAllBlogsGlobally: React.Dispatch<React.SetStateAction<Blog[]>>,
+    setAllBlogsGlobally: React.Dispatch<React.SetStateAction<Blog[]>>,
     filteredBlogs: Blog[],
     setFilteredBlogs: React.Dispatch<React.SetStateAction<Blog[]>>,
     searchValue:string,
@@ -199,22 +199,26 @@ export const BlogContextProvider = ({children}:{children:ReactNode}) => {
 
     // const [allBlogsGlobally, setAllBlogsGlobally] = useState<Blog[]>([]);
     const [filteredBlogs, setFilteredBlogs] = useState<Blog[]>([]);
+    const [allBlogsGlobally, setAllBlogsGlobally] = useState<Blog[]>([]);
     const [searchValue,setSearchValue] = useState<string>('');
     const [searching, setSearching] = useState<boolean>(false);
     const {fetchBlogsLoading, fetchBlogsError, allBlogs} = useFetchAllBlogs();
 
-    // useEffect(() =>{
-    //     if(!allBlogs.length)return;
-    //      console.log("allBlogs globally ", allBlogs);
-    //     if(allBlogs.length > 0){
-    //         setAllBlogsGlobally(allBlogs);
-    //     }
-       
-    // },[allBlogs])
+    useEffect(() =>{
+        if(!allBlogs?.length) return;
+         console.log("allBlogs globally ", allBlogs);
+        if(allBlogs.length > 0){
+            setAllBlogsGlobally(allBlogs);
+        }
+       if(!fetchBlogsLoading && allBlogs.length === 0){
+        setAllBlogsGlobally([]);
+       }
+    },[allBlogs])
     
     return(
         <BlogContext.Provider value={{
-            allBlogsGlobally: allBlogs,
+            allBlogsGlobally,
+            setAllBlogsGlobally,
             fetchBlogsError,
             fetchBlogsLoading,
             filteredBlogs,

@@ -7,6 +7,7 @@ import { Upload } from "lucide-react";
 import { VITE_API_URL } from "../config.ts";
 import { FaSpinner } from "react-icons/fa";
 import toast from "react-hot-toast";
+import useLoginConfirm from "../utils/useLoginConfirm.tsx";
 
 export default function Write() {
   const [blogTitle, setBlogTitle] = useState({
@@ -26,7 +27,7 @@ export default function Write() {
   const [contentText, setContentText] = useState("");
   const [imagesShortNames, setImagesShortNames] = useState([]);
   const [contentImages, setContentImages] = useState([]);
-
+  const loginConfirm = useLoginConfirm();
   function smallText(text) {
     const joined = text.split(" ");
 
@@ -36,16 +37,18 @@ export default function Write() {
 
 
   useEffect(() => {
-    if (!loggedIn) {
-      const moveToLoginPage = window.confirm(
-        "you are logged out. please Login Again and Write Your Post"
-      );
-      console.log("moveToLogIn result: ", moveToLoginPage);
-      if (moveToLoginPage) {
-        moveTo("/login");
-      } else {
-      }
-    }
+   const loginCheck = async () => {
+            if (!loggedIn) {
+                const confirm = await loginConfirm("Your Login time has Expired. Please Login Again to continue");
+                if (confirm) {
+                    moveTo('/login');
+                    return;
+                } else {
+                    return;
+                }
+            }
+        }
+        loginCheck();
   }, [loggedIn, moveTo]);
 
   const handleTitles = (e) => {
@@ -211,6 +214,15 @@ export default function Write() {
   };
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!loggedIn) {
+      const confirm = await loginConfirm("Your Login time has Expired. Please Login Again to continue");
+      if (confirm) {
+          moveTo('/login');
+          return;
+      } else {
+          return;
+      }
+    }
     const seeErrors = checkValidation();
     if (Object.keys(seeErrors).length > 0) {
       setErrors(seeErrors);

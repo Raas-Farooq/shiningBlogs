@@ -40,51 +40,57 @@ interface MyPost{
 
 const useFetchingPost = (postId:string) => {
 
-    const {setLoading} = useAuthenContext();
+    // const {setLoading} = useAuthenContext();
+    const [fetchPostLoading, setFetchPostLoading] = useState(true);
     const [errors, setErrors]=useState<LocalErrors>({message:''});
     const [post, setPost]=useState<MyPost | null>(null)
     useEffect(() => {
-      // console.log("postId: TechBlog ", postId);
+      console.log("postId: TechBlog ", postId);
         async function getPost() {
           if (!postId) {
-            setLoading(false);
+            // setLoading(false);
             return;
           }
-          setLoading(true);
-          try {
-            const response = await axios.get(
+
+          // try {
+            await axios.get(
               `${VITE_API_URL}/weblog/getBlogPost/${postId}`
-            );
-            setPost(response.data.blogPost);
-          } catch (err:unknown) {
-            if(err && typeof(err) === 'object'){
-              if('response' in err && (err as ErrorInterface).response?.data.message){
-                setErrors({
-                  message:(err as ErrorInterface).response.data.message
-                })
-              }
+            ).then(res => {
+              console.log("res blog", res.data.blogPost);
+              setPost(res.data.blogPost)
+            })
+            .catch(err => setErrors(err))
+            .finally(() => setFetchPostLoading(false));
+
+          // } catch (err:unknown) {
+          //   if(err && typeof(err) === 'object'){
+          //     if('response' in err && (err as ErrorInterface).response?.data.message){
+          //       setErrors({
+          //         message:(err as ErrorInterface).response.data.message
+          //       })
+          //     }
               
-              else if('request' in err){
-                setErrors({
-                  message:
-                    "Not connected to the server. Plz check & Try Again!!",
-                });
-              }
-              else if('message' in err && typeof(err.message) === 'string') {
-                setErrors({
-                  message:err.message
-                });
-              }
-            }
-          }
-          finally{
-            setLoading(false);
-          }
+          //     else if('request' in err){
+          //       setErrors({
+          //         message:
+          //           "Not connected to the server. Plz check & Try Again!!",
+          //       });
+          //     }
+          //     else if('message' in err && typeof(err.message) === 'string') {
+          //       setErrors({
+          //         message:err.message
+          //       });
+          //     }
+          //   }
+          // }
+          // finally{
+          //   setLoading(false);
+          // }
         }
         getPost();
       }, [postId]);
 
-      return {post, errors}
+      return {post, errors, fetchPostLoading}
 }
 
 export default useFetchingPost

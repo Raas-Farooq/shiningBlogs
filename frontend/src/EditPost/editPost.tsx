@@ -1,112 +1,118 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import useFetchPost from './fetchingResources/fetchBlogPost.ts'
-import {  useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import EditContentImages from "../Components/contentSection/editContentImages.tsx";
 import axios from "axios";
 import { useAuthenContext, useBlogContext } from "../globalContext/globalContext.tsx";
 import useFetchLocalData from "./fetchingResources/useFetchLocalData.ts";
 import { VITE_API_URL } from "../config.ts";
 import { FaSpinner } from "react-icons/fa";
-import {ObjectId} from 'bson';
+import { ObjectId } from 'bson';
+import useLoginConfirm from "../utils/useLoginConfirm.tsx";
+import toast from "react-hot-toast";
 
 
-interface PostData{
-  _id:string,
-  userId:string,
-  title:string,
-  titleImage:string,
-  public_id:string,                               
-  content:[{
-    type:string,
-    value:string
+interface PostData {
+  _id: string,
+  userId: string,
+  title: string,
+  titleImage: string,
+  public_id: string,
+  content: [{
+    type: string,
+    value: string
   }],
-  contentImages:[{
-    id:number,
-    public_id?:string,
-    path:string,
-    position:number,
-    fileName:string,
-    _id:string
+  contentImages: [{
+    id: number,
+    public_id?: string,
+    path: string,
+    position: number,
+    fileName: string,
+    _id: string
   }],
-  
+
 }
 
 interface LocalErrors {
-  message:any
+  message: any
 }
-interface ErrorWithMsg{
-  msg:string
+interface ErrorWithMsg {
+  msg: string
 }
 interface ErrorCaught {
-  response:{
-    status?:number,
-    data:{
-      error?:string | ErrorWithMsg[],
-      message?:string,
-      name?:string,
-      errors?:string | ErrorWithMsg
+  response: {
+    status?: number,
+    data: {
+      error?: string | ErrorWithMsg[],
+      message?: string,
+      name?: string,
+      errors?: string | ErrorWithMsg
     }
-    error?:string
+    error?: string
   }
-  request:any,
-  message:string
+  request: any,
+  message: string
 }
 
-interface ImagePositions {
-  position:number,
-  fileName:string
-}
-interface ContentImage{
-  path:string,
-  public_id?:string,
-  position:number,
-  fileName:string,
-  _id:string,
-  id:number,
-  file?:File
+// interface ImagePositions {
+//   position:number,
+//   fileName:string
+// }
+interface ContentImage {
+  path: string,
+  public_id?: string,
+  position: number,
+  fileName: string,
+  _id: string,
+  id: number,
+  file?: File
 }
 
 interface EditPostData {
   title: string;
   titleImage: string; // Can be a string (URL) or a File object
-  public_id:string,
+  public_id: string,
   contentText: string;
   imagePreview: string;
 }
 
-interface SavedPic {
-  path?:string,
-  position:number,
-  fileName:string
-}
+// interface SavedPic {
+//   path?:string,
+//   position:number,
+//   fileName:string
+// }
 const EditPost = () => {
-  
-  const { loggedIn,loading,errorMessage, setErrorMessage } = useAuthenContext();
-  const {setAllBlogsGlobally} = useBlogContext();
+
+  const { loggedIn, errorMessage, setErrorMessage } = useAuthenContext();
+  const { setAllBlogsGlobally } = useBlogContext();
   const [uploadingOnCloudinary, setUploadingOnCloudinary] = useState(false);
   const [cursorPosition, setCursorPosition] = useState(0);
   // const [newTitleImage, setNewTitleImage] = useState(false);
   const [editedSomething, setEditedSomething] = useState(false);
   const [contentImages, setContentImages] = useState<ContentImage[]>([]);
-  const [repostedPost, setRepostedPost] = useState<boolean>(false);
   const moveTo = useNavigate();
   const isNavigatingBack = useRef(false);
+  const loginConfirm = useLoginConfirm();
 
   useEffect(() => {
-    if (!loading && !loggedIn) {
-      const moveToLogin = window.confirm(
-        "token expired! please Login Again. Do you want to Login"
-      );
-      if (moveToLogin) {
-        moveTo("/login");
+    async function loginCheck(){
+         if (!fetchPostLoading && !loggedIn) {
+        const confirm = await loginConfirm("Your Login time has Expired. Please Login Again to continue");
+        if(confirm){
+          moveTo('/login');
+          return;
+        }else{
+          return;
+        }
       }
     }
+    loginCheck();
   }, [loggedIn]);
-  
+
   const [editPostData, setEditPostData] = useState<EditPostData>({
     title: "",
     titleImage: "",
-    public_id:'',
+    public_id: '',
     contentText: "",
     imagePreview: "",
   });
@@ -116,34 +122,38 @@ const EditPost = () => {
   const getState = useLocation();
 
   const postId = getState.state?.postId;
-  const {post, errors} = useFetchPost(postId) as {post:PostData | null, errors:LocalErrors};
+  const { post, errors, fetchPostLoading } = useFetchPost(postId) as { post: PostData | null, errors: LocalErrors, fetchPostLoading: boolean };
 
-  const DEFAULT_POST: PostData = {
-    _id: '',
-    userId: '',
-    title: '',
-    titleImage: '',
-    public_id:'',
-    content:[{
-      type:'',
-      value:''
-    }],
-    contentImages:[{
-      path:'',
-      position:0,
-      fileName:'',
-      _id:'',
-      id:0
-    }],
-  };
 
-  const {postLoading, localPostData,receiveLocalImages} = useFetchLocalData(post || DEFAULT_POST);
-  
+  // const DEFAULT_POST: PostData = {
+  //   _id: '',
+  //   userId: '',
+  //   title: '',
+  //   titleImage: '',
+  //   public_id:'',
+  //   content:[{
+  //     type:'',
+  //     value:''
+  //   }],
+  //   contentImages:[{
+  //     path:'',
+  //     position:0,
+  //     fileName:'',
+  //     _id:'',
+  //     id:0
+  //   }],
+  // };
+
+  const isFetched = !!post?._id;
+
+  const { postLoading, localPostData, receiveLocalImages } = useFetchLocalData(isFetched ? post : null);
+
+
   const selectCurrentSelection = () => {
-    if(currentArea.current){
+    if (currentArea.current) {
       setCursorPosition(currentArea.current.selectionStart);
     }
-    
+
   };
 
   const clearLocalStorage = useCallback(() => {
@@ -171,20 +181,20 @@ const EditPost = () => {
   }, [editedSomething, clearLocalStorage]);
 
   useEffect(() => {
-    if(errorMessage || errors.message){
+    if (errorMessage || errors.message) {
       window.scrollTo({
-        top:0,
-        behavior:'smooth'
+        top: 0,
+        behavior: 'smooth'
       })
     }
   }, [errorMessage, errors.message])
   const handleNavigation = useCallback(
-    async (link:string | number) => {
+    async (link: string | number) => {
       if (await confirmNavigation()) {
-        if( typeof(link) === 'number'){
+        if (typeof (link) === 'number') {
           moveTo(link);
         }
-        if( typeof(link) === 'string'){
+        if (typeof (link) === 'string') {
           moveTo(link);
         }
       }
@@ -193,7 +203,7 @@ const EditPost = () => {
   );
 
   const windowLoads = useCallback(
-    async (e:BeforeUnloadEvent) => {
+    async (e: BeforeUnloadEvent) => {
       if (editedSomething) {
         clearLocalStorage();
         e.preventDefault();
@@ -210,37 +220,37 @@ const EditPost = () => {
   }, [windowLoads]);
 
   // Convert and Store image as base 64
-  
+
   useEffect(() => {
-    if(receiveLocalImages?.length){
+    if (receiveLocalImages?.length) {
       setContentImages(receiveLocalImages);
-    }else{
-      if(post?.contentImages){
-         setContentImages(post?.contentImages);
+    } else {
+      if (post?.contentImages) {
+        setContentImages(post?.contentImages);
       }
-     
+
     }
-    if(localPostData?.title || localPostData.contentText){
+    if (localPostData?.title || localPostData.contentText) {
       setEditPostData(prev => ({
         ...prev,
-        title:localPostData.title || '',
-        titleImage:localPostData.titleImage || '',
-        contentText:localPostData.contentText || '',
+        title: localPostData.title || '',
+        titleImage: localPostData.titleImage || '',
+        contentText: localPostData.contentText || '',
         imagePreview: localPostData.imagePreview || '',
-        public_id:localPostData.public_id || ''
-        })
+        public_id: localPostData.public_id || ''
+      })
       )
     }
-  },[localPostData?.title, 
-    localPostData?.titleImage, 
-    localPostData?.contentText, 
-    localPostData?.imagePreview,
-  post,
+  }, [localPostData?.title,
+  localPostData?.titleImage,
+  localPostData?.contentText,
+  localPostData?.imagePreview,
+    post,
   localPostData?.public_id])
 
 
   // Handle changes to the title input
-  const handleChange = (e:React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newTitle = e.target.value;
     localStorage.setItem("localTitle", (newTitle));
     // setNewTitleImage(true);
@@ -249,73 +259,73 @@ const EditPost = () => {
   };
 
   // Handle changes to the title Image
-  const handleImageChange = async (e:React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     let image = e.target.files?.[0];
-    if(!image) 
-      {
-        console.warn("no file seleted");
-        return;
-      }    
+    if (!image) {
+      console.warn("no file seleted");
+      return;
+    }
 
-      try{
-          const previewImageLink = URL.createObjectURL(image);
-          setEditPostData((prev) => (
-          { 
-            ...prev,
-            titleImage:'',
-            imagePreview:previewImageLink
-          }
-        ))
-      }
-      catch(err){
-        console.warn('got error while creating ObjectURL ', err);
-      }
-      setUploadingOnCloudinary(true);
-      
-    try{
-      if(editPostData?.public_id){
-        try{
+    try {
+      const previewImageLink = URL.createObjectURL(image);
+      setEditPostData((prev) => (
+        {
+          ...prev,
+          titleImage: '',
+          imagePreview: previewImageLink
+        }
+      ))
+    }
+    catch (err) {
+      console.warn('got error while creating ObjectURL ', err);
+    }
+    setUploadingOnCloudinary(true);
+
+    try {
+      if (editPostData?.public_id) {
+        try {
           await axios.delete(`${VITE_API_URL}/weblog/removeCloudinaryImage`, {
-            withCredentials:true,
-              data: {public_id:editPostData.public_id}
+            withCredentials: true,
+            data: { public_id: editPostData.public_id }
           })
         }
-        catch(err){
-          console.log("error while removing data",err)
+        catch (err) {
+          console.log("error while removing data", err)
         }
       }
       const formData = new FormData();
       formData.append("image", image);
       const response = await axios.post(`${VITE_API_URL}/weblog/uploadOnCloudinary`, formData, {
-        withCredentials:true,
-        headers:{
-          "Content-Type":"multipart/form-data"
+        withCredentials: true,
+        headers: {
+          "Content-Type": "multipart/form-data"
         }
       })
-      if(response?.data.success){
-          
-          setEditPostData((prev) => (
-            { ...prev, 
-              titleImage: response.data.cloudinary_link,
-              public_id:response.data.public_id 
-            }));
-            
-          // setNewTitleImage(true);
-        }
+      if (response?.data.success) {
+
+        setEditPostData((prev) => (
+          {
+            ...prev,
+            titleImage: response.data.cloudinary_link,
+            public_id: response.data.public_id
+          }));
+
+        // setNewTitleImage(true);
+      }
     }
-    catch(err){
+    catch (err) {
       console.error("cloudinary upload error: ", err);
-    }finally{
+    } finally {
       setUploadingOnCloudinary(false);
     }
 
-      
+
     setEditedSomething(true);
   }
 
   // Managing text of the Post after Change
 
-  const handleContentText = (e:React.ChangeEvent<HTMLTextAreaElement>) => {
+  const handleContentText = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     e.preventDefault();
     const oldContentText = editPostData.contentText;
     let newContentText = e.target.value;
@@ -337,12 +347,12 @@ const EditPost = () => {
     setEditedSomething(true);
   };
 
- 
+
 
   // handle changes to the content images
-  const handleContentImages = async (e:React.ChangeEvent<HTMLInputElement>) => {
+  const handleContentImages = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const newImage = e.target.files?.[0];
-    if(!newImage) return ;
+    if (!newImage) return;
     const imageMark = `[image-${contentImages.length}]`;
     const beforeImage = editPostData.contentText.substring(0, cursorPosition);
     const afterImage = editPostData.contentText.substring(cursorPosition);
@@ -351,24 +361,24 @@ const EditPost = () => {
     localStorage.setItem("localContent", JSON.stringify(newContentText));
     const formImage = new FormData();
     formImage.append('image', newImage);
-     try{
+    try {
       setUploadingOnCloudinary(true);
-       const response = await axios.post(`${VITE_API_URL}/weblog/uploadOnCloudinary`, formImage,
+      const response = await axios.post(`${VITE_API_URL}/weblog/uploadOnCloudinary`, formImage,
         {
-          withCredentials:true,
-          headers:{
-            'Content-Type':"multipart/form-data"
+          withCredentials: true,
+          headers: {
+            'Content-Type': "multipart/form-data"
           }
         }
-       )
-        const imageLink = response.data.cloudinary_link;
-        const publicId = response.data.public_id;
-         const localImage = {
-        _id:new ObjectId().toHexString(),
+      )
+      const imageLink = response.data.cloudinary_link;
+      const publicId = response.data.public_id;
+      const localImage = {
+        _id: new ObjectId().toHexString(),
         id: contentImages?.length,
         fileName: newImage.name,
         public_id: publicId,
-        path:imageLink,
+        path: imageLink,
         file: newImage,
         position: cursorPosition,
       };
@@ -377,38 +387,37 @@ const EditPost = () => {
       localStorage.setItem("localContentImages", JSON.stringify(allImages));
       setContentImages(allImages);
       setEditedSomething(true);
-     }catch(err){
+    } catch (err) {
       console.log("error while uploading on Cloudinary: ", err);
-     }
-     finally{
+    }
+    finally {
       setUploadingOnCloudinary(false)
-     }
-    
+    }
+
   };
-  
+
   // removing the content Image
-  const removeImage = async(id:number, text:string) => {
+  const removeImage = async (id: number, text: string) => {
     const newContentImages = contentImages.filter((image) => image.id !== id);
     setContentImages(newContentImages);
     let public_id;
-    for (let image of contentImages){
-      if(image.id === id){
+    for (let image of contentImages) {
+      if (image.id === id) {
         public_id = image.public_id;
       }
     }
-    if(public_id){
-      try{
+    if (public_id) {
+      try {
         const deleteImage = await axios.delete(`${VITE_API_URL}/weblog/removeCloudinaryImage`, {
-          withCredentials:true,
-            data: {public_id:public_id}
+          withCredentials: true,
+          data: { public_id: public_id }
         })
-        console.log("Image Deletion ", deleteImage)
-        }
-        catch(err){
-          console.log("error while removing data",err)
-        }
+      }
+      catch (err) {
+        console.log("error while removing data", err)
+      }
     }
-    
+
     let updatedText = text;
     if (!newContentImages.length) {
       updatedText = updatedText.split("[image-0]").join("");
@@ -423,12 +432,12 @@ const EditPost = () => {
       setEditPostData((prev) => ({ ...prev, contentText: updatedText }));
     }
     const updateImages = newContentImages.map((image, index) => ({
-      _id:new ObjectId().toHexString(),
+      _id: new ObjectId().toHexString(),
       id: index,
       path: image.path,
       fileName: image.fileName,
       position: image.position,
-      public_id:image.public_id,
+      public_id: image.public_id,
 
     }));
     setContentImages(updateImages);
@@ -437,11 +446,21 @@ const EditPost = () => {
   };
 
   // handle Reposting
-  const handleReposting = async (e:React.MouseEvent<HTMLButtonElement>) => {
+  const handleReposting = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    if(!editedSomething){
-      alert("You didn't Make any Change to Document");
+    if (!editedSomething) {
+      toast.error("You didn't Make any Change to Document");
       return;
+    }
+    if(!loggedIn){
+        const confirm = await loginConfirm("Your Login time has Expired. Please Login to continue");
+        if(confirm){
+          moveTo('/login');
+          return;
+        }else{
+          return;
+        }
+      
     }
     const formData = new FormData();
     // if (editPostData.titleImage instanceof File) {
@@ -461,11 +480,12 @@ const EditPost = () => {
     }
 
     if (contentImages) {
-        formData.append("contentImages", JSON.stringify(contentImages));
+      formData.append("contentImages", JSON.stringify(contentImages));
     }
     formData.append("titleImage", editPostData.titleImage);
+    const toastId = toast.loading("Updating Post..")
     try {
-      setRepostedPost(true)
+      
       const response = await axios.put(
         `${VITE_API_URL}/weblog/updatedBlog/${post?._id}`,
         formData,
@@ -478,7 +498,7 @@ const EditPost = () => {
       );
       if (response?.data.success) {
         await axios.get(`${VITE_API_URL}/weblog/allBlogs`).
-        then(response => setAllBlogsGlobally(response.data.blogs));;
+          then(response => setAllBlogsGlobally(response.data.blogs));;
         setEditedSomething(false);
         localStorage.setItem(
           "localTitleImage",
@@ -489,17 +509,17 @@ const EditPost = () => {
           JSON.stringify(response.data.blog.title)
         );
       }
-      window.alert("Successfully Updated the Post");
+      toast.success("Successfully Updated the Post", {id:toastId});
       moveTo(-1)
-      
+
       // setNewTitleImage(false);
-    } catch (err:unknown) {
-      if(isErrorCaught(err)){
-        if(err.response?.status === 400){
-          if(err.response?.data?.name === 'validationError'){
-            if(Array.isArray(err.response?.data?.error)){
+    } catch (err: unknown) {
+      if (isErrorCaught(err)) {
+        if (err.response?.status === 400) {
+          if (err.response?.data?.name === 'validationError') {
+            if (Array.isArray(err.response?.data?.error)) {
               const firstError = err.response.data.error[0];
-              if(firstError && 'msg' in firstError){
+              if (firstError && 'msg' in firstError) {
                 setErrorMessage(firstError.msg)
               }
             }
@@ -509,13 +529,13 @@ const EditPost = () => {
             setErrorMessage(err.response.data.error);
             return;
           }
-          
+
           // Case 3: Error in data.message
           if (err.response?.data?.message) {
             setErrorMessage(err.response.data.message);
             return;
           }
-          
+
           // Case 4: Generic error format
           if (err.response?.data?.errors) {
             const firstErrorKey = Object.keys(err.response.data.errors)[0];
@@ -528,31 +548,29 @@ const EditPost = () => {
           err.response?.data?.error === "jwt expired" ||
           err.response?.data?.message === "Unable to get Token Bearer"
         ) {
-          const confirmMovingToLogin = window.confirm(
-            "Your session has Expired! You are Logged Out"
-          );
-          if (confirmMovingToLogin) {
-            moveTo("/login");
+          const confirm = await loginConfirm("Your Login time Expired. Please Login Again to continue");
+          if(confirm){
+            moveTo("/login")
           }
+          return;
         }
-        
-        if((err as ErrorCaught)?.request){
+
+        if ((err as ErrorCaught)?.request) {
           setErrorMessage('Server error got while Reposting')
         }
-        if((err as ErrorCaught)?.message){
+        if ((err as ErrorCaught)?.message) {
           setErrorMessage((err as ErrorCaught).message)
         }
       }
-      
-    }finally{
-      setRepostedPost(false);
+      toast.error("Error while Updating the Post", {id:toastId})
+
     }
   };
 
-  if (loading || postLoading) {
-    return <h1>Loading the Post..</h1>;
+  if (fetchPostLoading || postLoading) {
+    return <h1 className="mt-20">Loading the Post..</h1>;
   }
-  function isErrorCaught(err:unknown): err is ErrorCaught {
+  function isErrorCaught(err: unknown): err is ErrorCaught {
     return (
       typeof err === 'object' &&
       err !== null &&
@@ -561,18 +579,22 @@ const EditPost = () => {
       'message' in err
     )
   }
+
+  if (!post || !post?._id) {
+    return <h2> Loading Post..</h2>
+  }
   return (
-    <div className="bg-gray-200 min-h-screen py-10">
-    {(errors.message || errorMessage) && (
-      <div className="max-w-5xl mx-auto mb-5">
-        <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded">
-          <p className="font-bold">Error</p>
-          <p>{errorMessage || errors.message}</p>
+    <div className="bg-gray-200 min-h-screen py-10 mt-16">
+      {(errors.message || errorMessage) && (
+        <div className="max-w-5xl mx-auto mb-5">
+          <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded">
+            <p className="font-bold">Error</p>
+            <p>{errorMessage || errors.message}</p>
+          </div>
         </div>
-      </div>
-    )}
-    {uploadingOnCloudinary && (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+      )}
+      {uploadingOnCloudinary && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
           <div className="bg-white rounded-lg shadow-lg p-5 flex items-center gap-3">
             <FaSpinner className="animate-spin text-purple-600" />
             <span className="text-lg font-medium text-gray-700">
@@ -580,48 +602,42 @@ const EditPost = () => {
             </span>
           </div>
         </div>
-    )}
-    {repostedPost && <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white rounded-lg shadow-lg p-5 flex items-center gap-3">
-            <FaSpinner className="animate-spin text-purple-600" />
-            <span className="text-lg font-medium text-gray-700">
-              Reposting the Post, please wait...
-            </span>
-          </div>
-        </div>
-      }
+      )}
       <div className="lg:max-w-5xl max-w-4xl bg-gray-800 rounded-lg shadow-lg mx-auto w-full p-5">
-        <form method="post" className="space-y-2 flex my-5 flex-col">
-          <label htmlFor="title" className="text-pink-600">
+        <form method="post" className="space-y-5 flex flex-col">
+         <div>
+           <label htmlFor="title" className="block font-semibold text-white">
             Edit Title
           </label>
           <input
             type="text"
             name="title"
             placeholder="Edit the Title"
-            className="border border-gray-500 w-full max-w-md px-3 py-2 "
+            className="border border-gray-500 w-full max-w-md px-3 py-2 rounded-md"
             onChange={(e) => handleChange(e)}
             value={editPostData.title}
           />
+         </div>
 
           <div>
-            <label htmlFor="image" className="block text-pink-600">
+            <label htmlFor="image" className="border px-4 py-2 rounded-full bg-orange-600 text-white hover:bg-orange-700 cursor-pointer transition-all duration-200">
               Change Title Image
             </label>
             <input
               type="file"
               accept="image/*"
+              id="image"
               name="titleImg"
               onChange={handleImageChange}
-              className="w-[82px] my-2"
+              className="hidden"
             />
             {editPostData.titleImage ? (
               <img
                 src={editPostData.titleImage}
                 alt={editPostData.title}
-                className="w-full max-w-md object-fit rounded-lg h-full max-h-sm"
+                className="w-full max-w-sm object-fit rounded-lg h-full max-h-sm mt-4"
               />
-            ): (
+            ) : (
               <img
                 src={editPostData.imagePreview}
                 alt={editPostData.title}
@@ -629,7 +645,7 @@ const EditPost = () => {
               />
             )}
           </div>
-          <label htmlFor="post Body" className="block text-pink-600">
+          <label htmlFor="post Body" className="block font-semibold text-white">
             Post Body
           </label>
           <div className="relative">
@@ -644,49 +660,51 @@ const EditPost = () => {
               value={editPostData.contentText}
               required
             />
-            <div className="absolute bottom-3 right-2 ">
-              <label className="px-4 py-2 bg-pink-500 text-gray-700 hover:bg-pink-400 rounded-full shadow-lg transition-all duration-300 cursor-pointer">
-              <span className="text-sm"> Add Image</span>
-              <input
-                type="file"
-                name="image"
-                accept="image/*"
-                onChange={handleContentImages}
-                className="hidden"
-                id="contentImg"
-              />
+            <div className="absolute bottom-4 right-2 ">
+              <label className="px-4 py-2 bg-blue-600 text-white
+
+               hover:bg-blue-800 rounded-full shadow-lg transition-all duration-300 cursor-pointer">
+                <span className="text-sm"> Add Image</span>
+                <input
+                  type="file"
+                  name="image"
+                  accept="image/*"
+                  onChange={handleContentImages}
+                  className="hidden"
+                  id="contentImg"
+                />
               </label>
             </div>
           </div>
-          <div className="flex"> 
-              {contentImages.length > 0 &&    
+          <div className="flex">
+            {contentImages.length > 0 &&
               <>
-              <EditContentImages contentImages={contentImages} removeImage={removeImage} contentText={editPostData?.contentText} />
-              </>          
-              
-              }
+                <EditContentImages contentImages={contentImages} removeImage={removeImage} contentText={editPostData?.contentText} />
+              </>
+
+            }
           </div>
         </form>
 
         <div className="">
           <button
-            className="border p-2 bg-green-400 mb-4"
+            className="border p-2 bg-orange-600 my-4 text-white rounded-xl hover:bg-orange-700 transition-all duration-200"
             onClick={(e) => handleReposting(e)}
           >
             {" "}
-            RePost{" "}
+            Update{" "}
           </button>
 
           <div>
             <button
-              className="border p-2 bg-blue-400 mb-4 mr-4"
+              className="bg-gray-800 text-white hover:font-semibold w-16 hover:underline mb-4 mr-4 transform duration-200"
               onClick={() => handleNavigation(-1)}
             >
               {" "}
               Back{" "}
             </button>
             <button
-              className="border p-2 bg-blue-400"
+              className="bg-gray-800 text-white hover:font-semibold hover:underline transform duration-200"
               onClick={() => handleNavigation("/")}
             >
               {" "}
