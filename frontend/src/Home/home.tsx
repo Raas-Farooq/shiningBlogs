@@ -38,7 +38,7 @@ const famousTopics = [
         path: '#'
     },
     {
-        title: 'Spirituality',
+        title: 'Spiritual',
         src: '/spiritual2.jpg',
         path: '#'
     }
@@ -58,17 +58,22 @@ const Home = () => {
       "titleImagePreview",
       "textContent",
       "localContentImages",
+      "localTitle",
+      "localPublic_id",
+      "localTitleImage",
+      "localContent"
     ];
     keys.forEach((key) => localStorage.removeItem(key));
   }, []);
 
     useEffect(() => {
         clearLocalStorage();
+    
     }, [])
 
     const handleWriteBlog = async () => {
         if (!loggedIn) {
-            const loginResult = await confirmLogin();
+            const loginResult = await confirmLogin("");
             if (loginResult) {
                 navigate('/login');
             }
@@ -79,7 +84,7 @@ const Home = () => {
     }
 
     const handleTopics = (title:string) => {
-        navigate('/lifeBlogs', {state:{title}});
+        navigate('/mostExploredTopic', {state:{title}});
     }
     const commonClasses = "w-full max-w-4xl shadow-md rounded-lg object-cover";
     return (

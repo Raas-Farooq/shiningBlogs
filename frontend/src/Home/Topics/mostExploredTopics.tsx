@@ -1,16 +1,14 @@
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom"
 import { useAuthenContext, useBlogContext } from "../../globalContext/globalContext";
-import toast from "react-hot-toast";
 import useLoginConfirm from "../../utils/useLoginConfirm";
 import useBlogsLoadingNotify from "../useBlogsLoadingNotify";
 import { Blog } from "../../types/globalTypes";
 import BlogCard from "../../Components/contentSection/BlogCard";
 
 
-const Life = () => {
+const MostExploredTopic = () => {
     useBlogsLoadingNotify();
-    const life = 'Glow';
     const {allBlogsGlobally,fetchBlogsLoading} = useBlogContext();
     const [lifeBlogs, setLifeBlogs] = useState<Blog[] | []>([]);
     const {loggedIn} = useAuthenContext();
@@ -20,17 +18,20 @@ const Life = () => {
     const confirmLogin = useLoginConfirm();
 
     useEffect(() => {
-        if(!allBlogsGlobally) return;
+        if(!allBlogsGlobally?.length) return;
+        console.log("title: ", title);
         if(allBlogsGlobally.length > 0){
             const filteredBlogs = allBlogsGlobally.filter(blog => blog.category === title)
             setLifeBlogs(filteredBlogs);
         }
+        
     },[allBlogsGlobally])
 
 
-    const handlePostClick = (e:React.MouseEvent, post:Blog) => {
+    const handlePostClick = (e:React.MouseEvent<HTMLElement>, post:Blog) => {
         e.stopPropagation();
-        navigate(`/post/${post._id}`, {state:{post}})
+        console.log("Post: liffffe", post._id)
+        navigate(`/BlogPost/${post._id}`, {state:{post}})
     }
     async function handleCreateBlog(){
 
@@ -44,6 +45,9 @@ const Life = () => {
             }
         }
     }
+    if(!fetchBlogsLoading && allBlogsGlobally?.length === 0){
+        return <h2> NO Blog Found</h2>
+       }
 
     return (
         <div className="mt-20 text-center">
@@ -57,7 +61,7 @@ const Life = () => {
                     </button>
                 </div>)
             }
-            <h1> Life </h1>
+            <h1 className="text-3xl md:text-5xl text-orange-600 mb-8"> {title} </h1>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 place-items-center">
                  {lifeBlogs.map((blog,index) => (
                 <BlogCard
@@ -74,6 +78,6 @@ const Life = () => {
 
 }
 
-export default Life
+export default MostExploredTopic
 
 

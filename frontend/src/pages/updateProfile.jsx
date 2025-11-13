@@ -137,9 +137,9 @@ const UpdateProfile = () => {
     }
     // {localLoading && userReceived ? <h1> Loading..</h1>:
 
-    if (localLoading) return <h1> Loading...</h1>
+    if (localLoading) return <h1 className="mt-20"> Loading...</h1>
     return (
-        <div className="min-h-screen relative bg-gray-50 flex justify-center items-center flex-col">
+        <div className="min-h-screen relative bg-gray-50 flex justify-center items-center flex-col mt-20">
 
             <div className="w-full max-w-lg flex flex-col justify-center items-center shadow-2xl ">
                 <h1 className="text-3xl m-5 font-extrabold"> Update Your Profile</h1>

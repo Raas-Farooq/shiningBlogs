@@ -1,8 +1,6 @@
 
 import TextContent from "./textContent.tsx";
 import Title from "./Title.jsx";
-import { useBlogContext } from "../../globalContext/globalContext";
-import { useEffect } from "react";
 import { Blog } from "../../types/globalTypes.ts";
 
 
@@ -13,13 +11,6 @@ interface BlogCardProps{
 }
 const BlogCard:React.FC<BlogCardProps> = ({ blog, handlePostClick }) => {
   // eslint-disable-next-line no-unused-vars
-  const { allBlogsGlobally } = useBlogContext();
-
-  useEffect(() => {
-      console.log("BlogsCount: ", allBlogsGlobally)
-    }
-  ,[])
-
 
   return (
     <article

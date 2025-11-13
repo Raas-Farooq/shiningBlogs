@@ -1,6 +1,4 @@
 import { useEffect,useState } from "react";
-import fetchImageAsBase64 from "./fetchImageBase64.ts";
-import { VITE_API_URL } from "../../config.ts";
 
 // import { useAuthenContext } from "../../globalContext/globalContext.tsx";
 
@@ -58,7 +56,7 @@ const getLocalContentImages = (): ContentImage[] => {
 
 
 
-const useFetchLocalData = (post:PostData) => {
+const useFetchLocalData = (post:PostData | null) => {
 
 const [loadingTitleImage, setLoadingTitleImage] = useState<boolean>(false);
 const [postLoading, setPostLoading] = useState<boolean>(false);
@@ -75,8 +73,7 @@ const [localPostData, setLocalPostData] = useState(
 const [receiveLocalImages, setReceiveLocalImages] = useState<ContentImage[]>([])
 
     useEffect(() => {
-        if(!post) return;
-        
+        if(!post?._id) return;
         const loadTitleImage = async() => {
           try{
             setLoadingTitleImage(true);
@@ -112,7 +109,7 @@ const [receiveLocalImages, setReceiveLocalImages] = useState<ContentImage[]>([])
 
     useEffect(() => {
         async function loadInitialData() {
-          if (!post) {
+          if (!post?._id) {
             setPostLoading(true);
             return;
           }
@@ -139,9 +136,11 @@ const [receiveLocalImages, setReceiveLocalImages] = useState<ContentImage[]>([])
               // JSON.parse(localStorage.getItem("localContentImages")) || [];
               // load content Images
               if (post?.contentImages.length) {
+
                 const isContentImagesValid = post?.contentImages.every(
                   (image) => image.path && image.fileName && image._id
                 );
+          
                 if(isContentImagesValid){
                   let localContentImages:ContentImage[] = getLocalContentImages();
                   const notLocalImages = !localContentImages.length ||

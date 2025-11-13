@@ -1,16 +1,16 @@
 import toast from "react-hot-toast"
 
 
-
+type Message = null | undefined | string
 const useLoginConfirm = () => {
 
 
-    function confirmUserLogin(){
+    function confirmUserLogin(message:Message){
 
         return new Promise((resolve) => {
             toast(t => (
                 <div className="">
-                    <span> Please Login and Start Writing</span>
+                    <span> {message? message : 'Please Login and Start Writing' }</span>
 
                    <div className="flex justify-center gap-10 p-3">
                      <button

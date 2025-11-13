@@ -42,11 +42,11 @@ const EditContentImages:React.FC<EditContentImagesProps> = ({contentImages, remo
                 ( 
                 <div key={ind}>
                     <div className="flex gap-3">
-                        <span className="text-[11px]"> {"image-" + ind }</span>
+                        <span className="text-[11px] text-white"> {"image-" + ind }</span>
                         <button className="bg-gray-300" onClick={(e) => handleCancel(e, image.id)}> <FaTimes /> </button>
                     </div>
                     {/* <p> {image.fileName} position: {image.position} path: {image.path} </p> */}
-                    <span className="text-[11px]"> {image.fileName && image.fileName.length > 22 ?  image.fileName.substring(0,22) : image.fileName } </span>
+                    <span className="text-[11px] text-white"> {image.fileName && image.fileName.length > 22 ?  image.fileName.substring(0,22) : image.fileName } </span>
                    
                     {image?.path ? (
                         <img src={image.path} 
