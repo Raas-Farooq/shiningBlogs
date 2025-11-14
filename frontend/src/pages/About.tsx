@@ -18,7 +18,7 @@ const About = () => {
 
 
   return (
-    <div className="page-content bg-gray-50 min-h-screen">
+    <div className="page-content bg-gray-50 min-h-screen mt-20">
       <h1 className="text-4xl font-bold text-pink-600 text-center py-5">
         About Us
       </h1>

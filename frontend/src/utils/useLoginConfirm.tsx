@@ -4,19 +4,27 @@ import toast from "react-hot-toast"
 type Message = null | undefined | string
 const useLoginConfirm = () => {
 
-
+  let currentToastNotify:string | null = null;
     function confirmUserLogin(message:Message){
 
+      
         return new Promise((resolve) => {
-            toast(t => (
+
+            if(currentToastNotify){
+                toast.dismiss(currentToastNotify);
+                currentToastNotify = null;
+            }
+            const id = toast(t => (
+                
                 <div className="">
                     <span> {message? message : 'Please Login and Start Writing' }</span>
 
                    <div className="flex justify-center gap-10 p-3">
                      <button
-                    className="bg-red-500 text-white hover:bg-red-600 px-2 py-1 transition-colors duration-300"
+                    className="bg-red-600 rounded-md text-white hover:bg-red-800 px-2 py-1 transition-colors duration-300"
                     onClick={() => {
                         toast.dismiss(t.id);
+                        currentToastNotify= null;
                         resolve(true)
                     }} 
                     >
@@ -27,16 +35,19 @@ const useLoginConfirm = () => {
 
                     onClick={() => {
                         toast.dismiss(t.id);
+                        currentToastNotify= null;
                         resolve(false);
                     }}
-                    className=" hover:text-gray-900 hover:font-medium w-8" >
+                    className=" hover:text-gray-900 hover:font-medium w-8 transition-all duration-500" >
                         Cancel
                     </button>
                    </div>
                 </div>
             ), {
+                
                 duration:Infinity
-            })
+            });
+            currentToastNotify = id;
         })
     }
     return confirmUserLogin;

@@ -10,7 +10,11 @@ interface Post {
     title:string,
     titleImage:string,
     public_id:string,
-    content:[],
+    content:[{
+    type: string;
+    value: string;
+    _id?: string;
+        }],
     contentImages: [],
     createdAt:string,
     updatedAt:string
@@ -43,7 +47,7 @@ const useFetchPost = (id:string | undefined) => {
         title: "",
         titleImage: "",
         public_id:"",
-        content: [],
+        content: [{type:'text', value:""}],
         contentImages:[],
         createdAt: "",
         updatedAt: ""

@@ -6,7 +6,7 @@ import { VITE_API_URL } from "../../config";
 interface ContentItem {
   type:string,
   value:string,
-  _id:string
+  _id?:string
 }
 interface Image {
   fileName:string,

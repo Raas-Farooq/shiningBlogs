@@ -75,10 +75,10 @@ export default function Navbar({showSearch=true}){
     const handleWriteClick = async (e:React.MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();
         if(!loggedIn){
-            const confirmMessage = await loginConfirm();
+            const confirmMessage = await loginConfirm("");
             if(confirmMessage){
                 setTimeout(() => {
-                    moveTo('/login')
+                    moveTo('/login', {state:{page:'write'}})
                 },1200)
             }
             
@@ -89,9 +89,9 @@ export default function Navbar({showSearch=true}){
     const handleContentClick = async () => 
         {
             if(!loggedIn){
-            const confirmMessage = await loginConfirm();
+            const confirmMessage = await loginConfirm("Please Login and View Your Content");
             if(confirmMessage){
-                moveTo('/login')
+                moveTo('/login', {state:{page:"content"}})
             }
             
         } else{
@@ -101,16 +101,7 @@ export default function Navbar({showSearch=true}){
 
 
 
-        // md:absolute lg:relative lg:mt-0 
-       const searchBarClass = () => clsx({
-        'mt-7 md:block md:absolute lg:relative lg:mt-0': true,
-        'hidden': !searchValue,
-        'block': searchClicked || searchValue.length>0 || loggedIn && !showMenu,
-        'xs:block': searchClicked || searchValue.length > 0 || (loggedIn && !showMenu),
-        'xs:hidden': !(searchClicked || searchValue.length > 0 || (loggedIn && !showMenu)),
-        'xs:hidden lg:hidden': showMenu || !inHomePage,
-        'md:block md:mt-0': loggedIn,
-        })
+     
         const linkStyles = 'text-lg font-semibold  text-gray-800 hover:text-blue-500 transition-colors duration-200 focus:outline-none focus:ring-0';
     return(
         <nav className={`flex items-center justify-between bg-white,

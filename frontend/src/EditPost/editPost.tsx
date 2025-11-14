@@ -99,7 +99,7 @@ const EditPost = () => {
          if (!fetchPostLoading && !loggedIn) {
         const confirm = await loginConfirm("Your Login time has Expired. Please Login Again to continue");
         if(confirm){
-          moveTo('/login');
+          moveTo('/login', {state:{page:'editPost', postId:postId}});
           return;
         }else{
           return;
@@ -121,6 +121,7 @@ const EditPost = () => {
   // const moveTo = useNavigate();
   const getState = useLocation();
 
+  console.log("getState: ", getState);
   const postId = getState.state?.postId;
   const { post, errors, fetchPostLoading } = useFetchPost(postId) as { post: PostData | null, errors: LocalErrors, fetchPostLoading: boolean };
 
@@ -168,7 +169,7 @@ const EditPost = () => {
 
     if (!editedSomething || isNavigatingBack.current) return true;
 
-    const confirmed = window.confirm(
+    const confirmed = await loginConfirm(
       "You have unsaved changes. Are you sure you want to leave?"
     );
     if (confirmed) {
@@ -222,6 +223,7 @@ const EditPost = () => {
   // Convert and Store image as base 64
 
   useEffect(() => {
+    console.log("Local data of post ", localPostData);
     if (receiveLocalImages?.length) {
       setContentImages(receiveLocalImages);
     } else {

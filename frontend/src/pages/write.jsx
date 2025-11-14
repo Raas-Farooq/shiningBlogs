@@ -37,11 +37,49 @@ export default function Write() {
 
 
   useEffect(() => {
+    async function fetchLocalStorage(){
+      try{
+         const localContentStored = localStorage.getItem('localContent') || "";
+        if(localContentStored){
+          const updatedForm = JSON.parse(localContentStored);
+          setContentText(updatedForm)
+        }
+
+        const localTitleStored = localStorage.getItem('localTitle') || "";
+        if(localTitleStored){
+          console.log("type of localStore", typeof(localTitleStored))
+          setBlogTitle(data => ({
+            ...data,
+            title:localTitleStored
+          }))
+        }
+        const localContentImagesStored = localStorage.getItem('localContentImages') || null;
+        console.log("localContentImages right after fetching", typeof(localContentImagesStored))
+        if(localContentImagesStored){
+          const accessImages = JSON.parse(localContentImagesStored);
+          setContentImages(accessImages);
+        }
+      }catch(err){
+        console.error("error while fetching local data", err);
+      }
+     
+    }
+fetchLocalStorage()
+
+  },[])
+
+  useEffect(() => {
+      localStorage.setItem('localContentImages', JSON.stringify(contentImages));
+      console.log("contentImages: ", contentImages);
+  },[contentImages])
+
+
+  useEffect(() => {
    const loginCheck = async () => {
             if (!loggedIn) {
                 const confirm = await loginConfirm("Your Login time has Expired. Please Login Again to continue");
                 if (confirm) {
-                    moveTo('/login');
+                    moveTo('/login', {state:{page:"write"}});
                     return;
                 } else {
                     return;
@@ -169,9 +207,8 @@ export default function Write() {
         position: cursorPosition,
       },
     ]);
-    
+    console.log("contentImgaes: ", contentImages, " path: ", cloudinaryUrl, "fileName: ", shortName, " position: ", cursorPosition)
     setContentText(newContent);
-    localStorage.setItem('localContentImages', JSON.stringify(contentImages));
     localStorage.setItem("localContent", JSON.stringify(newContent));
 
   };
@@ -217,7 +254,7 @@ export default function Write() {
     if (!loggedIn) {
       const confirm = await loginConfirm("Your Login time has Expired. Please Login Again to continue");
       if (confirm) {
-          moveTo('/login');
+          moveTo('/login', {state:{page:"write"}});
           return;
       } else {
           return;
@@ -299,12 +336,10 @@ export default function Write() {
           err.response?.data?.error === "jwt expired" ||
           err.response?.data?.message === "Unable to get Token Bearer"
         ) {
-          const confirmMovingLogin = window.confirm(
-            "you Are Logged Out! please login and Come Again."
-          );
+          const confirmMovingLogin = await loginConfirm()
           setErrorMessage(err?.response?.data.error);
           if (confirmMovingLogin) {
-            moveTo("/login");
+            moveTo("/login", {state:{page:"write"}});
           }
         }
         if(err?.request){
@@ -413,7 +448,7 @@ export default function Write() {
             </div>
             
           </div>
-          {contentImages.length > 0 && (
+          {contentImages?.length > 0 && (
               <ContentImages
                 contentImages={contentImages}
                 removeImage={removeContentImage}

@@ -31,7 +31,7 @@ interface Blog{
   content:Array<{
     type: string;
     value: string;
-    _id: string;
+    _id?: string;
   }>,
   contentImages:ContentImage[],
   createdAt:string,
@@ -170,9 +170,12 @@ const BlogPost:React.FC = () => {
     if(!postLoading && !post._id){
       moveTo('/notFound')
     }else{
+      console.log("post .content: ", post.content);
       localStorage.setItem('localTitle', post?.title);
       localStorage.setItem('localTitleImage', post?.titleImage);
-      localStorage.setItem('localContent', JSON.stringify(post?.content));
+      if(post.content.length){
+        localStorage.setItem('localContent', JSON.stringify(post?.content[0].value));
+      }
       localStorage.setItem("localContentImages", JSON.stringify(post?.contentImages))
       localStorage.setItem("localPublic_id", post?.public_id)
     }
