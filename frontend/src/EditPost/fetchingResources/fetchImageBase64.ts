@@ -4,7 +4,7 @@ import { VITE_API_URL } from "../../config"
 const fetchImageAsBase64 = (async (image:string):Promise<string | null> => {
     try {
       const response = await fetch(`${VITE_API_URL}/${image}`);
-      console.log("response fetchImageAsBase64 :", response)
+
       const blob = await response.blob();
       return new Promise((resolve) => {
         const reader = new FileReader();

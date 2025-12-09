@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {FaBars, FaTimes, FaRegUser} from 'react-icons/fa';
 import { useAuthenContext, useBlogContext,useUIContext } from '../../globalContext/globalContext';
 import WindowSize from '../../windowSize.ts';
@@ -70,6 +70,13 @@ export default function Navbar({showSearch=true}){
     }
    
 
+    const clearLocalStorage = useCallback(() => {
+        localStorage.removeItem("localTitle");
+        localStorage.removeItem('localPublic_id');
+        localStorage.removeItem("localTitleImage");
+        localStorage.removeItem("localContent");
+        localStorage.removeItem("localContentImages");
+      }, []);
     
 
     const handleWriteClick = async (e:React.MouseEvent<HTMLButtonElement>) => {
@@ -83,6 +90,7 @@ export default function Navbar({showSearch=true}){
             }
             
         }else{
+            clearLocalStorage();
             moveTo('/write')
         }
     }
@@ -135,7 +143,11 @@ export default function Navbar({showSearch=true}){
             )}>
                 <li><Link to={'/'} onClick={handleHome} className={`${linkStyles}`}>Home</Link></li>
                 <li><Link to={'/about'} className={`${linkStyles}`}>About</Link></li>
-                <li><span onClick={handleWriteClick} className={`cursor-pointer ${linkStyles}`}>Write</span></li>
+                <li><span onClick={() => {
+                    setShowMenu(false);
+                    handleWriteClick()
+                 }
+                } className={`cursor-pointer ${linkStyles}`}>Write</span></li>
                 <li><span onClick={handleContentClick} className={`cursor-pointer ${linkStyles}`}>My Posts</span></li>
             </ul>
 

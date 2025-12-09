@@ -4,6 +4,14 @@ import { useAuthenContext } from '../globalContext/globalContext';
 import MakeApiCall from '../pages/makeApiCall';
 import { VITE_API_URL } from '../config';
 
+interface ContentImageInterface{
+    fileName:string,
+    id:number,
+    _id:string,
+    path:'string',
+    public_id:string,
+    position:number
+}
 interface Post {
     _id:string,
     userId:string,
@@ -15,7 +23,7 @@ interface Post {
     value: string;
     _id?: string;
         }],
-    contentImages: [],
+    contentImages: ContentImageInterface[],
     createdAt:string,
     updatedAt:string
 }

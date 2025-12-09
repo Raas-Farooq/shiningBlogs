@@ -4,12 +4,13 @@ import { useAuthenContext } from '../globalContext/globalContext';
 import { VITE_API_URL } from '../config';
 
 
-const useUserPrivileges= (blogId:string) => {
+const useUserPrivileges= (blogId:string | undefined) => {
     const {setErrorMessage} = useAuthenContext(); 
     const [blogOwner, setBlogOwner] = useState<boolean>(false);
     const [ownerLoading, setOwnerLoading] = useState<boolean>(true);
 
     useEffect(() => {
+        if(!blogId) return;
         async function userPrivileges(){
                 try{
                     if(blogId){

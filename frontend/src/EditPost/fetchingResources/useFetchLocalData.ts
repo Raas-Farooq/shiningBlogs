@@ -121,7 +121,7 @@ const [receiveLocalImages, setReceiveLocalImages] = useState<ContentImage[]>([])
               const localContentText = JSON.parse(
                 localStorage.getItem("localContent") || '""'
               );
-              console.log(" parsed Local Content ", localContentText);
+  
               const newContentText =
                 post?.content && !localContentText
                   ? post.content.find((content) => content.type === "text")?.value ||

@@ -44,17 +44,22 @@ export default function Write() {
           const updatedForm = JSON.parse(localContentStored);
           setContentText(updatedForm)
         }
-
+          const localImageStored = localStorage.getItem('localTitleImage') || "";
+        if(localImageStored){
+          setBlogTitle(data => ({
+            ...data,
+            titleImg:localImageStored,
+            imgPreview:localImageStored
+          }))
+        }
         const localTitleStored = localStorage.getItem('localTitle') || "";
         if(localTitleStored){
-          console.log("type of localStore", typeof(localTitleStored))
           setBlogTitle(data => ({
             ...data,
             title:localTitleStored
           }))
         }
         const localContentImagesStored = localStorage.getItem('localContentImages') || null;
-        console.log("localContentImages right after fetching", typeof(localContentImagesStored))
         if(localContentImagesStored){
           const accessImages = JSON.parse(localContentImagesStored);
           setContentImages(accessImages);
@@ -70,7 +75,6 @@ fetchLocalStorage()
 
   useEffect(() => {
       localStorage.setItem('localContentImages', JSON.stringify(contentImages));
-      console.log("contentImages: ", contentImages);
   },[contentImages])
 
 
@@ -207,7 +211,6 @@ fetchLocalStorage()
         position: cursorPosition,
       },
     ]);
-    console.log("contentImgaes: ", contentImages, " path: ", cloudinaryUrl, "fileName: ", shortName, " position: ", cursorPosition)
     setContentText(newContent);
     localStorage.setItem("localContent", JSON.stringify(newContent));
 
@@ -364,7 +367,7 @@ fetchLocalStorage()
     <div className="bg-gray-50 min-h-screen py-10 mt-10">
       <div className="bg-white shadow-md rounded:lg px-6 py-8 w-full mx-auto max-w-3xl">
         <h2 className="text-3xl font-bold md:text-4xl text-center text-orange-600"> Your Shinning Post</h2>
-        {errorMessage && <h2 className="text-red-500"> *{errorMessage} </h2>} 
+        {/* {errorMessage && <h2 className="text-red-500"> *{errorMessage} </h2>}  */}
         <form method="post" className="space-y-3 flex flex-col">
           <label htmlFor="title" className="text-gray-600 font-medium">
             {" "}
@@ -398,7 +401,7 @@ fetchLocalStorage()
             className="hidden"
           />
           {blogTitle && blogTitle.imgPreview ? (
-            <img src={blogTitle.imgPreview} className="max-w-xs" />
+            <img src={blogTitle.imgPreview} className="w-full max-w-xs max-h-60" />
           ) : (
             ""
           )}
