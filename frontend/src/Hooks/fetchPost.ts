@@ -4,14 +4,26 @@ import { useAuthenContext } from '../globalContext/globalContext';
 import MakeApiCall from '../pages/makeApiCall';
 import { VITE_API_URL } from '../config';
 
+interface ContentImageInterface{
+    fileName:string,
+    id:number,
+    _id:string,
+    path:'string',
+    public_id:string,
+    position:number
+}
 interface Post {
     _id:string,
     userId:string,
     title:string,
     titleImage:string,
     public_id:string,
-    content:[],
-    contentImages: [],
+    content:[{
+    type: string;
+    value: string;
+    _id?: string;
+        }],
+    contentImages: ContentImageInterface[],
     createdAt:string,
     updatedAt:string
 }
@@ -43,7 +55,7 @@ const useFetchPost = (id:string | undefined) => {
         title: "",
         titleImage: "",
         public_id:"",
-        content: [],
+        content: [{type:'text', value:""}],
         contentImages:[],
         createdAt: "",
         updatedAt: ""

@@ -9,14 +9,14 @@ const NotFound:React.FC = () => {
     const {errorMessage} = useAuthenContext();
 
     return(
-        <div>
-            <h1> Page is Not Found. Try Again Sometimes later!</h1>
+        <div className="flex justify-center text-center flex-col">
+            <h1 className="text-3xl md:text-5xl my-8"> Page not found. Please try again later!</h1>
             <p> 
-                Error 
-                "{errorMessage}" 
+                Error :
+                <span className="text-red-600 mx-6 italic">{errorMessage}</span>
             </p>
 
-            <button className="mt-5 bg-red-400 rounded-lg p-3 shadow-lg hover:bg-red-500" onClick={() => moveTo('/')}> Back</button>
+            <button className="mt-5 rounded-lg p-3 shadow-lg hover:border-blue-600 hover:text-blue-600 w-28" onClick={() => moveTo('/')}> Back</button>
         </div>
     )
 } 

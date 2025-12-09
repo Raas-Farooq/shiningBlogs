@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAuthenContext } from "../globalContext/globalContext";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { FaSpinner } from "react-icons/fa";
 import { VITE_API_URL } from "../config";
@@ -31,8 +31,15 @@ const Login = () => {
     const [password, setPassword] = useState<string>('');
     const [errors, setErrors] = useState<ErrorsProps>({ email: '', password: '' })
     const navigate = useNavigate();
+    const location = useLocation();
+    const page = location.state?.page;
+    const postId = location.state?.postId;
     const [loading, setLoading] = useState<boolean>(false);
 
+
+    useEffect(() => {
+        console.log("Page ", page, "post id ", postId);
+    },[page]);
     const emailValid = (email_text: string) => {
         const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
         return regex.test(email_text);
@@ -96,7 +103,16 @@ const Login = () => {
                 setIsAuthenticated(true);
                 setEmail('');
                 setPassword('');
-                navigate('/')
+                if(page && page !== 'editPost'){
+                    page ? navigate(`/${page}`) : navigate('/');
+                }else if(page === 'editPost'){
+                    toast(" equal to Edit ");
+                    navigate(`/${page}`, {state:{postId:postId}})
+                }
+                else{
+                    navigate('/')
+                }
+                
                 // setTimeout(() => {
                 //     navigate('/');
                 // },100)

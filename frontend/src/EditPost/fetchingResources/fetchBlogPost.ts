@@ -45,7 +45,6 @@ const useFetchingPost = (postId:string) => {
     const [errors, setErrors]=useState<LocalErrors>({message:''});
     const [post, setPost]=useState<MyPost | null>(null)
     useEffect(() => {
-      console.log("postId: TechBlog ", postId);
         async function getPost() {
           if (!postId) {
             // setLoading(false);
@@ -56,7 +55,6 @@ const useFetchingPost = (postId:string) => {
             await axios.get(
               `${VITE_API_URL}/weblog/getBlogPost/${postId}`
             ).then(res => {
-              console.log("res blog", res.data.blogPost);
               setPost(res.data.blogPost)
             })
             .catch(err => setErrors(err))

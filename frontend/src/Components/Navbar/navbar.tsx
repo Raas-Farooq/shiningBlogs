@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {FaBars, FaTimes, FaRegUser} from 'react-icons/fa';
 import { useAuthenContext, useBlogContext,useUIContext } from '../../globalContext/globalContext';
 import WindowSize from '../../windowSize.ts';
@@ -70,28 +70,36 @@ export default function Navbar({showSearch=true}){
     }
    
 
+    const clearLocalStorage = useCallback(() => {
+        localStorage.removeItem("localTitle");
+        localStorage.removeItem('localPublic_id');
+        localStorage.removeItem("localTitleImage");
+        localStorage.removeItem("localContent");
+        localStorage.removeItem("localContentImages");
+      }, []);
     
 
     const handleWriteClick = async (e:React.MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();
         if(!loggedIn){
-            const confirmMessage = await loginConfirm();
+            const confirmMessage = await loginConfirm("");
             if(confirmMessage){
                 setTimeout(() => {
-                    moveTo('/login')
+                    moveTo('/login', {state:{page:'write'}})
                 },1200)
             }
             
         }else{
+            clearLocalStorage();
             moveTo('/write')
         }
     }
     const handleContentClick = async () => 
         {
             if(!loggedIn){
-            const confirmMessage = await loginConfirm();
+            const confirmMessage = await loginConfirm("Please Login and View Your Content");
             if(confirmMessage){
-                moveTo('/login')
+                moveTo('/login', {state:{page:"content"}})
             }
             
         } else{
@@ -101,16 +109,7 @@ export default function Navbar({showSearch=true}){
 
 
 
-        // md:absolute lg:relative lg:mt-0 
-       const searchBarClass = () => clsx({
-        'mt-7 md:block md:absolute lg:relative lg:mt-0': true,
-        'hidden': !searchValue,
-        'block': searchClicked || searchValue.length>0 || loggedIn && !showMenu,
-        'xs:block': searchClicked || searchValue.length > 0 || (loggedIn && !showMenu),
-        'xs:hidden': !(searchClicked || searchValue.length > 0 || (loggedIn && !showMenu)),
-        'xs:hidden lg:hidden': showMenu || !inHomePage,
-        'md:block md:mt-0': loggedIn,
-        })
+     
         const linkStyles = 'text-lg font-semibold  text-gray-800 hover:text-blue-500 transition-colors duration-200 focus:outline-none focus:ring-0';
     return(
         <nav className={`flex items-center justify-between bg-white,
@@ -144,7 +143,11 @@ export default function Navbar({showSearch=true}){
             )}>
                 <li><Link to={'/'} onClick={handleHome} className={`${linkStyles}`}>Home</Link></li>
                 <li><Link to={'/about'} className={`${linkStyles}`}>About</Link></li>
-                <li><span onClick={handleWriteClick} className={`cursor-pointer ${linkStyles}`}>Write</span></li>
+                <li><span onClick={() => {
+                    setShowMenu(false);
+                    handleWriteClick()
+                 }
+                } className={`cursor-pointer ${linkStyles}`}>Write</span></li>
                 <li><span onClick={handleContentClick} className={`cursor-pointer ${linkStyles}`}>My Posts</span></li>
             </ul>
 

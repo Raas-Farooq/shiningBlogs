@@ -37,11 +37,53 @@ export default function Write() {
 
 
   useEffect(() => {
+    async function fetchLocalStorage(){
+      try{
+         const localContentStored = localStorage.getItem('localContent') || "";
+        if(localContentStored){
+          const updatedForm = JSON.parse(localContentStored);
+          setContentText(updatedForm)
+        }
+          const localImageStored = localStorage.getItem('localTitleImage') || "";
+        if(localImageStored){
+          setBlogTitle(data => ({
+            ...data,
+            titleImg:localImageStored,
+            imgPreview:localImageStored
+          }))
+        }
+        const localTitleStored = localStorage.getItem('localTitle') || "";
+        if(localTitleStored){
+          setBlogTitle(data => ({
+            ...data,
+            title:localTitleStored
+          }))
+        }
+        const localContentImagesStored = localStorage.getItem('localContentImages') || null;
+        if(localContentImagesStored){
+          const accessImages = JSON.parse(localContentImagesStored);
+          setContentImages(accessImages);
+        }
+      }catch(err){
+        console.error("error while fetching local data", err);
+      }
+     
+    }
+fetchLocalStorage()
+
+  },[])
+
+  useEffect(() => {
+      localStorage.setItem('localContentImages', JSON.stringify(contentImages));
+  },[contentImages])
+
+
+  useEffect(() => {
    const loginCheck = async () => {
             if (!loggedIn) {
                 const confirm = await loginConfirm("Your Login time has Expired. Please Login Again to continue");
                 if (confirm) {
-                    moveTo('/login');
+                    moveTo('/login', {state:{page:"write"}});
                     return;
                 } else {
                     return;
@@ -169,9 +211,7 @@ export default function Write() {
         position: cursorPosition,
       },
     ]);
-    
     setContentText(newContent);
-    localStorage.setItem('localContentImages', JSON.stringify(contentImages));
     localStorage.setItem("localContent", JSON.stringify(newContent));
 
   };
@@ -217,7 +257,7 @@ export default function Write() {
     if (!loggedIn) {
       const confirm = await loginConfirm("Your Login time has Expired. Please Login Again to continue");
       if (confirm) {
-          moveTo('/login');
+          moveTo('/login', {state:{page:"write"}});
           return;
       } else {
           return;
@@ -299,12 +339,10 @@ export default function Write() {
           err.response?.data?.error === "jwt expired" ||
           err.response?.data?.message === "Unable to get Token Bearer"
         ) {
-          const confirmMovingLogin = window.confirm(
-            "you Are Logged Out! please login and Come Again."
-          );
+          const confirmMovingLogin = await loginConfirm()
           setErrorMessage(err?.response?.data.error);
           if (confirmMovingLogin) {
-            moveTo("/login");
+            moveTo("/login", {state:{page:"write"}});
           }
         }
         if(err?.request){
@@ -329,7 +367,7 @@ export default function Write() {
     <div className="bg-gray-50 min-h-screen py-10 mt-10">
       <div className="bg-white shadow-md rounded:lg px-6 py-8 w-full mx-auto max-w-3xl">
         <h2 className="text-3xl font-bold md:text-4xl text-center text-orange-600"> Your Shinning Post</h2>
-        {errorMessage && <h2 className="text-red-500"> *{errorMessage} </h2>} 
+        {/* {errorMessage && <h2 className="text-red-500"> *{errorMessage} </h2>}  */}
         <form method="post" className="space-y-3 flex flex-col">
           <label htmlFor="title" className="text-gray-600 font-medium">
             {" "}
@@ -363,7 +401,7 @@ export default function Write() {
             className="hidden"
           />
           {blogTitle && blogTitle.imgPreview ? (
-            <img src={blogTitle.imgPreview} className="max-w-xs" />
+            <img src={blogTitle.imgPreview} className="w-full max-w-xs max-h-60" />
           ) : (
             ""
           )}
@@ -413,7 +451,7 @@ export default function Write() {
             </div>
             
           </div>
-          {contentImages.length > 0 && (
+          {contentImages?.length > 0 && (
               <ContentImages
                 contentImages={contentImages}
                 removeImage={removeContentImage}

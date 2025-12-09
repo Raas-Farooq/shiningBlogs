@@ -94,18 +94,18 @@ const EditPost = () => {
   const isNavigatingBack = useRef(false);
   const loginConfirm = useLoginConfirm();
 
-  useEffect(() => {
-    async function loginCheck(){
-         if (!fetchPostLoading && !loggedIn) {
-        const confirm = await loginConfirm("Your Login time has Expired. Please Login Again to continue");
-        if(confirm){
-          moveTo('/login');
-          return;
-        }else{
-          return;
-        }
+  async function loginCheck() {
+    if (!fetchPostLoading && !loggedIn) {
+      const confirm = await loginConfirm("Your Login time has Expired. Please Login Again to continue");
+      if (confirm) {
+        moveTo('/login', { state: { page: 'editPost', postId: postId } });
+        return;
+      } else {
+        return;
       }
     }
+  }
+  useEffect(() => {
     loginCheck();
   }, [loggedIn]);
 
@@ -168,7 +168,7 @@ const EditPost = () => {
 
     if (!editedSomething || isNavigatingBack.current) return true;
 
-    const confirmed = window.confirm(
+    const confirmed = await loginConfirm(
       "You have unsaved changes. Are you sure you want to leave?"
     );
     if (confirmed) {
@@ -222,6 +222,7 @@ const EditPost = () => {
   // Convert and Store image as base 64
 
   useEffect(() => {
+
     if (receiveLocalImages?.length) {
       setContentImages(receiveLocalImages);
     } else {
@@ -265,7 +266,11 @@ const EditPost = () => {
       console.warn("no file seleted");
       return;
     }
-
+    if (!loggedIn) {
+      loginCheck();
+      return;
+    }
+    const toastId = toast.loading("Uploading Image on Cloudinary..")
     try {
       const previewImageLink = URL.createObjectURL(image);
       setEditPostData((prev) => (
@@ -279,7 +284,6 @@ const EditPost = () => {
     catch (err) {
       console.warn('got error while creating ObjectURL ', err);
     }
-    setUploadingOnCloudinary(true);
 
     try {
       if (editPostData?.public_id) {
@@ -310,13 +314,12 @@ const EditPost = () => {
             public_id: response.data.public_id
           }));
 
-        // setNewTitleImage(true);
+        toast.success("Successfully Uploaded Image ", { id: toastId })
       }
     }
     catch (err) {
       console.error("cloudinary upload error: ", err);
-    } finally {
-      setUploadingOnCloudinary(false);
+      toast.error("Failed To Upload Image On Cloudinary", { id: toastId })
     }
 
 
@@ -353,16 +356,21 @@ const EditPost = () => {
   const handleContentImages = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const newImage = e.target.files?.[0];
     if (!newImage) return;
+    if (!loggedIn) {
+      loginCheck();
+      return;
+    }
+    const toastId = toast.loading("Uploading Image on Cloudinary..");
+    // new Text with image placeholder
     const imageMark = `[image-${contentImages.length}]`;
     const beforeImage = editPostData.contentText.substring(0, cursorPosition);
     const afterImage = editPostData.contentText.substring(cursorPosition);
     const newContentText = beforeImage + imageMark + afterImage;
-    setEditPostData((prev) => ({ ...prev, contentText: newContentText }));
-    localStorage.setItem("localContent", JSON.stringify(newContentText));
+
     const formImage = new FormData();
     formImage.append('image', newImage);
     try {
-      setUploadingOnCloudinary(true);
+
       const response = await axios.post(`${VITE_API_URL}/weblog/uploadOnCloudinary`, formImage,
         {
           withCredentials: true,
@@ -371,27 +379,36 @@ const EditPost = () => {
           }
         }
       )
-      const imageLink = response.data.cloudinary_link;
-      const publicId = response.data.public_id;
-      const localImage = {
-        _id: new ObjectId().toHexString(),
-        id: contentImages?.length,
-        fileName: newImage.name,
-        public_id: publicId,
-        path: imageLink,
-        file: newImage,
-        position: cursorPosition,
-      };
-      const allImages = [...contentImages, localImage];
+      if (response.data.success) {
+        toast.success("Successfully Uploaded Image ", { id: toastId });
+        const imageLink = response.data.cloudinary_link;
+        const publicId = response.data.public_id;
+        const localImage = {
+          _id: new ObjectId().toHexString(),
+          id: contentImages?.length,
+          fileName: newImage.name,
+          public_id: publicId,
+          path: imageLink,
+          file: newImage,
+          position: cursorPosition,
+        };
+        const allImages = [...contentImages, localImage];
+        localStorage.setItem("localContentImages", JSON.stringify(allImages));
+        setEditPostData((prev) => ({ ...prev, contentText: newContentText }));
+        localStorage.setItem("localContent", JSON.stringify(newContentText));
+        setContentImages(allImages);
+        setEditedSomething(true);
+      } else {
+        console.error("API indicated failure:", response.data.message || "Unknown error");
+        toast.error("Failed To Upload Image On Cloudinary", { id: toastId })
+        setEditPostData((prev) => ({ ...prev, contentText: beforeImage }));
+        localStorage.setItem("localContent", JSON.stringify(beforeImage));
+      }
 
-      localStorage.setItem("localContentImages", JSON.stringify(allImages));
-      setContentImages(allImages);
-      setEditedSomething(true);
     } catch (err) {
-      console.log("error while uploading on Cloudinary: ", err);
-    }
-    finally {
-      setUploadingOnCloudinary(false)
+      console.error("error while uploading on Cloudinary: ", err);
+      toast.error("Failed To Upload Image On Cloudinary", { id: toastId });
+
     }
 
   };
@@ -452,15 +469,15 @@ const EditPost = () => {
       toast.error("You didn't Make any Change to Document");
       return;
     }
-    if(!loggedIn){
-        const confirm = await loginConfirm("Your Login time has Expired. Please Login to continue");
-        if(confirm){
-          moveTo('/login');
-          return;
-        }else{
-          return;
-        }
-      
+    if (!loggedIn) {
+      const confirm = await loginConfirm("Your Login time has Expired. Please Login to continue");
+      if (confirm) {
+        moveTo('/login');
+        return;
+      } else {
+        return;
+      }
+
     }
     const formData = new FormData();
     // if (editPostData.titleImage instanceof File) {
@@ -485,7 +502,7 @@ const EditPost = () => {
     formData.append("titleImage", editPostData.titleImage);
     const toastId = toast.loading("Updating Post..")
     try {
-      
+
       const response = await axios.put(
         `${VITE_API_URL}/weblog/updatedBlog/${post?._id}`,
         formData,
@@ -509,7 +526,7 @@ const EditPost = () => {
           JSON.stringify(response.data.blog.title)
         );
       }
-      toast.success("Successfully Updated the Post", {id:toastId});
+      toast.success("Successfully Updated the Post", { id: toastId });
       moveTo(-1)
 
       // setNewTitleImage(false);
@@ -549,7 +566,7 @@ const EditPost = () => {
           err.response?.data?.message === "Unable to get Token Bearer"
         ) {
           const confirm = await loginConfirm("Your Login time Expired. Please Login Again to continue");
-          if(confirm){
+          if (confirm) {
             moveTo("/login")
           }
           return;
@@ -562,7 +579,7 @@ const EditPost = () => {
           setErrorMessage((err as ErrorCaught).message)
         }
       }
-      toast.error("Error while Updating the Post", {id:toastId})
+      toast.error("Error while Updating the Post", { id: toastId })
 
     }
   };
@@ -593,31 +610,21 @@ const EditPost = () => {
           </div>
         </div>
       )}
-      {uploadingOnCloudinary && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white rounded-lg shadow-lg p-5 flex items-center gap-3">
-            <FaSpinner className="animate-spin text-purple-600" />
-            <span className="text-lg font-medium text-gray-700">
-              Uploading on Cloudinary, please wait...
-            </span>
-          </div>
-        </div>
-      )}
       <div className="lg:max-w-5xl max-w-4xl bg-gray-800 rounded-lg shadow-lg mx-auto w-full p-5">
         <form method="post" className="space-y-5 flex flex-col">
-         <div>
-           <label htmlFor="title" className="block font-semibold text-white">
-            Edit Title
-          </label>
-          <input
-            type="text"
-            name="title"
-            placeholder="Edit the Title"
-            className="border border-gray-500 w-full max-w-md px-3 py-2 rounded-md"
-            onChange={(e) => handleChange(e)}
-            value={editPostData.title}
-          />
-         </div>
+          <div>
+            <label htmlFor="title" className="block font-semibold text-white">
+              Edit Title
+            </label>
+            <input
+              type="text"
+              name="title"
+              placeholder="Edit the Title"
+              className="border border-gray-500 w-full max-w-md px-3 py-2 rounded-md"
+              onChange={(e) => handleChange(e)}
+              value={editPostData.title}
+            />
+          </div>
 
           <div>
             <label htmlFor="image" className="border px-4 py-2 rounded-full bg-orange-600 text-white hover:bg-orange-700 cursor-pointer transition-all duration-200">
@@ -635,13 +642,13 @@ const EditPost = () => {
               <img
                 src={editPostData.titleImage}
                 alt={editPostData.title}
-                className="w-full max-w-sm object-fit rounded-lg h-full max-h-sm mt-4"
+                className="w-full max-w-sm object-fit rounded-lg h-full max-h-64 mt-4 object-top"
               />
             ) : (
               <img
                 src={editPostData.imagePreview}
                 alt={editPostData.title}
-                className="w-full max-w-md object-fit rounded-lg h-full max-h-sm"
+                className="w-full max-w-md object-fit rounded-lg max-h-64 object-top"
               />
             )}
           </div>

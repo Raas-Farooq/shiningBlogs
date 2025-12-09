@@ -15,8 +15,8 @@ const Title:React.FC<TitleProps> = ({title}) => {
     useEffect(() => {
         if(title.length > 35){
             const words = title.split(" ");
-            const initialWords = words.slice(0,4).join(" ");
-            let lastWords = words.slice(4,8).join(' ');
+            const initialWords = words.slice(0,3).join(" ");
+            let lastWords = words.slice(3,8).join(' ');
             if(words.length > 8){
                 lastWords = lastWords + '..'
             }
@@ -32,16 +32,16 @@ const Title:React.FC<TitleProps> = ({title}) => {
             (<>
                 {slicedTitle.lastWords ? (
                     <>
-                        <p className={`text-center xs:text-xs sm:text-sm font-semibold text-gray-800 `}>
+                        <p className={`text-center xs:text-xs sm:text-xs font-semibold text-gray-800 `}>
                             {slicedTitle?.initialWords}
                         </p>
-                        <p className={`text-center xs:text-xs xl:text-sm font-semibold text-gray-800 `}>
+                        <p className={`text-center xs:text-xs xl:text-sm font-semibold text-gray-800 pb-2`}>
                             {slicedTitle?.lastWords} 
                         </p>
                     </>
                 ):
                 
-                <p className="text-center xs:text-xs font-semibold sm:text-lg pb-4 xl:pb-3 xl:pb-5 text-gray-800"> {slicedTitle?.initialWords} </p>
+                <p className="text-center xs:text-xs font-semibold sm:text-lg pb-3 text-gray-800"> {slicedTitle?.initialWords} </p>
                 }
             </>)
             }
