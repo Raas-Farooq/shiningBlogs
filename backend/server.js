@@ -7,20 +7,24 @@ import TestOrigins from './middleware/testOrigins.js';
 import { Blog } from './models/model.js';
 
 const app = express();
-
 app.use(express.json());
-const allowedOrigins = ['http://localhost:5173', 'http://127.0.0.1:8080/', 'http://localhost:5174', 'http://localhost:3000', 'https://shiningblogs-frontend.onrender.com'];
+app.use(cookieParser());
+const allowedOrigins = ['http://localhost:5173', 'http://127.0.0.1:8080', 'http://localhost:5174', 'http://localhost:3000', 'http://172.17.117.48:5173','http://172.17.117.48:5174', 'https://shiningblogs-frontend.onrender.com'];
 
-app.use(cors({
-  origin: function (origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
-  credentials: true
-}));
+const corsAuthen = {
+    origin:function(requestOrigin , callback){
+
+        if(!requestOrigin || allowedOrigins.includes(requestOrigin)){
+            return callback(null, true)
+        }
+        return callback (new Error("Not allowed by CORS"))
+        
+    },
+    credentials:true
+}
+
+app.use(cors(corsAuthen));
+app.options(/.*/, cors(corsAuthen));
 
 app.get('/health', async (req, res) => {
   try {
@@ -43,7 +47,6 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use(cookieParser());
 app.use('/uploads', express.static('uploads'));
 app.get('/', (req, res) => {
   return res.send("The backend is Running successfully")

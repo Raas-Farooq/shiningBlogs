@@ -35,13 +35,13 @@ const Title:React.FC<TitleProps> = ({title}) => {
                         <p className={`text-center xs:text-xs sm:text-xs font-semibold text-gray-800 `}>
                             {slicedTitle?.initialWords}
                         </p>
-                        <p className={`text-center xs:text-xs xl:text-sm font-semibold text-gray-800 pb-2`}>
+                        <p className={`text-center xs:text-xs xl:text-sm font-semibold text-gray-800 pb-1`}>
                             {slicedTitle?.lastWords} 
                         </p>
                     </>
                 ):
                 
-                <p className="text-center xs:text-xs font-semibold sm:text-lg pb-3 text-gray-800"> {slicedTitle?.initialWords} </p>
+                <p className="text-center xs:text-xs font-semibold sm:text-sm pb-4 text-gray-800"> {slicedTitle?.initialWords} </p>
                 }
             </>)
             }

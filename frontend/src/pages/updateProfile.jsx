@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useAuthenContext, useUIContext } from "../globalContext/globalContext.tsx";
-import { Link, useNavigate, useNavigation } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { FaImage } from "react-icons/fa";
 import axios from 'axios';
 import { VITE_API_URL } from "../config.ts";
@@ -11,6 +11,7 @@ const UpdateProfile = () => {
 
     const { isAuthenticated, setImagePreview, imagePreview, currentUser, setCurrentUser } = useAuthenContext();
     const { setEditProfile } = useUIContext();
+    const navigate = useNavigate();
     // const [userImage, setUserImage] = useState('');
     const [userReceived, setUserReceived] = useState({});
     const [message, setMessage] = useState('');
@@ -34,11 +35,8 @@ const UpdateProfile = () => {
                 const response = await axios.get(`${VITE_API_URL}/weblog/getUser`, { withCredentials: true });
                 const user = response.data.user;
                 setUserReceived(user);
-
-                let realImage = '';
                 if (user.profileImg) {
-                    realImage = `${VITE_API_URL}/${user.profileImg}`;
-                    setImagePreview(realImage);
+                    setImagePreview(user.profileImg);
                 }
 
                 let imgPreview = '';
@@ -70,16 +68,34 @@ const UpdateProfile = () => {
             [name]: value
         }))
     }
-
-    const handleImageSubmit = (e) => {
+    const handleImageSubmit = async (e) => {
         e.preventDefault();
         const imgFile = e.target.files[0];
         setImagePreview(URL.createObjectURL(imgFile));
-        setFormData((prevState) => ({
-            ...prevState,
-            userImage: imgFile,
-            imgPreview: URL.createObjectURL(imgFile)
-        }))
+        const formHeader = new FormData();
+        formHeader.append('image', imgFile);
+        const toastId= toast.loading("Uploading on cloudinary");
+        try{
+            const response = await axios.post(`${VITE_API_URL}/weblog/uploadOnCloudinary`, formHeader,
+             {
+                withCredentials:true,
+            });
+            if(response.data.success){
+                const uploadedImg = response.data.cloudinary_link;
+                setFormData(prev => {
+                    return{
+                        ...prev,
+                        userImage:uploadedImg,
+                        imgPreview:URL.createObjectURL(imgFile)
+                    }
+                })
+                toast.success("Successfully Uploaded on cloudinary ", {id: toastId})
+            }
+        }
+        catch(err){
+            console.error("error while posting ", err);
+            toast.error("fail to upload on cloudinary ", {id: toastId})
+        }
     }
     const handleInterests = (e) => {
         setAddInterest(e.target.value);
@@ -99,9 +115,8 @@ const UpdateProfile = () => {
         if (formData.username) formInfo.append('username', formData.username);
         if (userReceived.email) formInfo.append('email', userReceived.email);
         if (userReceived.password) formInfo.append('password', userReceived.password);
-        if (formData.userImage instanceof File) {
-            formInfo.append('profileImg', formData.userImage, formData.userImage.name)
-        }
+
+        if(formData.userImage) formInfo.append('userImage', formData.userImage)
         if (formData.goal) formInfo.append('goal', formData.goal);
 
         if (formData.interests && formData.interests.length > 0) {
@@ -122,12 +137,10 @@ const UpdateProfile = () => {
                 })
             if (response.data.success) {
                 setLocalLoading(false);
-                // console.log("response.data: ", response.data);
                 setCurrentUser(response.data.new_Profile);
                 toast.success("Updated Profile Successfully", { id: toastId });
             }
         } catch (err) {
-            console.log("err: ", err);
              toast.error('Got Error while updating profile', { id: toastId });
         }
         finally {
@@ -193,11 +206,15 @@ const UpdateProfile = () => {
 
                 </form>
             </div>
-            <div className="w-full text-center m-5 shadow-none px-3 py-2 rounded-lg">
-                <button onClick={() => setEditProfile(false)} ><Link
+            {/* <div className="w-full text-center m-5 shadow-none px-3 py-2 rounded-lg">
+                <button onClick={() => {
+                    navigate(-1)
+                    setEditProfile(false)
+                }
+                } ><Link
                     className="text-gray-600 hover:text-blue-600 "
                     to="/userAccount">Go Back </Link></button>
-            </div>
+            </div> */}
         </div>
     )
 }

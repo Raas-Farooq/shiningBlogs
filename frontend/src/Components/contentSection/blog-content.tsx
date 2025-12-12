@@ -34,8 +34,6 @@ export default function BlogContent() {
 
   const { showMenu } = useUIContext();
   const { loggedIn, currentUser } = useAuthenContext();
-
-  const [loading, setLoading] = useState<boolean>(true);
   const [profileImage, setProfileImage] = useState<string>("");
   const navigateTo = useNavigate();
   
@@ -56,7 +54,7 @@ export default function BlogContent() {
             navigateTo('/write');
         }
         else{
-            const userResponse = await confirmLogin();
+            const userResponse = await confirmLogin("Please login to create a new Blog Post");
             if(userResponse){
                 navigateTo('/login')
             }

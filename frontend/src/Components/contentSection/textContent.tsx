@@ -16,8 +16,8 @@ interface ContentImageInterface{
 }
 interface TextContentProps{
   content:PostContent[] | null | undefined,
-  isFullView : boolean,
-  contentImages:ContentImageInterface[] | null
+  isFullView? : boolean,
+  contentImages?:ContentImageInterface[] | null
 }
 export default function TextContent({content=[], isFullView=false, contentImages=[]}:TextContentProps){
 
@@ -35,7 +35,7 @@ export default function TextContent({content=[], isFullView=false, contentImages
    
     useEffect(() => {
       const textContent = content?.find(text => text.type === 'text')?.value || '';
-
+      console.log("blog content inside Text Content :", content, "contentImages ", contentImages)
       setText(textContent); 
      
         if(textContent){
@@ -90,7 +90,7 @@ export default function TextContent({content=[], isFullView=false, contentImages
         }
         
 
-    }, [content, contentImages])
+    }, [content])
   
     return (
         <div className={`${isFullView ? 'w-4/5': 'w-60'} `}>

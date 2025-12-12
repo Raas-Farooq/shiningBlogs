@@ -61,9 +61,9 @@ const registerUser = async (req,res) => {
 
                 res.cookie('token', token, {
                     httpOnly:true,
-                    secure:true,
+                    secure:process.env.NODE_ENV==='production',
                     maxAge:3600000,
-                    sameSite:'None'
+                    sameSite:'Lax'
 
                 })
                 res.status(201).json({
@@ -200,6 +200,7 @@ const logging =  async(req,res) => {
             })
         }
         // Match the provided password with the stored password
+        const isProduction = process.env.NODE_ENV === 'production';
         const isPasswordMatched = await bcrypt.compare(password, user.password);
         if(!isPasswordMatched){
             return res.status(404).json(
@@ -214,7 +215,7 @@ const logging =  async(req,res) => {
         jwt.sign(
             ({user:{userId:user._id}}), 
             process.env.JWT_SECRET,
-             {expiresIn: '5m'}
+             {expiresIn: '1h'}
              , (err, token) => {
                 if(err){
                     return res.status(500).json({
@@ -224,11 +225,11 @@ const logging =  async(req,res) => {
                 }
                 res.cookie('token', token, {
                     httpOnly:true,
-                    secure:true,
+                    secure:false,
                     maxAge:3600000,
-                    sameSite:'None'
+                    sameSite:'Lax'
                 })
-
+                console.log("token", token, "user ", user, " on successfull login")
                 return res.status(201).json({
                     success:true, 
                     message:"logged in and Successfully created the token",
@@ -305,8 +306,8 @@ const updateUserProfile = async (req, res) => {
             message:"Not a valid data"
         })
     }
-    
-    const {username, email,goal} = req.body;
+
+    const {username, email,goal, userImage} = req.body;
     const interests = req.body.interests ? JSON.parse(req.body.interests) : undefined;
     const user = await User.findById(userId);
     if(user._id.toString() !== userId){
@@ -319,12 +320,13 @@ const updateUserProfile = async (req, res) => {
 
     
     try{
+        console.log("req body update profile ", req.body);
         let updatingUser = {};
         if(username) updatingUser.username = username;
         if(email) updatingUser.email = email;
-        if(req.file){
-        
-            updatingUser.profileImg=req.file.path;
+        if(userImage){
+            
+            updatingUser.profileImg=userImage;
         }
         if(goal) updatingUser.goal = goal;
         if(interests) updatingUser.TopicsInterested = interests;
@@ -672,6 +674,7 @@ const canEditBlog = async(req,res) => {
 
 }
 const getMyContent = async(req,res) => {
+    console.log("requests reached getMy content: ", req.params)
     const id = req.params.id;
     try{
         const yourBlogs = await Blog.find({userId:id});

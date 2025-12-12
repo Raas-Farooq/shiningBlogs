@@ -38,7 +38,7 @@ const useLoginConfirm = () => {
                         currentToastNotify= null;
                         resolve(false);
                     }}
-                    className=" hover:text-gray-900 hover:font-medium w-8 transition-all duration-500" >
+                    className="hover:text-red-800 rounded-lg w-14 bg-transparent transition-all duration-200" >
                         Cancel
                     </button>
                    </div>

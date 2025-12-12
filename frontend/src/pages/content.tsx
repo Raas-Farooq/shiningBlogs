@@ -5,9 +5,9 @@ import { useAuthenContext, useUIContext } from "../globalContext/globalContext.t
 import Title from '../Components/contentSection/Title.tsx';
 import TextContent from "../Components/contentSection/textContent.tsx";
 import TitleImage from '../Components/contentSection/titleImage.tsx'
-import { FaSpinner } from "react-icons/fa";
 import { VITE_API_URL } from "../config.ts";
 import useLoginConfirm from "../utils/useLoginConfirm.tsx";
+import toast from "react-hot-toast";
 
 
 interface PostContent {
@@ -64,17 +64,24 @@ export default function Content() {
 
     // all Blogs Access
     async function getYourPosts() {
-
+        setLoading(true)
+        const toastId = toast.loading("Fetching your Posts")
         try {
             const response = await axios.get(`${VITE_API_URL}/weblog/getMyContent/${user_id}`, {
                 withCredentials: true
             })
-
-            setYourContent(response.data.yourBlogs);
+            if (response.data.success) {
+                setYourContent(response.data.yourBlogs);
+                toast.success("Loaded Posts successfully", { id: toastId })
+            }
+            else {
+                toast.error("Error occurred while loading blogs", { id: toastId })
+            }
 
         }
-        catch (err) {
-            setLoading(false)
+        catch (err: string | any) {
+            console.error("error while loading fetching user posts ", err);
+            // toast.error("Error occurred while loading blogs ", { id: toastId })
         }
         finally {
             setLoading(false)
@@ -87,31 +94,24 @@ export default function Content() {
     }
 
     return (
-        <div className="page-content bg-gradient-to-b from-gray-50 to-gray-100 px-6 py-8 text-center  mt-16">
+        <div className="page-content bg-gradient-to-b from-gray-50 to-gray-100 px-6 py-8 text-center mt-16">
             <h1 className="text-orange-600 text-4xl md:text-5xl font-bold text-center border-b-4 inline-block border-gray-500 my-3"> My Posts </h1>
             <div className="BlogsContainer flex flex-wrap justify-center bg-white max-w-6xl mx-auto gap-6">
-                {loggedIn && loading ? (
-                    <div>
-                        <FaSpinner className="animate-spin font-bold text-lg inline" /> Please Wait..
 
-                    </div>)
-                    :
-                    (
-                        yourContent?.map((blog, index) =>
-                        (
-                            <div key={index}
-                                id={blog._id}
-                                className="flex flex-col shadow-lg p-4 cursor-pointer text-center hover:shadow-3xl hover:scale-110 transition-all duration-500 "
+                {yourContent && yourContent?.map((blog, index) =>
+                (
+                    <div key={index}
+                        id={blog._id}
+                        className="flex flex-col shadow-lg p-4 cursor-pointer text-center hover:shadow-3xl hover:scale-110 transition-all duration-500 "
 
-                                onMouseDown={() => handlePostClick(blog)}
-                            >
-                                <h2 className="text-center xs:text-xs sm:text-lg font-medium"> <Title title={blog.title} /></h2>
-                                <TitleImage postImg={blog.titleImage} title={blog.title} />
-                                <TextContent content={blog.content} />
-                            </div>
-                        )
-                        )
-                    )
+                        onMouseDown={() => handlePostClick(blog)}
+                    >
+                        <h2 className="text-center xs:text-xs sm:text-lg font-medium"> <Title title={blog.title} /></h2>
+                        <TitleImage postImg={blog.titleImage} title={blog.title} />
+                        <TextContent content={blog.content} />
+                    </div>
+                )
+                )
                 }
             </div>
             {(!loading && yourContent?.length === 0) &&
