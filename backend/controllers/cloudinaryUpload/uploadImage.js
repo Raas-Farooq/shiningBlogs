@@ -5,7 +5,6 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const UploadImage = async(req,res) => {
-
     const image = req.file;
     cloudinary.config({
         cloud_name: process.env.CLOUDINARY_NAME,

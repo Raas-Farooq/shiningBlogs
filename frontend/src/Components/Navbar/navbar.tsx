@@ -29,18 +29,19 @@ export default function Navbar({showSearch=true}){
     }, [showSearch]);
 
     useEffect(() => {
+        console.log("currentUser NAVBAR", currentUser)
         const gettingProfileImage = async() => {
             if(currentUser?.profileImg){
                 const userImage = (`${VITE_API_URL}/${currentUser.profileImg}`);
-
-                setUserProfileImage(userImage);
+                console.log("userImage: navbar ", userImage);
+                setUserProfileImage(currentUser.profileImg);
             }else{
                 setUserProfileImage('')
             }
         }
         gettingProfileImage();
 
-    }, [loggedIn]);
+    }, [loggedIn, currentUser]);
 
 
     useEffect(() => {
@@ -113,7 +114,8 @@ export default function Navbar({showSearch=true}){
         const linkStyles = 'text-lg font-semibold  text-gray-800 hover:text-blue-500 transition-colors duration-200 focus:outline-none focus:ring-0';
     return(
         <nav className={`flex items-center justify-between bg-white,
-             backdrop-blur-sm bg-opacity-80 py-3 fixed top-0 z-20 w-full
+            px-2
+             backdrop-blur-sm bg-opacity-80 py-3 fixed top-0 left-2 z-20 w-full
               ${showMenu && 'flex-col items-center'}` }>
             
             {/* Mobile Menu Toggle */}
@@ -135,20 +137,24 @@ export default function Navbar({showSearch=true}){
             </div>
 
             {/* Desktop Navigation Links */}
-            <ul className={clsx(
+            <ul className={clsx( 
                 'md:flex md:items-center md:space-x-6',
                 !showMenu && 'hidden',
                 showMenu && 'flex flex-col items-center space-y-4 md:space-y-0',
                 'transition-all duration-300',
             )}>
                 <li><Link to={'/'} onClick={handleHome} className={`${linkStyles}`}>Home</Link></li>
-                <li><Link to={'/about'} className={`${linkStyles}`}>About</Link></li>
-                <li><span onClick={() => {
+                <li><Link to={'/about'} onClick={() => setShowMenu(false)} className={`${linkStyles}`}>About</Link></li>
+                <li><button onClick={(e) => {
                     setShowMenu(false);
-                    handleWriteClick()
+                    handleWriteClick(e)
                  }
-                } className={`cursor-pointer ${linkStyles}`}>Write</span></li>
-                <li><span onClick={handleContentClick} className={`cursor-pointer ${linkStyles}`}>My Posts</span></li>
+                } className={`cursor-pointer bg-transparent ${linkStyles}`}>Write</button></li>
+                <li><button onClick={() => {
+                    handleContentClick()
+                    setShowMenu(false)
+                } 
+                    } className={`cursor-pointer bg-transparent ${linkStyles}`}>My Posts</button></li>
             </ul>
 
             {/* User Account / Login / Register (Desktop) */}

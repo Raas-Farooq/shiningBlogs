@@ -1,9 +1,6 @@
 import './App.css'
 import Navbar from './Components/Navbar/navbar.tsx';
-import MainSection from  './Components/mainSection/main-section.tsx';
-import BlogContent from './Components/contentSection/blog-content.tsx';
 import { useAuthenContext } from './globalContext/globalContext.tsx';
-import Home from './Home/home.tsx';
 import { Toaster } from 'react-hot-toast';
 import { Outlet } from 'react-router-dom';
 

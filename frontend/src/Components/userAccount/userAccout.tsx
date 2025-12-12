@@ -24,8 +24,7 @@ const UserAccount = () => {
   useEffect(() => {
 
     if (currentUser?.profileImg) {
-      const myImage = `${VITE_API_URL}/${currentUser.profileImg}`;
-      setImagePreview(myImage);
+      setImagePreview(currentUser.profileImg);
     }
     async function fetchingCurrentUser() {
       const userId = localStorage.getItem('userId');
