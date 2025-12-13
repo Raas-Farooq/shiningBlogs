@@ -8,6 +8,8 @@ import { body, validationResult } from 'express-validator';
 import jwt from 'jsonwebtoken';
 import authMiddleware from '../middleAuthentication/authMiddleware.js';
 import he from 'he';
+import { config } from 'dotenv';
+config();
 
 // import { isConstructorDeclaration } from 'typescript';
 
@@ -225,9 +227,9 @@ const logging =  async(req,res) => {
                 }
                 res.cookie('token', token, {
                     httpOnly:true,
-                    secure:false,
+                    secure:isProduction,
                     maxAge:3600000,
-                    sameSite:'Lax'
+                    sameSite:isProduction? 'none': 'Lax'
                 })
                 console.log("token", token, "user ", user, " on successfull login")
                 return res.status(201).json({
