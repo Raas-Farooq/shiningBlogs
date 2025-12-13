@@ -6,11 +6,11 @@ The modern blogging plateform featuring authentication, image-rich blog creation
 It efficiently manage all of your content and provide seamless smooth experience
 
 ---
-
+https://github.com/Raas-Farooq/raas-blogs.git
 #### Live Demo
 https://shiningblogs-frontend.onrender.com/
 #### Github
-[https://github.com/shinning-blogs.onrender.com](https://github.com/Raas-Farooq/shiningBlogs)
+([https://github.com/Raas-Farooq/raas-blogs](https://github.com/Raas-Farooq/raas-blogs.git))
 ## Screenshots
 
 #### Home Page
@@ -21,6 +21,16 @@ https://shiningblogs-frontend.onrender.com/
 
 #### write Your Post
 <img width="895" height="645" alt="writingNew" src="https://github.com/user-attachments/assets/227f2f84-0c4b-4dab-99f6-8434464b27e3" />
+
+#### Blogger Profile
+
+<img width="839" height="645" alt="profile" src="https://github.com/user-attachments/assets/a9193e8f-95ca-4e0c-94a8-04d1160fe5e9" />
+
+### Mobile View
+<div align="center">
+<img width="205" height="444" alt="mobileResponsive" src="https://github.com/user-attachments/assets/cce2d872-4c8e-497a-9f92-e9a99f99e3cd" />
+
+</div>
 
 ## Features
 - Beautiful modern UI
