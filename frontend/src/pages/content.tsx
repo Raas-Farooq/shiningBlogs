@@ -96,23 +96,25 @@ export default function Content() {
     return (
         <div className="page-content bg-gradient-to-b from-gray-50 to-gray-100 px-6 py-8 text-center mt-16">
             <h1 className="text-orange-600 text-4xl md:text-5xl font-bold text-center border-b-4 inline-block border-gray-500 my-3"> My Posts </h1>
-            <div className="BlogsContainer flex flex-wrap justify-center bg-white max-w-6xl mx-auto gap-6">
+            <div className="BlogsContainer flex flex-col items-center justify-center bg-white max-w-6xl mx-auto gap-6">
 
-                {yourContent && yourContent?.map((blog, index) =>
-                (
-                    <div key={index}
-                        id={blog._id}
-                        className="flex flex-col shadow-lg p-4 cursor-pointer text-center hover:shadow-3xl hover:scale-110 transition-all duration-500 "
+                <div className="grid grid-cols-1 md:grid-cols-2">
+                    {yourContent && yourContent?.map((blog, index) =>
+                    (
+                        <div key={index}
+                            id={blog._id}
+                            className="flex flex-col shadow-lg p-4 cursor-pointer text-center hover:shadow-3xl hover:scale-110 transition-all duration-500 "
 
-                        onMouseDown={() => handlePostClick(blog)}
-                    >
-                        <h2 className="text-center xs:text-xs sm:text-lg font-medium"> <Title title={blog.title} /></h2>
-                        <TitleImage postImg={blog.titleImage} title={blog.title} />
-                        <TextContent content={blog.content} />
-                    </div>
-                )
-                )
-                }
+                            onMouseDown={() => handlePostClick(blog)}
+                        >
+                            <h2 className="text-center xs:text-xs sm:text-lg font-medium"> <Title title={blog.title} /></h2>
+                            <TitleImage postImg={blog.titleImage} title={blog.title} />
+                            <TextContent content={blog.content} />
+                        </div>
+                    )
+                    )
+                    }
+                </div>
             </div>
             {(!loading && yourContent?.length === 0) &&
                 <div className="text-center">

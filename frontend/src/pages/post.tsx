@@ -43,8 +43,6 @@ const BlogPost: React.FC = () => {
   const { ownerLoading, blogOwner, setBlogOwner } = useUserPrivileges(id);
   const { post, postLoading } = useFetchPost(id ?? '');
   const moveTo = useNavigate();
-  const apiLink = import.meta.env.Vite_API_URL;
-
   useEffect(() => {
     setInHomePage(false);
   }, []);
@@ -247,17 +245,6 @@ const BlogPost: React.FC = () => {
             <h2> Loading..</h2>
           )}
         </div>
-
-        {currentUser && (
-          <div className="flex justify-center">
-            <button
-              onClick={() => moveTo("/userAccount")}
-              className="xs:block sm:hidden text-gray-600 border-none text-center p-3 bg-transparent hover:text-gray-900"
-            >
-              About Me
-            </button>
-          </div>
-        )}
       </div>
     </>
   );

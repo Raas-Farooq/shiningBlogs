@@ -19,7 +19,6 @@ const MostExploredTopic = () => {
 
     useEffect(() => {
         if(!allBlogsGlobally?.length) return;
-        console.log("title: ", title);
         if(allBlogsGlobally.length > 0){
             const filteredBlogs = allBlogsGlobally.filter(blog => blog.category === title)
             setLifeBlogs(filteredBlogs);
@@ -30,7 +29,6 @@ const MostExploredTopic = () => {
 
     const handlePostClick = (e:React.MouseEvent<HTMLElement>, post:Blog) => {
         e.stopPropagation();
-        console.log("Post: liffffe", post._id)
         navigate(`/BlogPost/${post._id}`, {state:{post}})
     }
     async function handleCreateBlog(){
@@ -39,7 +37,7 @@ const MostExploredTopic = () => {
             navigate('/write');
         }
         else{
-            const userResponse = await confirmLogin();
+            const userResponse = await confirmLogin("please login to write the blog");
             if(userResponse){
                 navigate('/login')
             }

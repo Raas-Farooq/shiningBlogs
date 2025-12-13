@@ -1,8 +1,8 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useAuthenContext } from "../globalContext/globalContext";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
-import { FaSpinner } from "react-icons/fa";
+
 import { VITE_API_URL } from "../config";
 import toast from "react-hot-toast";
 
@@ -34,12 +34,9 @@ const Login = () => {
     const location = useLocation();
     const page = location.state?.page;
     const postId = location.state?.postId;
-    const [loading, setLoading] = useState<boolean>(false);
 
 
-    useEffect(() => {
-        console.log("Page ", page, "post id ", postId);
-    },[page]);
+
     const emailValid = (email_text: string) => {
         const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
         return regex.test(email_text);
@@ -71,7 +68,6 @@ const Login = () => {
             setErrors(validationErrors);
             return;
         }
-        setLoading(true);
         try {
             const loginData = {
                 email,
