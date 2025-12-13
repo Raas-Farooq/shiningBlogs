@@ -47,7 +47,6 @@ const BlogPost: React.FC = () => {
 
   useEffect(() => {
     setInHomePage(false);
-    console.log("api Link: ", apiLink);
   }, []);
 
 
@@ -103,7 +102,6 @@ const BlogPost: React.FC = () => {
   useEffect(() => {
     // console.log("postLoading: ", postLoading, "post title", post.title);
     if (!postLoading && !post._id) {
-      console.log("!loading & post.title has run")
       moveTo('/notFound')
     }
   }, [postLoading, post, moveTo])

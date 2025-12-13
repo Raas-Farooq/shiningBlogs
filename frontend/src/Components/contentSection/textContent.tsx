@@ -35,7 +35,6 @@ export default function TextContent({content=[], isFullView=false, contentImages
    
     useEffect(() => {
       const textContent = content?.find(text => text.type === 'text')?.value || '';
-      console.log("blog content inside Text Content :", content, "contentImages ", contentImages)
       setText(textContent); 
      
         if(textContent){

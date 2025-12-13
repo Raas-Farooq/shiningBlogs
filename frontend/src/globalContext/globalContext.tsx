@@ -63,6 +63,7 @@ export const AuthenContextProvider = ({children} : {children:ReactNode}) => {
     useEffect(() => {
         const userId = localStorage.getItem('userId');
         if (userId) {
+            toast("Yes there is userId ")
           userAuthentication(); // Fetch full user data if we have a userId
         } else {
             setLoading(false);
@@ -71,6 +72,7 @@ export const AuthenContextProvider = ({children} : {children:ReactNode}) => {
 
 
     useEffect(() => {
+        console.log("single Authentication: Vit api url ", VITE_API_URL);
         userAuthentication();
     },[])
 
@@ -102,7 +104,6 @@ export const AuthenContextProvider = ({children} : {children:ReactNode}) => {
         const decoded = decodeToken(token);
         if(!decoded || !decoded.exp) return true
         const expiry = decoded.exp * 1000 - Date.now();
-        console.log("expiry time inside schedule ", decoded.exp * 1000);
         if(expiry <= 0){
             logout();
         }else{
@@ -116,9 +117,10 @@ export const AuthenContextProvider = ({children} : {children:ReactNode}) => {
 
     const userAuthentication = async () => {
         try {
+            toast("Came inside User Authentication")
             const response = await axios.get(`${VITE_API_URL}/weblog/checkAuthen`, {withCredentials: true});
             const token = response.data.token;
-          
+            console.log("user Authentication runs Token: ", token);
             if(scheduleAutoLogout(token)){
                 toast("Token expred.. logging OUt from userAuthentication fetch globalContext");
                 setLoggedIn(false);

@@ -1,19 +1,17 @@
 import { useCallback, useEffect, useState } from 'react';
 import {FaBars, FaTimes, FaRegUser} from 'react-icons/fa';
-import { useAuthenContext, useBlogContext,useUIContext } from '../../globalContext/globalContext';
+import { useAuthenContext,useUIContext } from '../../globalContext/globalContext';
 import WindowSize from '../../windowSize.ts';
 import { Link, useNavigate } from 'react-router-dom';
 import clsx from 'clsx';
-import { VITE_API_URL } from '../../config.ts';
 import useLoginConfirm from '../../utils/useLoginConfirm.tsx';
 
 export default function Navbar({showSearch=true}){
 
-    const {inHomePage, setInHomePage, setOpenUserAccount, setShowMenu, showMenu} = useUIContext();
-    const {searchValue, setSearching} = useBlogContext();
+    const { setInHomePage, setOpenUserAccount, setShowMenu, showMenu} = useUIContext();
     const {loggedIn,currentUser} = useAuthenContext();
     const [userProfileImage, setUserProfileImage] = useState('');
-    const [searchClicked, setSearchClicked] = useState(false);
+    // const [searchClicked, setSearchClicked] = useState(false);
     const size = WindowSize();
     const moveTo = useNavigate();
     const loginConfirm = useLoginConfirm();
@@ -29,11 +27,9 @@ export default function Navbar({showSearch=true}){
     }, [showSearch]);
 
     useEffect(() => {
-        console.log("currentUser NAVBAR", currentUser)
+
         const gettingProfileImage = async() => {
             if(currentUser?.profileImg){
-                const userImage = (`${VITE_API_URL}/${currentUser.profileImg}`);
-                console.log("userImage: navbar ", userImage);
                 setUserProfileImage(currentUser.profileImg);
             }else{
                 setUserProfileImage('')
@@ -47,11 +43,11 @@ export default function Navbar({showSearch=true}){
     useEffect(() => {
         if(size.width > 768){
             setShowMenu(false);
-            if(searchValue.length>0){
-                setSearchClicked(true)
-            }else{
-                setSearchClicked(false)
-            }
+            // if(searchValue.length>0){
+            //     setSearchClicked(true)
+            // }else{
+            //     setSearchClicked(false)
+            // }
             
         }
     }, [size.width, loggedIn])
@@ -62,9 +58,9 @@ export default function Navbar({showSearch=true}){
     }
     const handleShowCancel = (e:React.MouseEvent<HTMLButtonElement>) => {
         e.stopPropagation();
-        if(!inHomePage){
-            setSearching(false)
-        }
+        // if(!inHomePage){
+        //     setSearching(false)
+        // }
         setShowMenu(!showMenu);
         // setSearching(false);
         // setSearchValue('')
