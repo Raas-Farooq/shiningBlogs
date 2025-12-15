@@ -13,10 +13,11 @@ import BlogPost from "../pages/post.tsx";
 import EditPost from '../EditPost/editPost.tsx';
 import NotFound from '../pages/notFound.tsx';
 import ErrorBoundary from "./errorBoundary.jsx";
-import ScrollToTop from "../utils/scrollToTop.tsx";
+// import ScrollToTop from "../utils/scrollToTop.tsx";
 import BlogContent from "../Components/contentSection/blog-content.tsx";
 import Home from "../Home/home.tsx";
 import MostExploredTopic from "../Home/Topics/mostExploredTopics.tsx";
+import ScrollToTop from "../utils/scrollToTop.tsx";
 
 interface ProtectedRouteProps {
     children: ReactNode;

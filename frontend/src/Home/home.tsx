@@ -2,7 +2,7 @@ import clsx from "clsx"
 import { Link, useNavigate } from "react-router-dom"
 import { useAuthenContext } from "../globalContext/globalContext";
 import useLoginConfirm from "../utils/useLoginConfirm";
-import toast from "react-hot-toast"
+
 import { useCallback, useEffect } from "react";
 import useImageCached from "../utils/useImageCached";
 // import toast from 'react-hot-toast';
@@ -66,10 +66,9 @@ const Home = () => {
     keys.forEach((key) => localStorage.removeItem(key));
   }, []);
 
-    useEffect(() => {
-        clearLocalStorage();
-    
-    }, [])
+  useEffect(() => {
+    clearLocalStorage()
+  },[])
 
     const handleWriteBlog = async () => {
         if (!loggedIn) {

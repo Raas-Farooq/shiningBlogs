@@ -39,9 +39,7 @@ export default function BlogContent() {
   
   useEffect(() => {
     if (currentUser?.profileImg) {
-      const myImage = `${VITE_API_URL}/${currentUser.profileImg}`;
-      setProfileImage(myImage);
-
+      setProfileImage(currentUser?.profileImg);
     }
   }, [currentUser?.profileImg, allBlogsGlobally]);
 
