@@ -133,7 +133,7 @@ const UserAccount = () => {
             </div>
 
             <div className="">
-              <button className="w-full text-center border border-red-500 text-red-500 hover:bg-red-500 hover:text-white transition-colors duration-200 px-3 py-1 rounded-md"
+              <button className="w-full text-center border border-red-500 text-white bg-red-500 hover:bg-red-700 hover:text-white transition-colors duration-200 px-3 py-1 rounded-md"
                 onClick={handleLogout}>
                 Log Out
 

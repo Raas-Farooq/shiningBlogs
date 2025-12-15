@@ -92,9 +92,9 @@ export default function TextContent({content=[], isFullView=false, contentImages
     }, [content])
   
     return (
-        <div className={`${isFullView ? 'w-4/5': 'w-60'} `}>
+        <div className={`${isFullView ? 'w-4/5': 'max-w-sm'} `}>
             {!isFullView ? 
-            <p className="text-gray-600 text-sm mt-2 h-12 overflow-hidden text-ellipsis">{makeWords(text)}..</p>
+            <p className="text-gray-600 text-sm mt-2 h-auto overflow-hidden text-ellipsis">{makeWords(text)}..</p>
             : 
             <div>
               {transformedText}

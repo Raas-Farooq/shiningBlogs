@@ -1,27 +1,18 @@
-import React, { useContext, useEffect, useState, ReactNode } from "react"
+import React, { useContext, useEffect, useState, ReactNode, useMemo } from "react"
 import axios from 'axios';
 import { jwtDecode } from "jwt-decode";
 import { VITE_API_URL } from "../config";
 import toast from "react-hot-toast";
-import { Blog } from "../types/globalTypes";
+import { Blog, PostContent } from "../types/globalTypes";
 import useFetchAllBlogs from "../Hooks/fetchAllBlogs";
-
+import useFetchMyPosts from "./useFetchMyPosts";
+import {User} from '../types/globalTypes';
 // import { BiLogoMailchimp } from "react-icons/bi";
 // import UserAccount from "../Components/userAccount/userAccout";
 // import { isButtonElement } from "react-router-dom/dist/dom";
 // find src -name "*.jsx" -exec sh -c 'mv "$0" "${0%.jsx}.tsx"' {} \; renaming all files
 
-interface User{
-  _id:string,
-  username:string,
-  email:string,
-  password:string,
-  profileImg:string,
-  TopicsInterested:[],
-  goal:string,
-  createdAt:string,
-  updatedAt:string
-}
+
 interface RegisterNewUser {
     _id:string,
     username:string,
@@ -31,15 +22,20 @@ interface decodedToken{
     exp?:number
 }
 interface AuthenContentProps {
+
     loggedIn: boolean;
     scheduleAutoLogout:(token:string) => void;
-    setLoggedIn: React.Dispatch<React.SetStateAction<boolean>>; // Add this line
-    registerData: RegisterNewUser | null;
-    setRegisterData: React.Dispatch<React.SetStateAction<RegisterNewUser | null>>; // Also add this
-    isAuthenticated: boolean;
-    setIsAuthenticated: React.Dispatch<React.SetStateAction<boolean>>;
+    myPosts:PostContent[] | null,
+    setMyPosts:React.Dispatch<React.SetStateAction<PostContent[] | null>>,
+    myPostsFetchError: Error | null;
     loading: boolean;
     setLoading: React.Dispatch<React.SetStateAction<boolean>>;
+    setLoggedIn: React.Dispatch<React.SetStateAction<boolean>>; 
+    registerData: RegisterNewUser | null;
+    setRegisterData: React.Dispatch<React.SetStateAction<RegisterNewUser | null>>;
+    isAuthenticated: boolean;
+    setIsAuthenticated: React.Dispatch<React.SetStateAction<boolean>>;
+    myPostsLoading: boolean | undefined;
     currentUser: User | null;
     setCurrentUser: React.Dispatch<React.SetStateAction<User | null>>;
     imagePreview: string;
@@ -60,18 +56,29 @@ export const AuthenContextProvider = ({children} : {children:ReactNode}) => {
     const [currentUser, setCurrentUser] = useState<User | null>(null);
     const [imagePreview, setImagePreview] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
+    // const [myPostsLoading, setMyPostsLoading] = useState<boolean | undefined>(undefined);
+    const [myPosts, setMyPosts] = useState<PostContent[] | null>([]);
+    // const [myPostsFetchError, setMyPostsFetchError] = useState<Error | null>(null);
+    const { yourContent, fetchUserPostsLoading, fetchUserPostsErr } = useFetchMyPosts(currentUser? currentUser._id: undefined);
+    
     useEffect(() => {
+        console.log("loggedIn ",loggedIn)
         const userId = localStorage.getItem('userId');
         if (userId) {
+            console.log("You are logged In")
           userAuthentication(); // Fetch full user data if we have a userId
         } else {
             setLoading(false);
         }
     }, []);
-
+  
 
     useEffect(() => {
+        console.log("GLobal context is running")
         userAuthentication();
+        // if(currentUser){
+        //     console.log("myPosts: ",yourContent);
+        // }
     },[])
 
     const decodeToken = (token:string): decodedToken | null => {
@@ -125,6 +132,7 @@ export const AuthenContextProvider = ({children} : {children:ReactNode}) => {
                 return;
             }
             if (response.data.isAuthenticated) {
+                console.log("yes you are logged In inside userAuthenticatin ")
                 setLoggedIn(true);
                 const user = response.data.user;
                 setCurrentUser(user);
@@ -150,12 +158,13 @@ export const AuthenContextProvider = ({children} : {children:ReactNode}) => {
             setLoading(false);
         }
     }
-
-
-    return (
-        <AuthenContext.Provider value={{
-            scheduleAutoLogout,
+    const contextValues = useMemo(() => ({
+        scheduleAutoLogout,
             loggedIn,
+            myPosts:yourContent,
+            setMyPosts,
+            myPostsFetchError: fetchUserPostsErr,
+            myPostsLoading:fetchUserPostsLoading,
             setLoggedIn,
             registerData,
             setRegisterData,
@@ -170,7 +179,33 @@ export const AuthenContextProvider = ({children} : {children:ReactNode}) => {
             setImagePreview,
             errorMessage,
             setErrorMessage
-        }}>
+    }),[
+        scheduleAutoLogout,
+            loggedIn,
+            myPosts,
+            setMyPosts,
+            fetchUserPostsErr,
+            fetchUserPostsLoading,
+            setLoggedIn,
+            registerData,
+            setRegisterData,
+            isAuthenticated,
+            setIsAuthenticated,
+            userAuthentication,
+            loading, 
+            setLoading,
+            currentUser,
+            setCurrentUser,
+            imagePreview,
+            setImagePreview,
+            errorMessage,
+            setErrorMessage
+    ])
+
+    return (
+        <AuthenContext.Provider value={
+            contextValues
+        }>
             {children}
         </AuthenContext.Provider>
     )

@@ -18,7 +18,7 @@ export default function Write() {
   });
   const moveTo = useNavigate();
   const currentTextArea = useRef(null);
-  const { loggedIn, setErrorMessage, errorMessage } = useAuthenContext();
+  const { loggedIn, setErrorMessage, errorMessage, setMyPosts } = useAuthenContext();
   const {setAllBlogsGlobally} = useBlogContext();
   const [cursorPosition, setCursorPosition] = useState(0);
   // const [titleErr, setTitleErr] = useState('');
@@ -329,6 +329,10 @@ fetchLocalStorage()
             [...earlierBlogs, response.data.newBlog]
           )
           )
+          setMyPosts(prev => ([
+            ...prev,
+            response.data.newBlog
+          ]))
           
           toast.success("Blog Created. Success!", { id: toastId });
           moveTo("/");

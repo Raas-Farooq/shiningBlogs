@@ -5,7 +5,6 @@ import axios from "axios";
 
 import { VITE_API_URL } from "../config";
 import toast from "react-hot-toast";
-
 interface ErrorsProps {
     email: string,
     password: string,
@@ -34,8 +33,6 @@ const Login = () => {
     const location = useLocation();
     const page = location.state?.page;
     const postId = location.state?.postId;
-
-
 
     const emailValid = (email_text: string) => {
         const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
@@ -92,6 +89,7 @@ const Login = () => {
                     );
                     imgPreview = `data:${user.profileImg.contentType};base64,${base64String}`;
                 }
+               
                 toast.success("Logged In. Success!", { id: toastId });
                 scheduleAutoLogout(token);
                 setImagePreview(imgPreview);
@@ -99,20 +97,26 @@ const Login = () => {
                 setIsAuthenticated(true);
                 setEmail('');
                 setPassword('');
-                if(page && page !== 'editPost'){
-                    page ? navigate(`/${page}`) : navigate('/');
-                }else if(page === 'editPost'){
-                    toast(" equal to Edit ");
-                    navigate(`/${page}`, {state:{postId:postId}})
+                setLoggedIn(true);
+                if(page === 'editPost'){
+  
+                    navigate(`/${page}`, {state:{postId:postId}, replace:true})
+                }
+                else  if(page === 'write'){
+      
+                    navigate(`/${page}`, { replace:true})
+                }
+                else if(page === 'content'){console.log("page: INSIDE ", page );
+                    navigate('/content', {replace:true})
                 }
                 else{
-                    navigate('/')
+                    navigate('/', {replace:true})
                 }
-                
+
                 // setTimeout(() => {
                 //     navigate('/');
                 // },100)
-                setLoggedIn(true);
+                
             }
         }
         catch (err: unknown) {

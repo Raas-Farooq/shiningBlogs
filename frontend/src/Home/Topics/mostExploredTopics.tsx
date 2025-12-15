@@ -59,7 +59,9 @@ const MostExploredTopic = () => {
                     </button>
                 </div>)
             }
-            <h1 className="text-3xl md:text-5xl text-orange-600 mb-8"> {title} </h1>
+            <div className="w-full flex justify-center text-center">
+                 <h1 className="text-center text-3xl md:text-5xl text-orange-600 mb-8 border-b-4 w-fit border-orange-800"> {title} </h1>
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 place-items-center">
                  {lifeBlogs.map((blog,index) => (
                 <BlogCard
