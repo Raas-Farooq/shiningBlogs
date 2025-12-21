@@ -14,7 +14,7 @@ const About = () => {
 
   return (
     <div className="page-content bg-gray-50 min-h-screen mt-20">
-      <h1 className="text-4xl font-bold text-pink-600 text-center py-5">
+      <h1 className="text-4xl font-bold text-orange-600 text-center py-5">
         About Us
       </h1>
       <section className="container mx-auto px-6 py-12">
@@ -46,7 +46,7 @@ const About = () => {
                 aria-label="Facebook"
                 className="hover:text-blue-600 transition-colors duration-300"
               >
-                <FaFacebook size={24} />
+                <FaFacebook size={24} color="white" className="hover:text-blue-600"/>
               </a>
             </li>
             <li>

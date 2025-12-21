@@ -27,7 +27,7 @@ interface AuthenContentProps {
     scheduleAutoLogout:(token:string) => void;
     myPosts:Blog[] | [],
     setMyPosts:React.Dispatch<React.SetStateAction<Blog[] | []>>,
-    myPostsFetchError: Error | null;
+    myPostsFetchError: Error | any;
     loading: boolean;
     setLoading: React.Dispatch<React.SetStateAction<boolean>>;
     setLoggedIn: React.Dispatch<React.SetStateAction<boolean>>; 

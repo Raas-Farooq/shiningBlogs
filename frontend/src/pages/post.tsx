@@ -125,7 +125,7 @@ const BlogPost: React.FC = () => {
     <>
       <div
         data-component="post-container"
-        className={`${loggedIn ? "flex xs:flex-col sm:flex-row" : "w-full bg-gray-50"
+        className={`w-full ${loggedIn ? "flex xs:flex-col sm:flex-row" : "w-full flex justify-center bg-gray-50"
           }`}
       >
         {errorMessage && <h2 className="mt-20">
@@ -142,7 +142,7 @@ const BlogPost: React.FC = () => {
           ) : (
             <div className="w-full max-w-4xl mx-auto px-4 py-5 rounded:md shadow-lg bg-white mt-14">
               <div className="">
-                <div key={post?._id} id={post?._id} className="">
+                <div key={post?._id} id={post?._id} className="r">
                   <h2 className="text-center w-4/5 text-2xl text-purple-600 font-medium p-5">
                     {" "}
                     {post?.title}{" "}
@@ -208,9 +208,9 @@ const BlogPost: React.FC = () => {
           )}
         </div>
         <div
-          className={clsx("px-2 py-32 flex justify-right ml-auto", loggedIn ? "hidden md:w-[30vw] md: mt-16" : "w-0",
+          className={clsx("px-2 py-32 flex justify-right ml-auto", loggedIn ? "hidden md:w-[30vw] md:mt-16" : "w-0",
             "bg-white text-center relative hidden md:block",
-            !loggedIn && "xs: sm:hidden"
+            !loggedIn && "sm:hidden"
           )}
         >
           {currentUser ? (
@@ -253,7 +253,7 @@ const BlogPost: React.FC = () => {
               )}
             </>
           ) : (
-            <h2> Loading..</h2>
+            <h2 className={`${!loggedIn ? 'hidden' : 'block'} `}> Loading..</h2>
           )}
         </div>
       </div>
