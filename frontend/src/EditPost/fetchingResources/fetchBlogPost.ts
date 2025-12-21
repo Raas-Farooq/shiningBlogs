@@ -1,19 +1,8 @@
 import { useState,useEffect } from "react";
-import { useAuthenContext } from "../../globalContext/globalContext";
 import axios from 'axios'; 
 import { VITE_API_URL } from "../../config";
 
-interface ErrorInterface {
-  response : {
-    data : {
 
-      message:string,
-      error?:string
-    }
-  },
-  request?:any,
-  message?:string
-}
 
 interface LocalErrors {
   message:any
@@ -59,31 +48,6 @@ const useFetchingPost = (postId:string) => {
             })
             .catch(err => setErrors(err))
             .finally(() => setFetchPostLoading(false));
-
-          // } catch (err:unknown) {
-          //   if(err && typeof(err) === 'object'){
-          //     if('response' in err && (err as ErrorInterface).response?.data.message){
-          //       setErrors({
-          //         message:(err as ErrorInterface).response.data.message
-          //       })
-          //     }
-              
-          //     else if('request' in err){
-          //       setErrors({
-          //         message:
-          //           "Not connected to the server. Plz check & Try Again!!",
-          //       });
-          //     }
-          //     else if('message' in err && typeof(err.message) === 'string') {
-          //       setErrors({
-          //         message:err.message
-          //       });
-          //     }
-          //   }
-          // }
-          // finally{
-          //   setLoading(false);
-          // }
         }
         getPost();
       }, [postId]);

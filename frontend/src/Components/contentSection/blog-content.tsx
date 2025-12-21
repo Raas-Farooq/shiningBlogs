@@ -9,7 +9,7 @@ import {
   useBlogContext,
   useUIContext,
 } from "../../globalContext/globalContext.jsx";
-import { VITE_API_URL } from "../../config.ts";
+// import { VITE_API_URL } from "../../config.ts";
 import { clsx } from "clsx";
 import UserProfile from "./userProfile.tsx";
 import BlogCard from "./BlogCard.tsx";
@@ -29,6 +29,7 @@ export default function BlogContent() {
     searching,
     filteredBlogs,
     allBlogsGlobally,
+ 
     // setAllBlogsGlobally,
   } = useBlogContext();
 
@@ -44,7 +45,7 @@ export default function BlogContent() {
   }, [currentUser?.profileImg, allBlogsGlobally]);
 
   
-
+ 
   
    async function handleCreateBlog(){
         const confirmLogin = useLoginConfirm();
@@ -79,7 +80,7 @@ export default function BlogContent() {
   
   const handlePostClick: PostClick = (e, post) => {
     e.stopPropagation();
-    navigateTo(`/BlogPost/${post._id}`, { state: { post } });
+    navigateTo(`/BlogPost/${post._id}`, { state: { post, page:'/allBlogs' } });
   };
 
   const getBlogsToShow = () => {

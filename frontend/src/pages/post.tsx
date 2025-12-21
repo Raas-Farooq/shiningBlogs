@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { useAuthenContext, useUIContext } from "../globalContext/globalContext.tsx";
+import { useAuthenContext, useBlogContext, useUIContext } from "../globalContext/globalContext.tsx";
 import Image from "../Components/contentSection/titleImage.jsx";
-import { useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import TextContent from "../Components/contentSection/textContent.jsx";
 import { FaEdit, FaSpinner, FaTrash } from "react-icons/fa";
 import useFetchPost from "../Hooks/fetchPost.ts";
@@ -9,8 +9,8 @@ import useUserPrivileges from "../Hooks/ownerPrivileges.jsx";
 import makeApiCall from "./makeApiCall.ts";
 import clsx from "clsx";
 import { VITE_API_URL } from "../config.ts";
-
-
+import useConfirmDelete from "../utils/useConfirmDelete.tsx";
+import toast from "react-hot-toast";
 
 interface EditHandle {
   (e: React.MouseEvent<HTMLButtonElement>, postId: string): void;
@@ -36,16 +36,21 @@ interface RespReceived<T> {
 }
 
 const BlogPost: React.FC = () => {
+  const location = useLocation()
+  const [deletedPost, setDeletedPost] = useState(false);
+  const { setAllBlogsGlobally } = useBlogContext();
   const { setInHomePage } = useUIContext();
-  const { currentUser, loggedIn, setErrorMessage, errorMessage, setLoading } = useAuthenContext();
+  const { currentUser, loggedIn, setErrorMessage, errorMessage, setLoading, setMyPosts, myPosts } = useAuthenContext();
   let { id } = useParams();
-  const [isDeletingPost, setIsDeletingPost] = useState<boolean>(false);
   const { ownerLoading, blogOwner, setBlogOwner } = useUserPrivileges(id);
+  const page = location.state?.page;
   const { post, postLoading } = useFetchPost(id ?? '');
   const moveTo = useNavigate();
   useEffect(() => {
     setInHomePage(false);
+    setErrorMessage("");
   }, []);
+
 
 
 
@@ -53,21 +58,32 @@ const BlogPost: React.FC = () => {
     e.preventDefault();
     moveTo(`/editPost`, { state: { postId } });
   };
-  const handleDelete: DeleteHandle = (e, id) => {
+  const handleDelete: DeleteHandle = async (e, id) => {
     e.preventDefault();
-    const confirm = window.confirm(
-      "Are You sure to delete this Post. You won't be able to recover it!"
-    );
-
+    const confirmDeleteFun = useConfirmDelete();
+    const confirm = await confirmDeleteFun("Are You sure to delete this Post. You won't be able to recover it!");
+    // setLoading(true);
+    const toastId = toast.loading("Deleting the post")
     const deletingPost = async () => {
       setBlogOwner(false);
       const url = `${VITE_API_URL}/weblog/deleteBlog/${id}`;
       const onSuccess = (response: RespReceived<{ success: boolean }>) => {
         if (response.data.success) {
-          alert("Successfully Deleted the Blog");
+          setDeletedPost(true);
+          toast.success("Successfully Deleted the Blog", { id: toastId, duration: 3000 });
+          const updatePosts = myPosts?.filter(post => post._id !== id) || [];
+          setAllBlogsGlobally(updatePosts);
+          setMyPosts(updatePosts)
+
           setBlogOwner(true);
-          setIsDeletingPost(true)
-          moveTo('/');
+
+
+          if (page) {
+            moveTo(-1);
+          } else {
+            moveTo('/', { replace: true });
+          }
+
         }
       }
 
@@ -85,12 +101,11 @@ const BlogPost: React.FC = () => {
         else {
           setErrorMessage(err.message);
         }
+        toast.error("error while Deleting the Blog", { id: toastId, duration: 3000 });
       }
 
       makeApiCall(setLoading, url, { method: 'DELETE' }, onSuccess, onError);
       setBlogOwner(true);
-      setIsDeletingPost(false);
-
     };
     if (confirm) {
       deletingPost();
@@ -98,11 +113,13 @@ const BlogPost: React.FC = () => {
 
   }
   useEffect(() => {
-    // console.log("postLoading: ", postLoading, "post title", post.title);
-    if (!postLoading && !post._id) {
-      moveTo('/notFound')
+    if (!deletedPost) {
+      if (!postLoading && !post._id) {
+        moveTo('/notFound')
+      }
     }
-  }, [postLoading, post, moveTo])
+
+  }, [post, deletedPost])
 
   return (
     <>
@@ -111,31 +128,22 @@ const BlogPost: React.FC = () => {
         className={`${loggedIn ? "flex xs:flex-col sm:flex-row" : "w-full bg-gray-50"
           }`}
       >
-        {errorMessage && <h2>
+        {errorMessage && <h2 className="mt-20">
           {errorMessage}
         </h2>
         }
-        {isDeletingPost && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-            <div className="bg-white rounded-lg shadow-lg p-5 flex items-center gap-3">
-              <FaSpinner className="animate-spin text-purple-600" />
-              <span className="text-lg font-medium text-gray-700">
-                Deleting your post, please wait...
-              </span>
-            </div>
-          </div>
-        )}
-        <div className="flex flex-col  mt-20">
+
+        <div className="flex flex-col w-screen mt-20">
           {(postLoading || ownerLoading) ? (
             <div className="text-center">
               <FaSpinner className="animate-spin text-center inline text-xl font-bold" /> Loading
               the Post..
             </div>
           ) : (
-            <div className="w-full max-w-4xl mx-auto px-4 py-5 rounded:md shadow-lg bg-white mt-20">
+            <div className="w-full max-w-4xl mx-auto px-4 py-5 rounded:md shadow-lg bg-white mt-14">
               <div className="">
-                <div key={post?._id} id={post?._id}>
-                  <h2 className="text-center w-4/5 text-2xl text-purple-600 font-medium mb-10 p-5">
+                <div key={post?._id} id={post?._id} className="">
+                  <h2 className="text-center w-4/5 text-2xl text-purple-600 font-medium p-5">
                     {" "}
                     {post?.title}{" "}
                   </h2>
@@ -149,15 +157,17 @@ const BlogPost: React.FC = () => {
                       </button>
                     </div>
                   )}
-
-                  {post?.titleImage && (
-                    <Image
-                      postImg={post?.titleImage}
-                      title={post?.title}
-                      isFullView={true}
-                    />
-                  )}
-                  {post._id &&
+                  <div className="flex justify-center ">
+                    {post?.titleImage && (
+                      <Image
+                        postImg={post?.titleImage}
+                        title={post?.title}
+                        isFullView={true}
+                      />
+                    )}
+                  </div>
+                 <div className="flex md:justify-center">
+                     {post._id &&
                     (
                       <TextContent
                         content={post?.content}
@@ -165,6 +175,7 @@ const BlogPost: React.FC = () => {
                         contentImages={post?.contentImages && post.contentImages.length > 0 ? post.contentImages : []}
                       />
                     )}
+                  </div>
                 </div>
               </div>
               <div className="flex justify-center my-3">
@@ -197,7 +208,7 @@ const BlogPost: React.FC = () => {
           )}
         </div>
         <div
-          className={clsx(  "px-2 py-32 flex justify-right ml-auto", loggedIn ? "hidden md:w-[30vw]" : "w-0",
+          className={clsx("px-2 py-32 flex justify-right ml-auto", loggedIn ? "hidden md:w-[30vw] md: mt-16" : "w-0",
             "bg-white text-center relative hidden md:block",
             !loggedIn && "xs: sm:hidden"
           )}

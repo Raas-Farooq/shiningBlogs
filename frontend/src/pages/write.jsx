@@ -323,16 +323,18 @@ fetchLocalStorage()
           setContentImages([]);
           setContentText("");
           setImagesShortNames([]);
-          
+          const newBlog = response.data.newBlog;
           setAllBlogsGlobally(earlierBlogs => 
           (
-            [...earlierBlogs, response.data.newBlog]
+            [...earlierBlogs, newBlog]
           )
           )
           setMyPosts(prev => ([
-            ...prev,
-            response.data.newBlog
-          ]))
+            ...(prev), 
+              newBlog
+            ]
+          
+          ))
           
           toast.success("Blog Created. Success!", { id: toastId });
           moveTo("/");

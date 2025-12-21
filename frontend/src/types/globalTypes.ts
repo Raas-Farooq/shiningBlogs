@@ -11,17 +11,7 @@ interface Blog{
     updatedAt:string
 }
 
-export interface PostContent {
-    _id: string,
-    userId: string,
-    title: string,
-    titleImage: string,
-    content: [],
-    contentImages: [],
-    createdAt: string,
-    updatedAt: string
 
-}
 export interface User{
   _id:string,
   username:string,

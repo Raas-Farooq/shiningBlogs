@@ -1,9 +1,8 @@
-import { useAuthenContext, useBlogContext, useUIContext } from "../../globalContext/globalContext";
+import { useBlogContext } from "../../globalContext/globalContext";
 import clsx from 'clsx';
 
 const BlogSearchComponent = () => {
     const {setFilteredBlogs, setSearchValue, searchValue, setSearching, allBlogsGlobally} = useBlogContext();
-    const {showMenu} = useUIContext();
     
      const handleSearchChange = (e:React.ChangeEvent<HTMLInputElement>) => {
             const blogSearch = e.target.value;
