@@ -75,7 +75,7 @@ https://shiningblogs-frontend.onrender.com/
 - **Cron Jobs for Automation**
 
 ### Deployment
-- **Frontend:** Vercel  
+- **Frontend:** Render
 - **Backend:** Render
 - **Database:** MongoDB Atlas  
 
