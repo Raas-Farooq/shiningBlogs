@@ -6,7 +6,7 @@ The modern blogging plateform featuring authentication, image-rich blog creation
 It efficiently manage all of your content and provide seamless smooth experience
 
 ---
-https://github.com/Raas-Farooq/raas-blogs.git
+
 #### Live Demo
 https://shiningblogs-frontend.onrender.com/
 #### Github
@@ -49,6 +49,78 @@ https://shiningblogs-frontend.onrender.com/
 - Mobile-friendly responsive design
 
 ---
+## System Highlights
+- Efficient content-image synchronization
+- Editable content with image placeholders [image-n]
+- Auto-draft saving in LocalStorage
+- Adaptive paragraph updates when adding/removing images
+- Smooth editor with custom navigation protection
+- Fully protected backend using JWT + cookies
+- Cloudinary integration for images
+- Role-based UI behavior (myPosts, profile management, etc.)
+
+--- 
+## 🏗 Tech Stack
+
+### Frontend
+- **React**
+- **TypeScript**
+- **Tailwind CSS**
+
+### Backend
+- **Node.js**
+- **Express.js**
+- **MongoDB (Mongoose)**
+- **JWT Authentication**
+- **Cron Jobs for Automation**
+
+### Deployment
+- **Frontend:** Vercel  
+- **Backend:** Render
+- **Database:** MongoDB Atlas  
+
+---
+
+## Installation & Local Setup
+
+`git clone https://github.com/Raas-Farooq/raas-blogs.git`
+
+`cd raas-blogs`
+
+##### 🛠 Backend Setup
+
+`cd backend`
+
+`npm install`
+
+`add .env file`
+
+`npm run dev`
+
+
+##### 🧩 Frontend Setup
+
+`cd frontend`
+
+`npm install`
+
+`npm start`
+
+## .env
+MONGO_URI=
+
+JWT_SECRET=
+
+NODE_ENV=development
+
+SALT_ROUNDS=
+
+CLOUDINARY_NAME=
+
+CLOUDINARY_API_KEY=
+
+CLOUDINARY_SECRET_KEY=
+
 
 ## LICENSE
 
