@@ -1,24 +1,13 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { VITE_API_URL } from "../config";
-
-interface PostContent {
-    _id: string,
-    userId: string,
-    title: string,
-    titleImage: string,
-    content: [],
-    contentImages: [],
-    createdAt: string,
-    updatedAt: string
-
-}
+import { Blog } from "../types/globalTypes";
 
 
 function useFetchMyPosts(user_id: string | undefined) {
 
     const [fetchUserPostsLoading, setFetchUserPostsLoading] = useState<boolean>(true);
-    const [yourContent, setYourContent] = useState<PostContent[]>([]);
+    const [yourContent, setYourContent] = useState<Blog[]>([]);
     const [fetchUserPostsErr, setFetchUserPostsErr] = useState<Error | null>(null);
 
 

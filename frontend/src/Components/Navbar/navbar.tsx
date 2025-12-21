@@ -96,11 +96,11 @@ export default function Navbar({showSearch=true}){
             if(!loggedIn){
             const confirmMessage = await loginConfirm("Please Login and View Your Content");
             if(confirmMessage){
-                moveTo('/login', {state:{page:"content"}})
+                moveTo('/login', {state:{page:"myPosts"}})
             }
             
         } else{
-                moveTo('/content')
+                moveTo('/myPosts')
             }
         }
 

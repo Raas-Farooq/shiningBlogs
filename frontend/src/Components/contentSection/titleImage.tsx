@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { VITE_API_URL } from "../../config";
 
 
 interface ImageProps {
@@ -14,19 +13,15 @@ const Image:React.FC<ImageProps> = ({postImg, title, isFullView}) => {
 
     useEffect(() => {
         const absUrl =  postImg.startsWith('https://');
-        const relUrl = postImg.startsWith('uploads/');
         if(absUrl){
             setImageSrc(postImg);
         }
-        else if(relUrl){
-            setImageSrc(`${VITE_API_URL}/${postImg}`);
-            
-        }else{
+        else{
             console.log("image not set for this post")
         }
     }, [postImg])
 
-    const imageStyles= isFullView ? 'rounded-t-lg h-[450px] w-4/5 mb-12' : ' max-w-sm aspect-[4/3] rounded-t-lg overflow-hidden'
+    const imageStyles= isFullView ? 'rounded-t-lg max-h-[450px] w-full max-w-xl mb-12' : ' max-w-sm aspect-[4/3] rounded-t-lg overflow-hidden'
     return (
         <>   
             {imageSrc && <img src={imageSrc} alt={title} className={imageStyles} />}

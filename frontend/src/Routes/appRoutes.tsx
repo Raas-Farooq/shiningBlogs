@@ -2,7 +2,7 @@ import { BrowserRouter, Navigate, Route, Routes, useLocation } from "react-route
 import App from "../App.tsx";
 import About from "../pages/About.tsx";
 import Write from "../pages/write.jsx";
-import Content from "../pages/content.tsx";
+import MyPosts from "../pages/myPosts.tsx";
 import UserAccount from "../Components/userAccount/userAccout.tsx";
 import UpdateProfile from "../pages/updateProfile.jsx";
 import Register from "../pages/register.jsx";
@@ -60,7 +60,7 @@ const PageTransition = () => {
                         <Route index element={<Home />} />
                         <Route path="/about" element={<About />} />
                         <Route path="/write" element={<ProtecedRoute stayOnPage={true}><Write /></ProtecedRoute>} />
-                        <Route path="/content" element={<Content />} />
+                        <Route path="/myPosts" element={<MyPosts />} />
                         <Route path="/allBlogs" element={<BlogContent />} />
                         <Route path="/userAccount" element={<UserAccount />} />
                         <Route path="/updateProfile" element={<UpdateProfile />} /> 

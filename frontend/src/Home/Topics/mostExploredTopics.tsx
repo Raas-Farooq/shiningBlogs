@@ -13,7 +13,7 @@ const MostExploredTopic = () => {
     const [lifeBlogs, setLifeBlogs] = useState<Blog[] | []>([]);
     const {loggedIn} = useAuthenContext();
     const location = useLocation();
-    const {title} = location.state;
+    const {title} = location?.state;
     const navigate = useNavigate();
     const confirmLogin = useLoginConfirm();
 
@@ -29,7 +29,7 @@ const MostExploredTopic = () => {
 
     const handlePostClick = (e:React.MouseEvent<HTMLElement>, post:Blog) => {
         e.stopPropagation();
-        navigate(`/BlogPost/${post._id}`, {state:{post}})
+        navigate(`/BlogPost/${post._id}`, {state:{post, page:'mostExploredTopics'}})
     }
     async function handleCreateBlog(){
 

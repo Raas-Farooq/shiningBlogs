@@ -1,20 +1,15 @@
 // import React, { useEffect, useState } from "react";
 // import axios from "axios";
 // import { useEffect } from "react";
-import { useEffect, useState } from "react";
 import {
   FaFacebook,
   FaTwitter,
   FaPinterest,
   FaWhatsapp
 } from "react-icons/fa";
-import { VITE_API_URL } from "../config";
-import axios from "axios";
-
 
 
 const About = () => {
-  const [public_id, setPublic_id] = useState('ShinningBlogsImages/kz7yuiua9n160kvbvzzq')
 
 
   return (

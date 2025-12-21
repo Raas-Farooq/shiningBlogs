@@ -1,51 +1,17 @@
 import clsx from "clsx"
 import { Link, useNavigate } from "react-router-dom"
-import { useAuthenContext } from "../globalContext/globalContext";
+import { useAuthenContext, useBlogContext } from "../globalContext/globalContext";
 import useLoginConfirm from "../utils/useLoginConfirm";
 
 import { useCallback, useEffect } from "react";
 import useImageCached from "../utils/useImageCached";
+import { famousTopics, footerLinks } from "./footerLinks";
 // import toast from 'react-hot-toast';
-const footerLinks = [
 
-    {
-        name: 'About',
-        fields: ['About Us', 'Articles', 'Blogs', 'Career', 'Website', 'other Products']
-    },
-    {
-        name: 'Blogs',
-        fields: ['Education', 'Science', 'Religion', 'Health', 'Sport', 'AI']
-    },
-    {
-        name: "Support",
-        fields: ['Support Center', 'Community', 'Developers', 'Contact']
-    },
-    {
-        name: "Policy",
-        fields: ['Terms And Conditions', 'Privacy', 'Copyrights']
-    }
-]
-
-const famousTopics = [
-    {
-        title: 'Life',
-        src: '/life2.jpg',
-        path: '#'
-    },
-    {
-        title: 'Technology',
-        src: 'tech1.jpg',
-        path: '#'
-    },
-    {
-        title: 'Spiritual',
-        src: '/spiritual2.jpg',
-        path: '#'
-    }
-]
 
 const Home = () => {
     const { loggedIn } = useAuthenContext();
+    const {setSearchValue, setSearching, setFilteredBlogs} = useBlogContext()
     const confirmLogin = useLoginConfirm();
     const heroImage = useImageCached('/blog5.jpg')
     const readingImage = useImageCached('/reading1.jpg')
@@ -67,7 +33,10 @@ const Home = () => {
   }, []);
 
   useEffect(() => {
-    clearLocalStorage()
+    clearLocalStorage();
+    setSearchValue('');
+    setSearching(false);
+    setFilteredBlogs([])
   },[])
 
     const handleWriteBlog = async () => {

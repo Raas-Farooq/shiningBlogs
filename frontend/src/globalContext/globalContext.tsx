@@ -3,7 +3,7 @@ import axios from 'axios';
 import { jwtDecode } from "jwt-decode";
 import { VITE_API_URL } from "../config";
 import toast from "react-hot-toast";
-import { Blog, PostContent } from "../types/globalTypes";
+import { Blog } from "../types/globalTypes";
 import useFetchAllBlogs from "../Hooks/fetchAllBlogs";
 import useFetchMyPosts from "./useFetchMyPosts";
 import {User} from '../types/globalTypes';
@@ -25,8 +25,8 @@ interface AuthenContentProps {
 
     loggedIn: boolean;
     scheduleAutoLogout:(token:string) => void;
-    myPosts:PostContent[] | null,
-    setMyPosts:React.Dispatch<React.SetStateAction<PostContent[] | null>>,
+    myPosts:Blog[] | [],
+    setMyPosts:React.Dispatch<React.SetStateAction<Blog[] | []>>,
     myPostsFetchError: Error | null;
     loading: boolean;
     setLoading: React.Dispatch<React.SetStateAction<boolean>>;
@@ -57,7 +57,7 @@ export const AuthenContextProvider = ({children} : {children:ReactNode}) => {
     const [imagePreview, setImagePreview] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
     // const [myPostsLoading, setMyPostsLoading] = useState<boolean | undefined>(undefined);
-    const [myPosts, setMyPosts] = useState<PostContent[] | null>([]);
+    const [myPosts, setMyPosts] = useState<Blog[]>([]);
     // const [myPostsFetchError, setMyPostsFetchError] = useState<Error | null>(null);
     const { yourContent, fetchUserPostsLoading, fetchUserPostsErr } = useFetchMyPosts(currentUser? currentUser._id: undefined);
     
@@ -72,10 +72,20 @@ export const AuthenContextProvider = ({children} : {children:ReactNode}) => {
         }
     }, []);
   
+useEffect(() => {
+        if(yourContent){
+            setMyPosts(yourContent)
+        }
 
+    },[yourContent])
+
+    useEffect(() => {
+        console.log("myPosts ",myPosts)
+    },[myPosts])
     useEffect(() => {
         console.log("GLobal context is running")
         userAuthentication();
+
         // if(currentUser){
         //     console.log("myPosts: ",yourContent);
         // }
@@ -158,10 +168,10 @@ export const AuthenContextProvider = ({children} : {children:ReactNode}) => {
             setLoading(false);
         }
     }
-    const contextValues = useMemo(() => ({
+    const authContextValues = useMemo(() => ({
         scheduleAutoLogout,
             loggedIn,
-            myPosts:yourContent,
+            myPosts,
             setMyPosts,
             myPostsFetchError: fetchUserPostsErr,
             myPostsLoading:fetchUserPostsLoading,
@@ -204,7 +214,7 @@ export const AuthenContextProvider = ({children} : {children:ReactNode}) => {
 
     return (
         <AuthenContext.Provider value={
-            contextValues
+            authContextValues
         }>
             {children}
         </AuthenContext.Provider>
@@ -214,11 +224,11 @@ export const AuthenContextProvider = ({children} : {children:ReactNode}) => {
 
 
 interface BlogContextProps{
-    allBlogsGlobally: Blog[] | null,
+    allBlogsGlobally: Blog[] | [],
     fetchBlogsError:string | any,
     fetchBlogsLoading: boolean,
     setAllBlogsGlobally: React.Dispatch<React.SetStateAction<Blog[]>>,
-    filteredBlogs: Blog[],
+    filteredBlogs: Blog[] | [],
     setFilteredBlogs: React.Dispatch<React.SetStateAction<Blog[]>>,
     searchValue:string,
     setSearchValue:React.Dispatch<React.SetStateAction<string>>,
@@ -248,9 +258,8 @@ export const BlogContextProvider = ({children}:{children:ReactNode}) => {
        }
     },[allBlogs])
     
-    return(
-        <BlogContext.Provider value={{
-            allBlogsGlobally,
+    const BlogContextValues= useMemo(() => ({
+        allBlogsGlobally,
             setAllBlogsGlobally,
             fetchBlogsError,
             fetchBlogsLoading,
@@ -260,7 +269,20 @@ export const BlogContextProvider = ({children}:{children:ReactNode}) => {
             setSearching,
             searchValue,
             setSearchValue,
-        }}>
+    }),[
+        allBlogsGlobally,
+            setAllBlogsGlobally,
+            fetchBlogsError,
+            fetchBlogsLoading,
+            filteredBlogs,
+            setFilteredBlogs,
+            searching,
+            setSearching,
+            searchValue,
+            setSearchValue,
+    ])
+    return(
+        <BlogContext.Provider value={BlogContextValues}>
         {children}
         </BlogContext.Provider>
     )
@@ -287,10 +309,9 @@ export const UIContextProvider = ({children}:{children:ReactNode}) => {
     const [showMenu, setShowMenu] = useState<boolean>(false);  
     const [inHomePage, setInHomePage] = useState<boolean>(true);
     
-    
-    return (
-        <UIContext.Provider value={{
-            openUserAccount,
+    const UIContextValues = useMemo(() => {
+        return {
+             openUserAccount,
             setOpenUserAccount,
             setShowMenu,
             showMenu,
@@ -298,7 +319,19 @@ export const UIContextProvider = ({children}:{children:ReactNode}) => {
             setEditProfile,
             inHomePage,
             setInHomePage
-        }}>
+        }
+    }, [
+         openUserAccount,
+            setOpenUserAccount,
+            setShowMenu,
+            showMenu,
+            editProfile,
+            setEditProfile,
+            inHomePage,
+            setInHomePage
+    ])
+    return (
+        <UIContext.Provider value={UIContextValues}>
             {children}
         </UIContext.Provider>
     );

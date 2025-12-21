@@ -1,14 +1,14 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuthenContext, useUIContext } from "../globalContext/globalContext.tsx";
 import Title from '../Components/contentSection/Title.tsx';
 import TextContent from "../Components/contentSection/textContent.tsx";
 import TitleImage from '../Components/contentSection/titleImage.tsx'
 import useLoginConfirm from "../utils/useLoginConfirm.tsx";
-import { PostContent } from "../types/globalTypes.ts";
+import { Blog } from "../types/globalTypes.ts";
 
 
-export default function Content() {
+export default function MyPosts() {
     const { setInHomePage } = useUIContext();
     const { loggedIn, myPosts, myPostsFetchError, myPostsLoading } = useAuthenContext();
     const moveTo = useNavigate();
@@ -42,13 +42,15 @@ export default function Content() {
         localStorage.removeItem("localContentImages");
     }
 
-
-    const handlePostClick = (post: PostContent) => {
-        moveTo(`/BlogPost/${post._id}`)
+    const handlePostClick = (post: Blog) => {
+        moveTo(`/BlogPost/${post._id}`, { state: { page: '/myPosts' } })
     }
 
-    if(myPostsFetchError){
+    if (myPostsFetchError) {
         return <h2 className="text-2xl text-center"> Error while Fetching the Posts</h2>
+    }
+    if(myPostsLoading){
+        return <h2 className="text-2xl text-center"> Loading the Posts</h2> 
     }
     return (
         <div className="page-content bg-gradient-to-b from-gray-50 to-gray-100 px-6 py-8 text-center mt-16">
@@ -56,19 +58,27 @@ export default function Content() {
             <div className="BlogsContainer flex flex-col items-center justify-center bg-white max-w-6xl mx-auto gap-6">
 
                 <div className="grid grid-cols-1 md:grid-cols-2">
-                    {myPosts && myPosts?.map((blog, index) =>
-                    (
-                        <div key={index}
-                            id={blog._id}
-                            className="flex flex-col shadow-lg p-6 cursor-pointer text-center hover:shadow-3xl hover:scale-110 transition-all duration-500 "
+                    {/* {console.log("myPosts DOM; ", myPosts)} */}
+                    {myPosts && myPosts?.map((blog, index) => {
+                        if (!blog || !blog.title || !blog.titleImage) {
 
-                            onMouseDown={() => handlePostClick(blog)}
-                        >
-                            <h2 className="text-center xs:text-xs sm:text-lg font-medium"> <Title title={blog.title} /></h2>
-                            <TitleImage postImg={blog.titleImage} title={blog.title} />
-                            <TextContent content={blog.content} />
-                        </div>
-                    )
+                            console.warn(`Skipping render for invalid blog at index ${index}`, blog);
+                            return null;
+                        }
+                        return (
+                            <div key={blog._id || index}
+                                id={blog._id}
+                                className="flex flex-col shadow-lg p-6 cursor-pointer text-center hover:shadow-3xl hover:scale-110 transition-all duration-500 "
+
+                                onMouseDown={() => handlePostClick(blog)}
+                            >
+
+                                <h2 className="text-center xs:text-xs sm:text-lg font-medium"> <Title title={blog.title} /></h2>
+                                <TitleImage postImg={blog.titleImage} title={blog.title} />
+                                <TextContent content={blog.content} />
+                            </div>
+                        )
+                    }
                     )
                     }
                 </div>

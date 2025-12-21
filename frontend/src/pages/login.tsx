@@ -103,11 +103,11 @@ const Login = () => {
                     navigate(`/${page}`, {state:{postId:postId}, replace:true})
                 }
                 else  if(page === 'write'){
-      
+    
                     navigate(`/${page}`, { replace:true})
                 }
-                else if(page === 'content'){console.log("page: INSIDE ", page );
-                    navigate('/content', {replace:true})
+                else if(page === 'myPosts'){console.log("page: INSIDE ", page );
+                    navigate('/myPosts', {replace:true})
                 }
                 else{
                     navigate('/', {replace:true})

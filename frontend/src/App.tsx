@@ -8,11 +8,7 @@ function App() {
   const {loading} = useAuthenContext();
   return (
     <>
-    {loading ? <h1> ..Loading </h1> : (
-     <>
-     
-      <Navbar />
-      <Toaster 
+    <Toaster 
       position='top-center'
       toastOptions={
        {
@@ -21,6 +17,10 @@ function App() {
       }
       containerStyle={{zIndex:9999}}
       />
+    {loading ? <h1> ..Loading </h1> : (
+     <>
+     
+      <Navbar />
       <Outlet />
      </>
     )}
