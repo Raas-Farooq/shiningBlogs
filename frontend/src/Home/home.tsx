@@ -5,7 +5,7 @@ import useLoginConfirm from "../utils/useLoginConfirm";
 
 import { useCallback, useEffect } from "react";
 import useImageCached from "../utils/useImageCached";
-import { famousTopics, footerLinks } from "./footerLinks";
+import { famousTopics, footerLinks, topBloggers } from "./footerLinks";
 // import toast from 'react-hot-toast';
 
 
@@ -122,15 +122,15 @@ const Home = () => {
                     </div>
                 </section>
                 <section className="TopBlogs relative">
-                    <div className="max-w-4xl mx-auto flex flex-col items-center text-center px-6 py-12">
+                    <div className="max-w-6xl mx-auto flex flex-col items-center text-center px-6 py-8">
                         <h1 className="text-3xl md:text-4xl font-semibold mb-10"> Enjoy The Most Explored Topics </h1>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 place-items-center">
+                        <div className="flex flex-wrap justify-center gap-16">
                             {
                                 famousTopics.map((topic, ind) => (
                                     <div className="" key={ind}>
                                         <h2 className="text-xl font-bold my-4">{topic.title}</h2>
                                         <div className="relative group hover:scale-110 transition-transform duration-500">
-                                            <img src={topic.src} className="w-full object-cover shadow-md rounded-2xl" />
+                                            <img src={topic.src} className="w-full max-w-md object-cover shadow-md rounded-2xl" />
                                             <button className="absolute text-orange-600 px-4 py-2 bg-white/90 backdrop/blur rounded-lg left-1/2 
                                              -translate-x-1/2 bottom-3 group-hover:bg-orange-600 group-hover:text-white group-hover:scale-105 transition"
                                              onClick={() => handleTopics(topic.title)}
@@ -139,6 +139,21 @@ const Home = () => {
                                     </div>
                                 ))
                             }
+                        </div>
+                    </div>
+                </section>
+                <section className="TopBloggers">
+                    <div className="w-full max-w-6xl py-16 px-12 flex justify-center items-center flex-col">
+                        <h1 className="text-3xl md:text-4xl font-bold mb-10">Top Bloggers</h1>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {topBloggers.map((blogger,index) => {
+                                return <div className="text-center" key={index}>
+                                        <h2 className="font-bold mb-4">{blogger.name}</h2>
+                                        <img src={blogger.src}
+                                        className="w-full max-w-md object-cover rounded-lg hover:scale-105 transition-transform duration-300"
+                                        />
+                                    </div>
+                            })}
                         </div>
                     </div>
                 </section>

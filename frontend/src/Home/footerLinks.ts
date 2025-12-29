@@ -35,3 +35,21 @@ export const famousTopics = [
         path: '#'
     }
 ]
+
+export const topBloggers = [
+    {
+        name: 'Zeeshan',
+        src: '/blogger1Comp.jpg',
+        path: '#'
+    },
+    {
+        name: 'Daniyal',
+        src: '/blogger5.jpg',
+        path: '#'
+    },
+    {
+        name: 'Farhan',
+        src: '/blogger3Comp.jpg',
+        path: '#'
+    }
+]
