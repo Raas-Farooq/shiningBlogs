@@ -5,7 +5,7 @@ import useLoginConfirm from "../utils/useLoginConfirm";
 
 import { useCallback, useEffect } from "react";
 import useImageCached from "../utils/useImageCached";
-import { famousTopics, footerLinks, topBloggers } from "./footerLinks";
+import { famousTopics, footerLinks, topBloggers, stats } from "./footerLinks";
 // import toast from 'react-hot-toast';
 
 
@@ -54,26 +54,7 @@ const Home = () => {
     const handleTopics = (title: string) => {
         navigate('/mostExploredTopic', { state: { title } });
     }
-    // {heroImage.imageStatus === 'loading' && (
-    //                             // Display the placeholder only when loading
-    //                             <div className={`${commonClasses} bg-gray-200 aspect-[6/3] animate-pulse z-10`}>
-    //                             </div>
-    //                         )}
 
-    //                         {heroImage.imageStatus === 'loaded' && (
-    //                             // Display the actual image only when loaded
-    //                             <img
-    //                                 src={'/blog5.jpg'}
-    //                                 alt="Hero"
-    //                                 className={`${commonClasses} aspect-[6/3]`}
-    //                             />
-    //                         )}
-
-    //                         {heroImage.imageStatus === 'failed' && (
-    //                             <div className={`${commonClasses} bg-red-400 flex items-center justify-center`}>
-    //                                 <p className="text-white">Image Failed to Load</p>
-    //                             </div>
-    //                         )}
     const commonClasses = "w-full max-w-4xl shadow-md rounded-lg object-cover";
     return (
         <main className="min-h-screen bg-gray-50">
@@ -92,20 +73,70 @@ const Home = () => {
                                 A modern blogging platform for readers, writers, and professionals to share ideas that matter.
                             </p>
                             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
-                                <button className="px-8 py-4 bg-orange-600 hover:bg-orange-700 text-white rounded-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+                                <button onClick={() => handleWriteBlog()}
+                                    className="px-8 py-4 bg-orange-600 hover:bg-orange-700 text-white rounded-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
                                     Start Writing Free
                                 </button>
-                                <button className="px-8 py-4 bg-white hover:bg-gray-50 text-gray-800 rounded-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300 border-2 border-gray-200">
+                                <button onClick={() => navigate('/allBlogs')} className="px-8 py-4 bg-white hover:bg-gray-50 text-gray-800 rounded-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300 border-2 border-gray-200">
                                     Explore Blogs
                                 </button>
                             </div>
                             <div className="relative rounded-2xl overflow-hidden shadow-2xl max-w-4xl mx-auto">
-                                <img src="/api/placeholder/1200/600" alt="Platform preview" className="w-full" />
+                                {heroImage.imageStatus === 'loading' && (
+                                    // Display the placeholder only when loading
+                                    <div className={`${commonClasses} bg-gray-200 aspect-[6/3] animate-pulse z-10`}>
+                                    </div>
+                                )}
+
+                                {heroImage.imageStatus === 'loaded' && (
+                                    // Display the actual image only when loaded
+                                    <img
+                                        src={'/blog5.jpg'}
+                                        alt="Hero"
+                                        className={`${commonClasses} aspect-[6/3]`}
+                                    />
+                                )}
+
+                                {heroImage.imageStatus === 'failed' && (
+                                    <div className={`${commonClasses} bg-red-400 flex items-center justify-center`}>
+                                        <p className="text-white">Image Failed to Load</p>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </div>
                 </section>
-
+                <section className="py-16 bg-gradient-to-r from-orange-600 to-purple-600">
+                    <div className="container mx-auto px-4">
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+                            {stats.map((stat, index) => (
+                                <div key={index} className="text-center text-white">
+                                    <div className="text-3xl md:text-4xl font-bold mb-2">{stat.name}</div>
+                                    <div className="text-orange-100">{stat.label}</div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </section>
+                <section className="py-20 bg-white">
+                    <div className="container mx-auto px-4">
+                        <div className="text-center mb-16">
+                            <h2 className="text-4xl font-bold mb-4">Powerful Features for Modern Bloggers</h2>
+                            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+                                Everything you need to create, publish, and grow your blog
+                            </p>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+                            {features.map((feature, index) => (
+                                <div key={index} className="p-6 rounded-xl bg-gradient-to-br from-gray-50 to-white border border-gray-200 hover:shadow-lg transition-all duration-300 hover:-translate-y-2">
+                                    <div className="text-4xl mb-4">{feature.icon}</div>
+                                    <h3 className="text-xl font-bold mb-2">{feature.title}</h3>
+                                    <p className="text-gray-600">{feature.desc}</p>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </section>
                 <section className="ReadBlogs relative">
                     <div className="max-w-6xl mx-auto px-6 flex flex-col md:flex-row justify-center gap-10 items-center text-center px-6 py-12">
                         <div className="md:w-1/2 text-center md:text-left">
