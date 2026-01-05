@@ -5,7 +5,7 @@ import useLoginConfirm from "../utils/useLoginConfirm";
 
 import { useCallback, useEffect } from "react";
 import useImageCached from "../utils/useImageCached";
-import { famousTopics, footerLinks, topBloggers, stats, features } from "./footerLinks";
+import { famousTopics, footerLinks, topBloggers, stats, features, recentBlogs } from "./footerLinks";
 // import toast from 'react-hot-toast';
 
 
@@ -128,7 +128,7 @@ const Home = () => {
                                 Everything you need to create, publish, and grow your blog
                             </p>
                         </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-6xl mx-auto">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
                             {features.map((feature, index) => (
                                 <div key={index} className="p-6 rounded-xl bg-gradient-to-br from-gray-50 to-white border border-gray-200 hover:shadow-lg transition-all duration-300 hover:-translate-y-2">
                                     <div className="text-4xl mb-4">{feature.icon}</div>
@@ -139,6 +139,36 @@ const Home = () => {
                         </div>
                     </div>
                 </section>
+                {/* Most Recent Topics Section */}
+                <section className="py-20 bg-gray-50">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold mb-4">Trending Blogs</h2>
+            <p className="text-xl text-gray-600">Discover what's popular today</p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+            {recentBlogs.map((blog, index) => (
+              <div key={index} className="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 cursor-pointer">
+                <div className="relative">
+                  <img src={blog.image} alt={blog.title} className="w-full h-48 object-cover" />
+                  <span className="absolute top-4 right-4 px-3 py-1 bg-orange-600 text-white text-xs rounded-full">
+                    {blog.category}
+                  </span>
+                </div>
+                <div className="p-6">
+                  <h3 className="text-xl font-bold mb-3 hover:text-orange-600 transition-colors">
+                    {blog.title}
+                  </h3>
+                  <div className="flex items-center justify-between text-sm text-gray-600">
+                    <span>By {blog.author}</span>
+                    <span>📖 {blog.reads} reads</span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
                 <section className="ReadBlogs relative">
                     <div className="max-w-6xl mx-auto px-6 flex flex-col md:flex-row justify-center gap-10 items-center text-center px-6 py-12">
                         <div className="md:w-1/2 text-center md:text-left">
@@ -189,7 +219,7 @@ const Home = () => {
                         </div>
                     </div>
                 </section>
-                <section className="TopBloggers">
+                {/* <section className="TopBloggers">
                     <div className="w-full max-w-6xl py-16 px-12 flex justify-center items-center flex-col">
                         <h1 className="text-3xl md:text-4xl font-bold mb-10">Top Bloggers</h1>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -204,7 +234,7 @@ const Home = () => {
                             })}
                         </div>
                     </div>
-                </section>
+                </section> */}
             </div>
             <footer className="relative ">
                 <div className="min-w-screen bg-blue-900 h-36"></div>

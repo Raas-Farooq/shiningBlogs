@@ -64,8 +64,15 @@ export const stats = [
 export const features = [
   { icon: "✍️", title: "Easy Writing", desc: "Intuitive editor with rich formatting options" },
   { icon: "🔍", title: "Smart Search", desc: "Find exactly what you're looking for instantly" },
-//   { icon: "📊", title: "Analytics", desc: "Track your blog's performance in real-time" },
+  { icon: "📊", title: "Analytics", desc: "Track your blog's performance in real-time" },
   { icon: "🔒", title: "Secure", desc: "Your data is encrypted and protected" },
-//   { icon: "💬", title: "Community", desc: "Engage with readers through comments" },
+  { icon: "💬", title: "Community", desc: "Engage with readers through comments" },
   { icon: "📱", title: "Responsive", desc: "Perfect experience on all devices" }
+];
+
+
+export const recentBlogs = [
+  { title: "Getting Started with React", author: "Sarah J.", reads: "2.3K", image: "/api/placeholder/400/250", category: "Technology" },
+  { title: "Mindful Living in 2025", author: "Emma D.", reads: "1.8K", image: "/api/placeholder/400/250", category: "Lifestyle" },
+  { title: "Future of Remote Work", author: "Mike C.", reads: "3.1K", image: "/api/placeholder/400/250", category: "Business" }
 ];
