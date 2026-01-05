@@ -18,6 +18,7 @@ import BlogContent from "../Components/contentSection/blog-content.tsx";
 import Home from "../Home/home.tsx";
 import MostExploredTopic from "../Home/Topics/mostExploredTopics.tsx";
 import ScrollToTop from "../utils/scrollToTop.tsx";
+import BloggerProfile from "../Home/bloggerProfile/profile.tsx";
 
 interface ProtectedRouteProps {
     children: ReactNode;
@@ -59,6 +60,7 @@ const PageTransition = () => {
                     <Route path="/" element={<App />} >
                         <Route index element={<Home />} />
                         <Route path="/about" element={<About />} />
+                        <Route path="/bloggerProfile" element={<BloggerProfile />} />
                         <Route path="/write" element={<ProtecedRoute stayOnPage={true}><Write /></ProtecedRoute>} />
                         <Route path="/myPosts" element={<MyPosts />} />
                         <Route path="/allBlogs" element={<BlogContent />} />

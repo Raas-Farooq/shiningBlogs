@@ -27,7 +27,7 @@ const registerUser = async (req,res) => {
     }
 
     try{
-            
+
         const {username, email, password} = req.body;
         const isUserExist = await User.findOne({email});
 
@@ -65,7 +65,7 @@ const registerUser = async (req,res) => {
                     httpOnly:true,
                     secure:process.env.NODE_ENV==='production',
                     maxAge:3600000,
-                    sameSite:'Lax'
+                    sameSite:process.env.NODE_ENV === 'producion' ? 'none': 'Lax'
 
                 })
                 res.status(201).json({

@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect} from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuthenContext, useUIContext } from "../globalContext/globalContext.tsx";
 import Title from '../Components/contentSection/Title.tsx';
@@ -10,7 +10,8 @@ import { Blog } from "../types/globalTypes.ts";
 
 export default function MyPosts() {
     const { setInHomePage } = useUIContext();
-    const { loggedIn, myPosts, myPostsFetchError, myPostsLoading } = useAuthenContext();
+    const { loggedIn, myPosts,  myPostsFetchError, myPostsLoading } = useAuthenContext();
+    // const [postsNotFound, setPostsNotFound] = useState(false);
     const moveTo = useNavigate();
     const loginConfirm = useLoginConfirm();
 
@@ -45,9 +46,16 @@ export default function MyPosts() {
     const handlePostClick = (post: Blog) => {
         moveTo(`/BlogPost/${post._id}`, { state: { page: '/myPosts' } })
     }
-
+    let notFound:boolean=false;
     if (myPostsFetchError) {
-        return <h2 className="text-2xl text-center"> Error while Fetching the Posts</h2>
+        const noPostExist = myPostsFetchError?.response.status === 404 && myPostsFetchError?.response.statusText === 'Not Found';
+        // setPostsNotFound(notFound);
+        if(noPostExist){
+            // setMyPosts([]);
+            notFound = noPostExist;
+            // return <h2 className="text-2xl text-center mt-20"> You dont have any post</h2>
+        }
+        if(!notFound) return <h2 className="text-2xl text-center mt-20"> Error while Fetching the Posts</h2>
     }
     if(myPostsLoading){
         return <h2 className="text-2xl text-center"> Loading the Posts</h2> 
@@ -58,7 +66,7 @@ export default function MyPosts() {
             <div className="BlogsContainer flex flex-col items-center justify-center bg-white max-w-6xl mx-auto gap-6">
 
                 <div className="grid grid-cols-1 md:grid-cols-2">
-                    {/* {console.log("myPosts DOM; ", myPosts)} */}
+                    {/* {console.log("postsFound; ", postsFound)} */}
                     {myPosts && myPosts?.map((blog, index) => {
                         if (!blog || !blog.title || !blog.titleImage) {
 
@@ -83,7 +91,7 @@ export default function MyPosts() {
                     }
                 </div>
             </div>
-            {(!myPostsLoading && myPosts?.length === 0) &&
+            {(!myPostsLoading && myPosts?.length === 0 || notFound) &&
                 <div className="text-center">
                     <h2 className="text-xl mb-5"> Write Your First Blog Here</h2>
                     <button type="button"

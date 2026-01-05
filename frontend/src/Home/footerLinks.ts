@@ -1,3 +1,6 @@
+import { useEffect, useState } from "react";
+import { useBlogContext } from "../globalContext/globalContext";
+import { Blog } from "../types/globalTypes";
 export const footerLinks = [
 
     {
@@ -35,3 +38,60 @@ export const famousTopics = [
         path: '#'
     }
 ]
+
+export const topBloggers = [
+    {
+        name: 'Zeeshan',
+        src: '/blogger1Comp.jpg',
+        path: '#'
+    },
+    {
+        name: 'Daniyal',
+        src: '/blogger5.jpg',
+        path: '#'
+    },
+    {
+        name: 'Farhan',
+        src: '/blogger3Comp.jpg',
+        path: '#'
+    }
+];
+
+export const stats = [
+  { name: "Scalable", label: "Multi-User Architecture" },
+  { name: "JWT", label: "Secure Authentication" },
+  { name: "CRUD+", label: "Advanced Blog Operations" },
+  { name: "RWD", label: "Mobile-First Design" }
+];
+
+export const features = [
+  { icon: "✍️", title: "Easy Writing", desc: "Intuitive editor with rich formatting options" },
+  { icon: "🔍", title: "Smart Search", desc: "Find exactly what you're looking for instantly" },
+  { icon: "📊", title: "Analytics", desc: "Track your blog's performance in real-time" },
+  { icon: "🔒", title: "Secure", desc: "Your data is encrypted and protected" },
+  { icon: "💬", title: "Community", desc: "Engage with readers through comments" },
+  { icon: "📱", title: "Responsive", desc: "Perfect experience on all devices" }
+];
+
+
+export function useRecentBlogs() { 
+    const { allBlogsGlobally } = useBlogContext();
+    const [blogs, setBlogs] = useState<Blog[]>([]);
+
+    useEffect(() => {
+        const myBlogs = allBlogsGlobally.slice(4, 7);
+        setBlogs(myBlogs);
+    }, [allBlogsGlobally]); 
+
+    // Guard: Return empty if data isn't ready yet
+    if (blogs.length < 3) return [];
+
+    return blogs.map(blog => ({
+        id:blog._id,
+        title: blog.title,
+        reads: "2.3K",
+        image: blog.titleImage,
+        category: blog.category
+    }));
+}
+

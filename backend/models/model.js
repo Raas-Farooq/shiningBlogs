@@ -48,6 +48,7 @@ const User = mongoose.model('User', usersSchema)
 
 
 const blogSchema = new mongoose.Schema({
+   
     userId:{
         type:mongoose.Schema.Types.ObjectId,
         ref:'User'
@@ -72,6 +73,9 @@ const blogSchema = new mongoose.Schema({
     }]
     ,
  category:{
+        type:String
+    },
+    reads:{
         type:String
     },
     contentImages:[{

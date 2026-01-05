@@ -8,7 +8,7 @@ function useFetchMyPosts(user_id: string | undefined) {
 
     const [fetchUserPostsLoading, setFetchUserPostsLoading] = useState<boolean>(true);
     const [yourContent, setYourContent] = useState<Blog[]>([]);
-    const [fetchUserPostsErr, setFetchUserPostsErr] = useState<Error | null>(null);
+    const [fetchUserPostsErr, setFetchUserPostsErr] = useState<Error | any>(null);
 
 
     useEffect(() => {
@@ -18,7 +18,6 @@ function useFetchMyPosts(user_id: string | undefined) {
                 setFetchUserPostsLoading(false);
                 return;
             }
-            console.log("useFetchMyPostas")
             try {
 
                 const response = await axios.get(`${VITE_API_URL}/weblog/getMyContent/${user_id}`, {
@@ -27,14 +26,14 @@ function useFetchMyPosts(user_id: string | undefined) {
                 if (response.data.success) {
                     setYourContent(response.data.yourBlogs);
                 }
-                else {
-                    setFetchUserPostsErr(new Error("Something went Wrong while accessing Posts"));
-                }
+                // else {
+                //     setFetchUserPostsErr(new Error("Something went Wrong while accessing Posts"));
+                // }
 
             }
-            catch (err) {
+            catch (err:string | any) {
                 console.error("error while loading fetching user posts ", err);
-                setFetchUserPostsErr(err as Error);
+                setFetchUserPostsErr(err);
                 // toast.error("Error occurred while loading blogs ", { id: toastId })
             }
             finally {
