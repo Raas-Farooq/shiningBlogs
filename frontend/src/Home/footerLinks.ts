@@ -64,8 +64,8 @@ export const stats = [
 export const features = [
   { icon: "✍️", title: "Easy Writing", desc: "Intuitive editor with rich formatting options" },
   { icon: "🔍", title: "Smart Search", desc: "Find exactly what you're looking for instantly" },
-  { icon: "📊", title: "Analytics", desc: "Track your blog's performance in real-time" },
+//   { icon: "📊", title: "Analytics", desc: "Track your blog's performance in real-time" },
   { icon: "🔒", title: "Secure", desc: "Your data is encrypted and protected" },
-  { icon: "💬", title: "Community", desc: "Engage with readers through comments" },
+//   { icon: "💬", title: "Community", desc: "Engage with readers through comments" },
   { icon: "📱", title: "Responsive", desc: "Perfect experience on all devices" }
 ];
