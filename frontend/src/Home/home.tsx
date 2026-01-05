@@ -2,16 +2,16 @@ import clsx from "clsx"
 import { Link, useNavigate } from "react-router-dom"
 import { useAuthenContext, useBlogContext } from "../globalContext/globalContext";
 import useLoginConfirm from "../utils/useLoginConfirm";
-
 import { useCallback, useEffect } from "react";
 import useImageCached from "../utils/useImageCached";
-import { famousTopics, footerLinks, topBloggers, stats, features, recentBlogs } from "./footerLinks";
+import { famousTopics, footerLinks, stats, features, useRecentBlogs } from "./footerLinks";
 // import toast from 'react-hot-toast';
 
 
 const Home = () => {
     const { loggedIn } = useAuthenContext();
-    const { setSearchValue, setSearching, setFilteredBlogs } = useBlogContext()
+    const { setSearchValue, setSearching, setFilteredBlogs } = useBlogContext();
+    // const [myRecentBlogs, setMyRecentBlogs] = useState([]);
     const confirmLogin = useLoginConfirm();
     const heroImage = useImageCached('/blog5.jpg')
     const readingImage = useImageCached('/reading1.jpg')
@@ -36,8 +36,9 @@ const Home = () => {
         clearLocalStorage();
         setSearchValue('');
         setSearching(false);
-        setFilteredBlogs([])
+        setFilteredBlogs([]);
     }, [])
+
 
     const handleWriteBlog = async () => {
         if (!loggedIn) {
@@ -55,6 +56,11 @@ const Home = () => {
         navigate('/mostExploredTopic', { state: { title } });
     }
 
+    const handlePostClick = (id: string) => {
+        navigate(`/BlogPost/${id}`)
+    }
+
+    const myRecentBlogs = useRecentBlogs();
     const commonClasses = "w-full max-w-4xl shadow-md rounded-lg object-cover";
     return (
         <main className="min-h-screen bg-gray-50">
@@ -140,35 +146,6 @@ const Home = () => {
                     </div>
                 </section>
                 {/* Most Recent Topics Section */}
-                <section className="py-20 bg-gray-50">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-4">Trending Blogs</h2>
-            <p className="text-xl text-gray-600">Discover what's popular today</p>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-            {recentBlogs.map((blog, index) => (
-              <div key={index} className="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 cursor-pointer">
-                <div className="relative">
-                  <img src={blog.image} alt={blog.title} className="w-full h-48 object-cover" />
-                  <span className="absolute top-4 right-4 px-3 py-1 bg-orange-600 text-white text-xs rounded-full">
-                    {blog.category}
-                  </span>
-                </div>
-                <div className="p-6">
-                  <h3 className="text-xl font-bold mb-3 hover:text-orange-600 transition-colors">
-                    {blog.title}
-                  </h3>
-                  <div className="flex items-center justify-between text-sm text-gray-600">
-                    <span>By {blog.author}</span>
-                    <span>📖 {blog.reads} reads</span>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
                 <section className="ReadBlogs relative">
                     <div className="max-w-6xl mx-auto px-6 flex flex-col md:flex-row justify-center gap-10 items-center text-center px-6 py-12">
                         <div className="md:w-1/2 text-center md:text-left">
@@ -198,27 +175,68 @@ const Home = () => {
                         </div>
                     </div>
                 </section>
-                <section className="TopBlogs relative">
-                    <div className="max-w-6xl mx-auto flex flex-col items-center text-center px-6 py-8">
-                        <h1 className="text-3xl md:text-4xl font-semibold mb-10"> Enjoy The Most Explored Topics </h1>
-                        <div className="flex flex-wrap justify-center gap-16">
-                            {
-                                famousTopics.map((topic, ind) => (
-                                    <div className="" key={ind}>
-                                        <h2 className="text-xl font-bold my-4">{topic.title}</h2>
-                                        <div className="relative group hover:scale-110 transition-transform duration-500">
-                                            <img src={topic.src} className="w-full max-w-md object-cover shadow-md rounded-2xl" />
-                                            <button className="absolute text-orange-600 px-4 py-2 bg-white/90 backdrop/blur rounded-lg left-1/2 
-                                             -translate-x-1/2 bottom-3 group-hover:bg-orange-600 group-hover:text-white group-hover:scale-105 transition"
-                                                onClick={() => handleTopics(topic.title)}
-                                            >{topic.title}</button>
+                <section className="py-20 bg-gray-50">
+                    <div className="container mx-auto px-4">
+                        <div className="text-center mb-16">
+                            <h2 className="text-4xl font-bold mb-4">Trending Blogs</h2>
+                            <p className="text-xl text-gray-600">Discover what's popular today</p>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+                            {myRecentBlogs.map((blog, index) => (
+                                <div key={index} className="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 cursor-pointer"
+                                    onClick={() => handlePostClick(blog.id)}>
+                                    <div className="relative">
+                                        <img src={blog.image} alt={blog.title} className="w-full h-48 object-cover" />
+                                        <span className="absolute top-4 right-4 px-3 py-1 bg-orange-600 text-white text-xs rounded-full">
+                                            {blog.category}
+                                        </span>
+                                    </div>
+                                    <div className="p-6" >
+                                        <h3 className="text-xl font-bold mb-3 hover:text-orange-600 transition-colors">
+                                            {blog.title}
+                                        </h3>
+                                        <div className="flex items-center justify-between text-sm text-gray-600">
+                                            {/* <span>By {blog.author}</span> */}
+                                            <span>📖 {blog.reads} reads</span>
                                         </div>
                                     </div>
-                                ))
-                            }
+                                </div>
+                            ))}
                         </div>
                     </div>
                 </section>
+                <section className="py-20 bg-white">
+                    <div className="container mx-auto px-4">
+                        <div className="text-center mb-16">
+                            <h2 className="text-4xl font-bold mb-4">Explore Popular Topics</h2>
+                            <p className="text-xl text-gray-600">Find content that interests you</p>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+                            {famousTopics.map((topic, index) => (
+                                <div key={index} className="relative group">
+                                    <div className="overflow-hidden rounded-2xl shadow-lg">
+                                        <img
+                                            src={topic.src}
+                                            alt={topic.title}
+                                            className="w-full h-64 object-cover transition-transform duration-500 group-hover:scale-110"
+                                        />
+                                    </div>
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent rounded-2xl flex items-end justify-center pb-8">
+                                        <button
+                                            onClick={() => handleTopics(topic.title)}
+                                            className="px-6 py-3 bg-white text-orange-600 font-bold rounded-lg 
+                                            group-hover:bg-orange-600 group-hover:text-white transition-all 
+                                            duration-300 transform group-hover:scale-105 after:absolute after:inset-0 after:content-['']"
+                                        >
+                                            {topic.title}
+                                        </button>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </section>
+
                 {/* <section className="TopBloggers">
                     <div className="w-full max-w-6xl py-16 px-12 flex justify-center items-center flex-col">
                         <h1 className="text-3xl md:text-4xl font-bold mb-10">Top Bloggers</h1>

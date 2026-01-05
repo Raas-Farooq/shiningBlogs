@@ -1,3 +1,6 @@
+import { useEffect, useState } from "react";
+import { useBlogContext } from "../globalContext/globalContext";
+import { Blog } from "../types/globalTypes";
 export const footerLinks = [
 
     {
@@ -71,8 +74,24 @@ export const features = [
 ];
 
 
-export const recentBlogs = [
-  { title: "Getting Started with React", author: "Sarah J.", reads: "2.3K", image: "/api/placeholder/400/250", category: "Technology" },
-  { title: "Mindful Living in 2025", author: "Emma D.", reads: "1.8K", image: "/api/placeholder/400/250", category: "Lifestyle" },
-  { title: "Future of Remote Work", author: "Mike C.", reads: "3.1K", image: "/api/placeholder/400/250", category: "Business" }
-];
+export function useRecentBlogs() { 
+    const { allBlogsGlobally } = useBlogContext();
+    const [blogs, setBlogs] = useState<Blog[]>([]);
+
+    useEffect(() => {
+        const myBlogs = allBlogsGlobally.slice(4, 7);
+        setBlogs(myBlogs);
+    }, [allBlogsGlobally]); 
+
+    // Guard: Return empty if data isn't ready yet
+    if (blogs.length < 3) return [];
+
+    return blogs.map(blog => ({
+        id:blog._id,
+        title: blog.title,
+        reads: "2.3K",
+        image: blog.titleImage,
+        category: blog.category
+    }));
+}
+
