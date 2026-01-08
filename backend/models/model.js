@@ -96,4 +96,46 @@ const blogSchema = new mongoose.Schema({
 })
 
 const Blog = mongoose.model('blog', blogSchema)
-export {User, Blog}
+
+const commentSchema = new mongoose.Schema({
+    postId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'blog',
+        required: true
+    },
+    userId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
+    },
+    username: {
+        type: String,
+        required: true
+    },
+    userProfileImg: {
+        type: String
+    },
+    content: {
+        type: String,
+        required: true,
+        maxlength: 1000
+    },
+    parentCommentId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Comment',
+        default: null
+    },
+    createdAt: {
+        type: Date,
+        default: Date.now
+    }
+}, {
+    timestamps: true,
+    collection: 'Comments'
+});
+
+commentSchema.index({ postId: 1, createdAt: -1 });
+commentSchema.index({ parentCommentId: 1 });
+
+const Comment = mongoose.model('Comment', commentSchema);
+export {User, Blog, Comment}
