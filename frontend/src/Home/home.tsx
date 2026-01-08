@@ -63,7 +63,7 @@ const Home = () => {
     const myRecentBlogs = useRecentBlogs();
     const commonClasses = "w-full max-w-4xl shadow-md rounded-lg object-cover";
     return (
-        <main className="min-h-screen bg-gray-50">
+        <main className="min-h-screen bg-gray-50 text-gray-900">
             <div className="container mx-auto space-y-16 px-4 sm:px-6 lg:px-8">
                 <section className="relative py-20 md:py-32 overflow-hidden">
                     <div className="absolute inset-0 bg-gradient-to-br from-orange-50 via-blue-50 to-purple-50 opacity-70"></div>
@@ -145,12 +145,12 @@ const Home = () => {
                         </div>
                     </div>
                 </section>
-                {/* Most Recent Topics Section */}
-                <section className="ReadBlogs relative">
+                {/* Read Blogs Section */}
+                <section className="ReadBlogs relative bg-gray-50 text-gray-900">
                     <div className="max-w-6xl mx-auto px-6 flex flex-col md:flex-row justify-center gap-10 items-center text-center px-6 py-12">
                         <div className="md:w-1/2 text-center md:text-left">
                             <h1 className="text-3xl md:text-4xl font-bold"> Best Place To Become Reader</h1>
-                            <p className="mb-8 mt-2"> Find Blogs from all areas of life.</p>
+                            <p className="mb-8 mt-2 text-gray-600"> Find Blogs from all areas of life.</p>
                             <button
                                 onClick={() => {
                                     navigate('/allBlogs')
