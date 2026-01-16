@@ -4,7 +4,7 @@ import { useAuthenContext,useUIContext } from '../../globalContext/globalContext
 import WindowSize from '../../windowSize.ts';
 import { Link, useNavigate } from 'react-router-dom';
 import clsx from 'clsx';
-import useLoginConfirm from '../../utils/useLoginConfirm.tsx';
+import useLoginConfirm from '../../../utils/useLoginConfirm.tsx';
 
 export default function Navbar({showSearch=true}){
 

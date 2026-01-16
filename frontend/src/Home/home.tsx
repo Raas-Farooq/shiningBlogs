@@ -1,9 +1,9 @@
 import clsx from "clsx"
 import { Link, useNavigate } from "react-router-dom"
 import { useAuthenContext, useBlogContext } from "../globalContext/globalContext";
-import useLoginConfirm from "../utils/useLoginConfirm";
+import useLoginConfirm from "../../utils/useLoginConfirm";
 import { useCallback, useEffect } from "react";
-import useImageCached from "../utils/useImageCached";
+import useImageCached from "../../utils/useImageCached";
 import { famousTopics, footerLinks, stats, features, useRecentBlogs } from "./footerLinks";
 // import toast from 'react-hot-toast';
 

@@ -9,7 +9,7 @@ import useUserPrivileges from "../Hooks/ownerPrivileges.jsx";
 import makeApiCall from "./makeApiCall.ts";
 import clsx from "clsx";
 import { VITE_API_URL } from "../config.ts";
-import useConfirmDelete from "../utils/useConfirmDelete.tsx";
+import useConfirmDelete from "../../utils/useConfirmDelete.tsx";
 import toast from "react-hot-toast";
 import Comments from "./comment.tsx";
 

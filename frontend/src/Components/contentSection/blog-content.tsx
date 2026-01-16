@@ -14,7 +14,7 @@ import { clsx } from "clsx";
 import UserProfile from "./userProfile.tsx";
 import BlogCard from "./BlogCard.tsx";
 import BlogSearchComponent from "./customBlogSearch.tsx";
-import useLoginConfirm from "../../utils/useLoginConfirm.tsx";
+import useLoginConfirm from "../../../utils/useLoginConfirm.tsx";
 import { Blog } from "../../types/globalTypes.ts";
 
 export default function BlogContent() {

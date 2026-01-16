@@ -17,7 +17,7 @@ import ErrorBoundary from "./errorBoundary.jsx";
 import BlogContent from "../Components/contentSection/blog-content.tsx";
 import Home from "../Home/home.tsx";
 import MostExploredTopic from "../Home/Topics/mostExploredTopics.tsx";
-import ScrollToTop from "../utils/scrollToTop.tsx";
+import ScrollToTop from "../../utils/scrollToTop.tsx";
 import BloggerProfile from "../Home/bloggerProfile/profile.tsx";
 
 interface ProtectedRouteProps {
