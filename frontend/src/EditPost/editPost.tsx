@@ -8,7 +8,7 @@ import useFetchLocalData from "./fetchingResources/useFetchLocalData.ts";
 import { VITE_API_URL } from "../config.ts";
 import { FaSpinner } from "react-icons/fa";
 import { ObjectId } from 'bson';
-import useLoginConfirm from "../utils/useLoginConfirm.tsx";
+import useLoginConfirm from "../../utils/useLoginConfirm.tsx";
 import toast from "react-hot-toast";
 
 

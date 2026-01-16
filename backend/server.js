@@ -1,10 +1,10 @@
 import express from 'express';
-import databaseConnection from './config/db.js';
-import router from './routes/route.js';
+import databaseConnection from './src/config/db.js';
+import router from './src/routes/route.js';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
-import TestOrigins from './middleware/testOrigins.js';
-import { Blog } from './models/model.js';
+import TestOrigins from './src/middleware/testOrigins.js';
+import { Blog } from './src/models/model.js';
 
 const app = express();
 app.use(express.json());

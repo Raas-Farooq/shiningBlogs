@@ -7,7 +7,7 @@ import { Upload } from "lucide-react";
 import { VITE_API_URL } from "../config.ts";
 import { FaSpinner } from "react-icons/fa";
 import toast from "react-hot-toast";
-import useLoginConfirm from "../utils/useLoginConfirm.tsx";
+import useLoginConfirm from "../../utils/useLoginConfirm.tsx";
 
 export default function Write() {
   const [blogTitle, setBlogTitle] = useState({

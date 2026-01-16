@@ -4,7 +4,7 @@ import { useAuthenContext, useUIContext } from "../globalContext/globalContext.t
 import Title from '../Components/contentSection/Title.tsx';
 import TextContent from "../Components/contentSection/textContent.tsx";
 import TitleImage from '../Components/contentSection/titleImage.tsx'
-import useLoginConfirm from "../utils/useLoginConfirm.tsx";
+import useLoginConfirm from "../../utils/useLoginConfirm.tsx";
 import { Blog } from "../types/globalTypes.ts";
 
 

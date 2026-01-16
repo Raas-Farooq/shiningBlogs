@@ -9,8 +9,9 @@ import useUserPrivileges from "../Hooks/ownerPrivileges.jsx";
 import makeApiCall from "./makeApiCall.ts";
 import clsx from "clsx";
 import { VITE_API_URL } from "../config.ts";
-import useConfirmDelete from "../utils/useConfirmDelete.tsx";
+import useConfirmDelete from "../../utils/useConfirmDelete.tsx";
 import toast from "react-hot-toast";
+import Comments from "./comment.tsx";
 
 interface EditHandle {
   (e: React.MouseEvent<HTMLButtonElement>, postId: string): void;
@@ -166,16 +167,21 @@ const BlogPost: React.FC = () => {
                       />
                     )}
                   </div>
-                 <div className="flex md:justify-center">
-                     {post._id &&
-                    (
-                      <TextContent
-                        content={post?.content}
-                        isFullView={true}
-                        contentImages={post?.contentImages && post.contentImages.length > 0 ? post.contentImages : []}
-                      />
-                    )}
+                  <div className="flex md:justify-center">
+                    {post._id &&
+                      (
+                        <TextContent
+                          content={post?.content}
+                          isFullView={true}
+                          contentImages={post?.contentImages && post.contentImages.length > 0 ? post.contentImages : []}
+                        />
+                      )}
                   </div>
+                  {post._id && (
+                    <div className="w-full max-w-4xl mx-auto mb-8">
+                      <Comments postId={post._id} />
+                    </div>
+                  )}
                 </div>
               </div>
               <div className="flex justify-center my-3">
